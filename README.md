@@ -2,7 +2,7 @@
 
 A rewrite of the Ember.js run loop as a generic microlibrary.
 
-More details soon... until then, look at [the tests](https://github.com/ebryn/backburner.js/blob/master/test/tests/backburner_test.js).
+More details soon... until then, look at [the source](https://github.com/ebryn/backburner.js/blob/master/lib/backburner.js) and [the tests](https://github.com/ebryn/backburner.js/blob/master/test/tests/backburner_test.js).
 
 ## Example usage
 
