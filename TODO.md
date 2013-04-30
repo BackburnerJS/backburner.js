@@ -1,0 +1,33 @@
+# TODOs:
+
+X error handling if action throws
+X stack tagging
+X run
+X next/later?
+X waterfall
+X handle nested runloops
+X autorun
+X debounce
+X coalesce laters/nexts
+X cancel
+X string methods
+X hasScheduledTimers
+X better waterfall implementation - cache length, check prior, then compare new length and rerun
+X ability to wrap flushes (options) - queue.aroundFlush = Ember.changeProperties
+
+== TESTS WILL PASS ==
+
+- remove next
+- rename later to setTimeout
+- scheduleOnce -> once / deferOnce
+- schedule -> defer / enqueue
+- schedule run inside actions for async observer support
+- default queue
+- cancel debounces?
+- don't create arrays for actions, push a tuple
+- try/finally bullshit
+- only tag stack in dev mode
+- sync?
+- perfs?
+- clean up string methods handling code?
+- merge timers and debouncees arrays?

@@ -52,7 +52,7 @@ module.exports = function(grunt) {
           format: 'amd'
         },
 
-        src: ['test/test_helpers.js', 'test/tests.js', 'test/tests/**/*_test.js'],
+        src: ['test/tests.js', 'test/tests/**/*_test.js'],
         dest: 'tmp/tests.amd.js'
       }
     },
