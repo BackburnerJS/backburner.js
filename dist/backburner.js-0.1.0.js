@@ -210,13 +210,13 @@ define("backburner",
       },
 
       cancel: function(timer) {
-        if (typeof timer === 'object' && timer.queue && timer.action) { // we're cancelling a once
-          timer.queue.cancel(timer.action);
-        } else if (typeof timer === 'function') { // we're cancelling a later fn
+        if (typeof timer === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
+          return timer.queue.cancel(timer.action);
+        } else if (typeof timer === 'function') { // we're cancelling a setTimeout
           for (var i = 0, l = timers.length; i < l; i += 2) {
             if (timers[i + 1] === timer) {
               timers.splice(i, 2); // remove the two elements
-              return;
+              return true;
             }
           }
         }
@@ -278,7 +278,7 @@ define("backburner/deferred_action_queues",
         queueName = queueNames[i];
         queues[queueName] = new Queue(this, queueName, options[queueName]);
       }
-    };
+    }
 
     DeferredActionQueues.prototype = {
       queueNames: null,
@@ -300,45 +300,58 @@ define("backburner/deferred_action_queues",
       flush: function() {
         var queues = this.queues,
             queueNames = this.queueNames,
-            queueName, queue, priorQueueIndex,
-            queueIndex = 0, numberOfQueues = queueNames.length;
+            queueName, queue, queueItems, priorQueueNameIndex,
+            queueNameIndex = 0, numberOfQueues = queueNames.length;
 
         outerloop:
-        while (queueIndex < numberOfQueues) {
-          queueName = queueNames[queueIndex];
+        while (queueNameIndex < numberOfQueues) {
+          queueName = queueNames[queueNameIndex];
           queue = queues[queueName];
+          queueItems = queue._queue.slice();
+          queue._queue = [];
 
           var options = queue.options,
               before = options && options.before,
               after = options && options.after,
-              action, target, method, args,
-              actionIndex = 0, numberOfActions = queue._queue.length;
+              target, method, args,
+              queueIndex = 0, numberOfQueueItems = queueItems.length;
 
-          if (numberOfActions && before) { before(); }
-          while (actionIndex < numberOfActions) {
-            action = queue.shift();
-            target = action[0];
-            method = action[1];
-            args   = action[2];
+          if (numberOfQueueItems && before) { before(); }
+          while (queueIndex < numberOfQueueItems) {
+            target = queueItems[queueIndex];
+            method = queueItems[queueIndex+1];
+            args   = queueItems[queueIndex+2];
 
             if (typeof method === 'string') { method = target[method]; }
 
             // TODO: error handling
             method.apply(target, args);
 
-            actionIndex++;
+            queueIndex += 4;
           }
-          if (numberOfActions && after) { after(); }
+          if (numberOfQueueItems && after) { after(); }
 
-          if ((priorQueueIndex = queue.priorQueueWithActions()) !== -1) {
-            queueIndex = priorQueueIndex;
+          if ((priorQueueNameIndex = indexOfPriorQueueWithActions(this, queueNameIndex)) !== -1) {
+            queueNameIndex = priorQueueNameIndex;
             continue outerloop;
           }
 
-          queueIndex++;
+          queueNameIndex++;
         }
       }
     };
+
+    function indexOfPriorQueueWithActions(daq, currentQueueIndex) {
+      var queueName, queue;
+
+      for (var i = 0, l = currentQueueIndex; i <= l; i++) {
+        queueName = daq.queueNames[i];
+        queue = daq.queues[queueName];
+        if (queue._queue.length) { return i; }
+      }
+
+      return -1;
+    }
 
     __exports__.DeferredActionQueues = DeferredActionQueues;
   });
@@ -361,82 +374,62 @@ define("backburner/queue",
       _queue: null,
 
       push: function(target, method, args, stack) {
-        var queue = this._queue,
-            action = [target, method, args, stack];
-        queue.push(action);
-        return {queue: this, action: action};
-      },
-
-      shift: function() {
-        return this._queue.shift();
+        var queue = this._queue;
+        queue.push(target, method, args, stack);
+        return {queue: this, target: target, method: method};
       },
 
       pushUnique: function(target, method, args, stack) {
-        var queue = this._queue, action;
+        var queue = this._queue;
 
-        for (var i = 0, l = queue.length; i < l; i++) {
-          action = queue[i];
+        for (var i = 0, l = queue.length; i < l; i += 4) {
+          currentTarget = queue[i];
+          currentMethod = queue[i+1];
 
-          if (action[0] === target && action[1] === method) {
-            action[2] = args; // replace args
-            action[3] = stack; // replace stack
-            return {queue: this, action: action}; // TODO: test this code path
+          if (currentTarget === target && currentMethod === method) {
+            queue[i+2] = args; // replace args
+            queue[i+3] = stack; // replace stack
+            return {queue: this, target: target, method: method}; // TODO: test this code path
           }
         }
 
-        action = [target, method, args, stack];
-        this._queue.push(action);
-        return {queue: this, action: action};
+        this._queue.push(target, method, args, stack);
+        return {queue: this, target: target, method: method};
       },
 
-      // remove me, only being used for Ember.run.sync
+      // TODO: remove me, only being used for Ember.run.sync
       flush: function() {
         var queue = this._queue,
             options = this.options,
             before = options && options.before,
             after = options && options.after,
-            action, target, method, args, i, l;
+            action, target, method, args, i, l = queue.length;
 
-        if (before) { before(); }
-        for (i = 0; i < queue.length; i++) {
-          action = queue[i];
-          target = action[0];
-          method = action[1];
-          args   = action[2];
+        if (l && before) { before(); }
+        for (i = 0; i < l; i += 4) {
+          target = queue[i];
+          method = queue[i+1];
+          args   = queue[i+2];
 
           method.apply(target, args); // TODO: error handling
         }
-        if (after) { after(); }
+        if (l && after) { after(); }
 
-        // FIXME: if length is 0, don't recreate array
-        this._queue = [];
+        if (queue.length) { this._queue = []; }
       },
 
       cancel: function(actionToCancel) {
-        var queue = this._queue, action, i, l;
+        var queue = this._queue, i, l;
 
-        for (i = 0, l = queue.length; i < l; i++) {
-          action = queue[i];
+        for (i = 0, l = queue.length; i < l; i += 4) {
+          currentTarget = queue[i];
+          currentMethod = queue[i+1];
 
-          if (action[0] === actionToCancel[0] && action[1] === actionToCancel[1]) {
+          if (currentTarget === actionToCancel.target && currentMethod === actionToCancel.method) {
             queue.splice(i, 1);
-            return;
+            return true;
           }
         }
-      },
-
-      priorQueueWithActions: function() {
-        var daq = this.daq,
-            currentQueueIndex = daq.queueNames.indexOf(this.name),
-            queueName, queue;
-
-        for (var i = 0, l = currentQueueIndex; i <= l; i++) {
-          queueName = daq.queueNames[i];
-          queue = daq.queues[queueName];
-          if (queue._queue.length) { return i; }
-        }
-
-        return -1;
       }
     };
 

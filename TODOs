@@ -18,17 +18,17 @@ X ability to wrap flushes (options) - queue.aroundFlush = Ember.changeProperties
 == EMBER TESTS WILL PASS ==
 
 - move ember run loop tests into backburner repo
-- remove next
-- rename later to setTimeout
-- scheduleOnce -> once / deferOnce
-- schedule -> defer / enqueue
+X remove next
+X rename later to setTimeout
+X scheduleOnce -> once / deferOnce
+X schedule -> defer / enqueue
 - schedule run inside actions for async observer support
 - default queue
 - cancel debounces?
-- don't create arrays for actions, push a tuple
+X don't create arrays for actions, push a tuple
 - try/finally bullshit
 - only tag stack in dev mode
-- sync?
-- perfs?
+- get rid of Queue#flush - being used by Ember.run.sync
+- moar perfs
 - clean up string methods handling code?
 - merge timers and debouncees arrays?
