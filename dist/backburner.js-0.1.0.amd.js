@@ -63,7 +63,15 @@ define("backburner",
       },
 
       defer: function(queueName, target, method /* , args */) {
-        // TODO: assert args?
+        if (!method) {
+          method = target;
+          target = null;
+        }
+
+        if (typeof method === 'string') {
+          method = target[method];
+        }
+
         var stack = new Error().stack,
             args = arguments.length > 3 ? slice.call(arguments, 3) : undefined;
         if (!this.currentInstance) { createAutorun(this); }
@@ -71,7 +79,15 @@ define("backburner",
       },
 
       deferOnce: function(queueName, target, method /* , args */) {
-        // TODO: assert args?
+        if (!method) {
+          method = target;
+          target = null;
+        }
+
+        if (typeof method === 'string') {
+          method = target[method];
+        }
+
         var stack = new Error().stack,
             args = arguments.length > 3 ? slice.call(arguments, 3) : undefined;
         if (!this.currentInstance) { createAutorun(this); }
@@ -174,7 +190,7 @@ define("backburner",
 
       cancel: function(timer) {
         if (typeof timer === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
-          return timer.queue.cancel(timer.action);
+          return timer.queue.cancel(timer);
         } else if (typeof timer === 'function') { // we're cancelling a setTimeout
           for (var i = 0, l = timers.length; i < l; i += 2) {
             if (timers[i + 1] === timer) {
@@ -382,14 +398,14 @@ define("backburner/queue",
       },
 
       cancel: function(actionToCancel) {
-        var queue = this._queue, i, l;
+        var queue = this._queue, currentTarget, currentMethod, i, l;
 
         for (i = 0, l = queue.length; i < l; i += 4) {
           currentTarget = queue[i];
           currentMethod = queue[i+1];
 
           if (currentTarget === actionToCancel.target && currentMethod === actionToCancel.method) {
-            queue.splice(i, 1);
+            queue.splice(i, 4);
             return true;
           }
         }

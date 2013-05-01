@@ -4,7 +4,7 @@ var originalDateValueOf = Date.prototype.valueOf;
 
 module("Backburner");
 
-test("run when passed a function", function() {
+test("run - when passed a function", function() {
   expect(1);
 
   var bb = new Backburner(['one']),
@@ -17,7 +17,7 @@ test("run when passed a function", function() {
   ok(functionWasCalled, "function was called");
 });
 
-test("run when passed a target and method", function() {
+test("run - when passed a target and method", function() {
   expect(2);
 
   var bb = new Backburner(['one']),
@@ -31,7 +31,7 @@ test("run when passed a target and method", function() {
   ok(functionWasCalled, "function was called");
 });
 
-test("run when passed a target, method, and arguments", function() {
+test("run - when passed a target, method, and arguments", function() {
   expect(5);
 
   var bb = new Backburner(['one']),
@@ -44,6 +44,106 @@ test("run when passed a target, method, and arguments", function() {
     equal(c, 3, "the third arguments was passed in");
     functionWasCalled = true;
   }, 1, 2, 3);
+
+  ok(functionWasCalled, "function was called");
+});
+
+test("defer - when passed a function", function() {
+  expect(1);
+
+  var bb = new Backburner(['one']),
+      functionWasCalled = false;
+
+  bb.run(function() {
+    bb.defer('one', function() {
+      functionWasCalled = true;
+    });
+  });
+
+  ok(functionWasCalled, "function was called");
+});
+
+test("defer - when passed a target and method", function() {
+  expect(2);
+
+  var bb = new Backburner(['one']),
+      functionWasCalled = false;
+
+  bb.run(function() {
+    bb.defer('one', {zomg: "hi"}, function() {
+      equal(this.zomg, "hi", "the target was properly set");
+      functionWasCalled = true;
+    });
+  });
+
+  ok(functionWasCalled, "function was called");
+});
+
+test("defer - when passed a target, method, and arguments", function() {
+  expect(5);
+
+  var bb = new Backburner(['one']),
+      functionWasCalled = false;
+
+  bb.run(function() {
+    bb.defer('one', {zomg: "hi"}, function(a, b, c) {
+      equal(this.zomg, "hi", "the target was properly set");
+      equal(a, 1, "the first arguments was passed in");
+      equal(b, 2, "the second arguments was passed in");
+      equal(c, 3, "the third arguments was passed in");
+      functionWasCalled = true;
+    }, 1, 2, 3);
+  });
+
+  ok(functionWasCalled, "function was called");
+});
+
+test("deferOnce - when passed a function", function() {
+  expect(1);
+
+  var bb = new Backburner(['one']),
+      functionWasCalled = false;
+
+  bb.run(function() {
+    bb.deferOnce('one', function() {
+      functionWasCalled = true;
+    });
+  });
+
+  ok(functionWasCalled, "function was called");
+});
+
+test("deferOnce - when passed a target and method", function() {
+  expect(2);
+
+  var bb = new Backburner(['one']),
+      functionWasCalled = false;
+
+  bb.run(function() {
+    bb.deferOnce('one', {zomg: "hi"}, function() {
+      equal(this.zomg, "hi", "the target was properly set");
+      functionWasCalled = true;
+    });
+  });
+
+  ok(functionWasCalled, "function was called");
+});
+
+test("deferOnce - when passed a target, method, and arguments", function() {
+  expect(5);
+
+  var bb = new Backburner(['one']),
+      functionWasCalled = false;
+
+  bb.run(function() {
+    bb.deferOnce('one', {zomg: "hi"}, function(a, b, c) {
+      equal(this.zomg, "hi", "the target was properly set");
+      equal(a, 1, "the first arguments was passed in");
+      equal(b, 2, "the second arguments was passed in");
+      equal(c, 3, "the third arguments was passed in");
+      functionWasCalled = true;
+    }, 1, 2, 3);
+  });
 
   ok(functionWasCalled, "function was called");
 });
@@ -145,7 +245,6 @@ test("autorun", function() {
   stop();
 });
 
-
 test("debounce", function() {
   expect(14);
 
@@ -226,4 +325,36 @@ test("debounce", function() {
       ok(wasCalled, "Another debounce call with the same function can be executed later");
     }, 110);
   }, 60);
+});
+
+test("cancel - deferOnce", function() {
+  expect(3);
+
+  var bb = new Backburner(['one']),
+      functionWasCalled = false;
+
+  bb.run(function() {
+    var timer = bb.deferOnce('one', function() {
+      functionWasCalled = true;
+    });
+
+    ok(timer, "Timer object was returned");
+    ok(bb.cancel(timer), "Cancel returned true");
+    ok(!functionWasCalled, "function was not called");
+  });
+});
+
+test("cancel - setTimeout", function() {
+  expect(3);
+
+  var bb = new Backburner(['one']),
+      functionWasCalled = false;
+
+  var timer = bb.setTimeout(function() {
+    functionWasCalled = true;
+  });
+
+  ok(timer, "Timer object was returned");
+  ok(bb.cancel(timer), "Cancel returned true");
+  ok(!functionWasCalled, "function was not called");
 });

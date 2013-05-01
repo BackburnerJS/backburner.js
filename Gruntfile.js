@@ -108,7 +108,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-qunit');
 
-  grunt.registerTask('test', ['connect', 'qunit']);
+  grunt.registerTask('test', ['connect', 'tests', 'qunit']);
 
   // Multi-task for wrapping browser version
 
