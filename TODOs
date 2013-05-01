@@ -15,8 +15,9 @@ X hasScheduledTimers
 X better waterfall implementation - cache length, check prior, then compare new length and rerun
 X ability to wrap flushes (options) - queue.aroundFlush = Ember.changeProperties
 
-== TESTS WILL PASS ==
+== EMBER TESTS WILL PASS ==
 
+- move ember run loop tests into backburner repo
 - remove next
 - rename later to setTimeout
 - scheduleOnce -> once / deferOnce
