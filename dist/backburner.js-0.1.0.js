@@ -98,7 +98,7 @@ define("backburner",
         return ret;
       },
 
-      schedule: function(queueName, target, method /* , args */) {
+      defer: function(queueName, target, method /* , args */) {
         // TODO: assert args?
         var stack = new Error().stack,
             args = arguments.length > 3 ? slice.call(arguments, 3) : undefined;
@@ -106,7 +106,7 @@ define("backburner",
         return this.currentInstance.schedule(queueName, target, method, args, false, stack);
       },
 
-      scheduleOnce: function(queueName, target, method /* , args */) {
+      deferOnce: function(queueName, target, method /* , args */) {
         // TODO: assert args?
         var stack = new Error().stack,
             args = arguments.length > 3 ? slice.call(arguments, 3) : undefined;
@@ -121,7 +121,7 @@ define("backburner",
         return this.later.apply(self, args);
       },
 
-      later: function() {
+      setTimeout: function() {
         var self = this,
             wait = pop.call(arguments),
             target = arguments[0],
@@ -228,6 +228,10 @@ define("backburner",
         }
       }
     };
+
+    Backburner.prototype.schedule = Backburner.prototype.defer;
+    Backburner.prototype.scheduleOnce = Backburner.prototype.deferOnce;
+    Backburner.prototype.later = Backburner.prototype.setTimeout;
 
     function createAutorun(backburner) {
       backburner.begin();
