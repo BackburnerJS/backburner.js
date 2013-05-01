@@ -1,4 +1,4 @@
-import { Backburner } from "backburner";
+import Backburner from "backburner";
 
 var originalDateValueOf = Date.prototype.valueOf;
 
@@ -48,20 +48,7 @@ test("run when passed a target, method, and arguments", function() {
   ok(functionWasCalled, "function was called");
 });
 
-test("next when passed a function", function() {
-  expect(1);
-
-  var bb = new Backburner(['one']);
-
-  bb.next(function() {
-    start();
-    ok(true, "function was called");
-  });
-
-  stop();
-});
-
-test("later", function() {
+test("setTimeout", function() {
   expect(6);
 
   var bb = new Backburner(['one']),
@@ -74,13 +61,13 @@ test("later", function() {
   Date.prototype.valueOf = function() { return now; };
 
   stop();
-  bb.later(null, function() {
+  bb.setTimeout(null, function() {
     start();
     instance = bb.currentInstance;
     equal(step++, 0);
   }, 10);
 
-  bb.later(null, function() {
+  bb.setTimeout(null, function() {
     equal(step++, 1);
     equal(instance, bb.currentInstance, "same instance");
   }, 10);
@@ -93,7 +80,7 @@ test("later", function() {
     equal(step++, 2);
 
     stop();
-    bb.later(null, function() {
+    bb.setTimeout(null, function() {
       start();
       equal(step++, 3);
       ok(true, "Another later will execute correctly");

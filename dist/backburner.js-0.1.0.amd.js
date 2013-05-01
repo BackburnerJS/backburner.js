@@ -1,10 +1,11 @@
 define("backburner",
-  ["exports"],
-  function(__exports__) {
+  ["backburner/deferred_action_queues","exports"],
+  function(__dependency1__, __exports__) {
     "use strict";
+    var DeferredActionQueues = __dependency1__.DeferredActionQueues;
+
     var slice = [].slice,
         pop = [].pop,
-        DeferredActionQueues,
         debouncees = [],
         timers = [],
         autorun, laterTimer, laterTimerExpiresAt;
@@ -75,13 +76,6 @@ define("backburner",
             args = arguments.length > 3 ? slice.call(arguments, 3) : undefined;
         if (!this.currentInstance) { createAutorun(this); }
         return this.currentInstance.schedule(queueName, target, method, args, true, stack);
-      },
-
-      next: function() {
-        var self = this,
-            args = slice.call(arguments);
-        args.push(1);
-        return this.later.apply(self, args);
       },
 
       setTimeout: function() {
@@ -229,7 +223,16 @@ define("backburner",
       }
     }
 
-    DeferredActionQueues = function(queueNames, options) {
+    __exports__.Backburner = Backburner;
+  });
+
+define("backburner/deferred_action_queues",
+  ["backburner/queue","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var Queue = __dependency1__.Queue;
+
+    function DeferredActionQueues(queueNames, options) {
       var queues = this.queues = {};
       this.queueNames = queueNames = queueNames || [];
 
@@ -300,6 +303,13 @@ define("backburner",
       }
     };
 
+    __exports__.DeferredActionQueues = DeferredActionQueues;
+  });
+
+define("backburner/queue",
+  ["exports"],
+  function(__exports__) {
+    "use strict";
     function Queue(daq, name, options) {
       this.daq = daq;
       this.name = name;
@@ -393,5 +403,5 @@ define("backburner",
       }
     };
 
-    __exports__.Backburner = Backburner;
+    __exports__.Queue = Queue;
   });
