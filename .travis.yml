@@ -5,4 +5,4 @@ before_script:
 - sh -e /etc/init.d/xvfb start
 - npm install
 - npm install grunt-cli
-script: grunt tests
+script: grunt test
