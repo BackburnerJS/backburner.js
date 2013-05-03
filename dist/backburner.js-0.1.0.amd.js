@@ -53,7 +53,7 @@ define("backburner",
           method = target[method];
         }
 
-        var args = arguments.length > 2 ? slice.call(arguments, 2) : undefined;
+        var args = arguments.length > 2 ? slice.call(arguments, 2) : [];
         try {
           ret = method.apply(target, args);
         } finally {
@@ -73,7 +73,7 @@ define("backburner",
         }
 
         var stack = new Error().stack,
-            args = arguments.length > 3 ? slice.call(arguments, 3) : undefined;
+            args = arguments.length > 3 ? slice.call(arguments, 3) : [];
         if (!this.currentInstance) { createAutorun(this); }
         return this.currentInstance.schedule(queueName, target, method, args, false, stack);
       },
@@ -89,7 +89,7 @@ define("backburner",
         }
 
         var stack = new Error().stack,
-            args = arguments.length > 3 ? slice.call(arguments, 3) : undefined;
+            args = arguments.length > 3 ? slice.call(arguments, 3) : [];
         if (!this.currentInstance) { createAutorun(this); }
         return this.currentInstance.schedule(queueName, target, method, args, true, stack);
       },
@@ -110,7 +110,7 @@ define("backburner",
           method = target[method];
         }
 
-        var args = arguments.length > 2 ? slice.call(arguments, 2) : undefined;
+        var args = arguments.length > 2 ? slice.call(arguments, 2) : [];
 
         // find position to insert - TODO: binary search
         var i, l;
