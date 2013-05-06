@@ -90,9 +90,12 @@ define("backburner",
           method = target[method];
         }
 
-        var args = arguments.length > 2 ? slice.call(arguments, 2) : [];
         try {
-          ret = method.apply(target, args);
+          if (arguments.length > 2) {
+            ret = method.apply(target, slice.call(arguments, 2));
+          } else {
+            ret = method.call(target);
+          }
         } finally {
           this.end();
         }
@@ -110,7 +113,7 @@ define("backburner",
         }
 
         var stack = new Error().stack,
-            args = arguments.length > 3 ? slice.call(arguments, 3) : [];
+            args = arguments.length > 3 ? slice.call(arguments, 3) : undefined;
         if (!this.currentInstance) { createAutorun(this); }
         return this.currentInstance.schedule(queueName, target, method, args, false, stack);
       },
@@ -126,7 +129,7 @@ define("backburner",
         }
 
         var stack = new Error().stack,
-            args = arguments.length > 3 ? slice.call(arguments, 3) : [];
+            args = arguments.length > 3 ? slice.call(arguments, 3) : undefined;
         if (!this.currentInstance) { createAutorun(this); }
         return this.currentInstance.schedule(queueName, target, method, args, true, stack);
       },
@@ -147,7 +150,18 @@ define("backburner",
           method = target[method];
         }
 
-        var args = arguments.length > 2 ? slice.call(arguments, 2) : [];
+        var fn, args;
+        if (arguments.length > 2) {
+          args = slice.call(arguments, 2);
+
+          fn = function() {
+            method.apply(target, args);
+          };
+        } else {
+          fn = function() {
+            method.call(target);
+          };
+        }
 
         // find position to insert - TODO: binary search
         var i, l;
@@ -155,9 +169,6 @@ define("backburner",
           if (executeAt < timers[i]) { break; }
         }
 
-        var fn = function() {
-          method.apply(target, args);
-        };
         timers.splice(i, 0, executeAt, fn);
 
         if (laterTimer && laterTimerExpiresAt < executeAt) { return fn; }
@@ -341,7 +352,11 @@ define("backburner/deferred_action_queues",
             if (typeof method === 'string') { method = target[method]; }
 
             // TODO: error handling
-            method.apply(target, args);
+            if (args && args.length > 0) {
+              method.apply(target, args);
+            } else {
+              method.call(target);
+            }
 
             queueIndex += 4;
           }
