@@ -53,6 +53,8 @@ define("backburner",
           method = target[method];
         }
 
+        // Prevent Safari double-finally.
+        var finallyAlreadyCalled = false;
         try {
           if (arguments.length > 2) {
             ret = method.apply(target, slice.call(arguments, 2));
@@ -60,7 +62,10 @@ define("backburner",
             ret = method.call(target);
           }
         } finally {
-          this.end();
+          if (!finallyAlreadyCalled) {
+            finallyAlreadyCalled = true;
+            this.end();
+          }
         }
         return ret;
       },
@@ -249,6 +254,7 @@ define("backburner",
         laterTimerExpiresAt = timers[0];
       }
     }
+
 
     __exports__.Backburner = Backburner;
   });
