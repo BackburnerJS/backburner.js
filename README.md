@@ -1,4 +1,4 @@
-# backburner.js
+# backburner.js [![Build Status](https://travis-ci.org/ebryn/backburner.js.png?branch=master)](https://travis-ci.org/ebryn/backburner.js)
 
 A rewrite of the Ember.js run loop as a generic microlibrary.
 
