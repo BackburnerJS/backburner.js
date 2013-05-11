@@ -48,6 +48,36 @@ test("run - when passed a target, method, and arguments", function() {
   ok(functionWasCalled, "function was called");
 });
 
+test("run - nesting run loops preserves the stack", function() {
+  expect(3);
+
+  var bb = new Backburner(['one']),
+    outerFunctionWasCalled = false,
+    middleFunctionWasCalled = false,
+    innerFunctionWasCalled = false;
+
+  bb.run(function () {
+    bb.defer('one', function () {
+      outerFunctionWasCalled = true;
+    });
+    bb.run(function () {
+      bb.defer('one', function () {
+        middleFunctionWasCalled = true;
+      });
+
+      bb.run(function () {
+        bb.defer('one', function () {
+          innerFunctionWasCalled = true;
+        });
+      });
+    });
+  });
+
+  ok(outerFunctionWasCalled, "function was called in the outer run loop");
+  ok(middleFunctionWasCalled, "function was called in the middle run loop");
+  ok(innerFunctionWasCalled, "function was called in the inner run loop");
+});
+
 test("defer - when passed a function", function() {
   expect(1);
 
