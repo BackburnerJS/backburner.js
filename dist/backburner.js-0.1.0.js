@@ -234,11 +234,14 @@ define("backburner",
         }
         timers = [];
 
-        if (autorun) { clearTimeout(autorun); }
+        if (autorun) {
+          clearTimeout(autorun);
+          autorun = null;
+        }
       },
 
       hasTimers: function() {
-        return !!timers.length && !autorun;
+        return !!timers.length || autorun;
       },
 
       cancel: function(timer) {
