@@ -359,6 +359,23 @@ test("cancel - setTimeout", function() {
   ok(!functionWasCalled, "function was not called");
 });
 
+test("cancelTimers", function() {
+  var bb = new Backburner(['one']),
+      functionWasCalled = false;
+
+  var timer = bb.setTimeout(function() {
+    functionWasCalled = true;
+  });
+
+  ok(timer, "Timer object was returned");
+  ok(bb.hasTimers(), "bb has scheduled timer");
+
+  bb.cancelTimers();
+
+  ok(!bb.hasTimers(), "bb has no scheduled timer");
+  ok(!functionWasCalled, "function was not called");
+});
+
 test("Prevent Safari double finally", function() {
   expect(1);
 
