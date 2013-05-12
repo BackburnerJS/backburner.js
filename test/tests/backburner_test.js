@@ -49,33 +49,54 @@ test("run - when passed a target, method, and arguments", function() {
 });
 
 test("run - nesting run loops preserves the stack", function() {
-  expect(3);
+  expect(10);
 
   var bb = new Backburner(['one']),
-    outerFunctionWasCalled = false,
-    middleFunctionWasCalled = false,
-    innerFunctionWasCalled = false;
+    outerBeforeFunctionWasCalled = false,
+    middleBeforeFunctionWasCalled = false,
+    innerFunctionWasCalled = false,
+    middleAfterFunctionWasCalled = false,
+    outerAfterFunctionWasCalled = false;
 
   bb.run(function () {
     bb.defer('one', function () {
-      outerFunctionWasCalled = true;
+      outerBeforeFunctionWasCalled = true;
     });
+
     bb.run(function () {
       bb.defer('one', function () {
-        middleFunctionWasCalled = true;
+        middleBeforeFunctionWasCalled = true;
       });
 
       bb.run(function () {
         bb.defer('one', function () {
           innerFunctionWasCalled = true;
         });
+        ok(!innerFunctionWasCalled, "function is deferred");
       });
+      ok(innerFunctionWasCalled, "function is called");
+
+      bb.defer('one', function () {
+        middleAfterFunctionWasCalled = true;
+      });
+
+      ok(!middleBeforeFunctionWasCalled, "function is deferred");
+      ok(!middleAfterFunctionWasCalled, "function is deferred");
     });
+
+    ok(middleBeforeFunctionWasCalled, "function is called");
+    ok(middleAfterFunctionWasCalled, "function is called");
+
+    bb.defer('one', function () {
+      outerAfterFunctionWasCalled = true;
+    });
+
+    ok(!outerBeforeFunctionWasCalled, "function is deferred");
+    ok(!outerAfterFunctionWasCalled, "function is deferred");
   });
 
-  ok(outerFunctionWasCalled, "function was called in the outer run loop");
-  ok(middleFunctionWasCalled, "function was called in the middle run loop");
-  ok(innerFunctionWasCalled, "function was called in the inner run loop");
+  ok(outerBeforeFunctionWasCalled, "function is called");
+  ok(outerAfterFunctionWasCalled, "function is called");
 });
 
 test("defer - when passed a function", function() {
@@ -418,11 +439,11 @@ test("Prevent Safari double finally", function() {
     equal(count, 1, 'end is called only once');
     realEnd.call(this);
   };
-  
+
   try {
     bb.run(function() {
       bb.defer('one', function() {
-        // If we throw from here, it'll be a throw from 
+        // If we throw from here, it'll be a throw from
         // the `finally` in `.run()`, thus invoking Safari's
         // bizarre double-finally bug. Without the proper guards,
         // this causes .end() to be run twice in Safari 6.0.2.

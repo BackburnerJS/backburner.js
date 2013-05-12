@@ -50,18 +50,20 @@ define("backburner",
     function Backburner(queueNames, options) {
       this.queueNames = queueNames;
       this.options = options || {};
+      this.instanceStack = [];
     }
 
     Backburner.prototype = {
       queueNames: null,
       options: null,
       currentInstance: null,
-      previousInstance: null,
+      instanceStack: null,
 
       begin: function() {
         if (this.currentInstance) {
-          this.previousInstance = this.currentInstance;
+          this.instanceStack.push(this.currentInstance);
         }
+
         this.currentInstance = new DeferredActionQueues(this.queueNames, this.options);
       },
 
@@ -70,9 +72,9 @@ define("backburner",
           this.currentInstance.flush();
         } finally {
           this.currentInstance = null;
-          if (this.previousInstance) {
-            this.currentInstance = this.previousInstance;
-            this.previousInstance = null;
+
+          if (this.instanceStack.length) {
+            this.currentInstance = this.instanceStack.pop();
           }
         }
       },
