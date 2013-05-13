@@ -292,6 +292,8 @@ define("backburner",
       if (timers.length) {
         laterTimer = setTimeout(function() {
           executeTimers(self);
+          laterTimer = null;
+          laterTimerExpiresAt = null;
         }, timers[0] - now);
         laterTimerExpiresAt = timers[0];
       }
