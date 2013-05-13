@@ -403,7 +403,7 @@ test("cancel - setTimeout", function() {
 
   var timer = bb.setTimeout(function() {
     functionWasCalled = true;
-  });
+  }, 0);
 
   ok(timer, "Timer object was returned");
   ok(bb.cancel(timer), "Cancel returned true");
@@ -416,7 +416,7 @@ test("cancelTimers", function() {
 
   var timer = bb.setTimeout(function() {
     functionWasCalled = true;
-  });
+  }, 0);
 
   ok(timer, "Timer object was returned");
   ok(bb.hasTimers(), "bb has scheduled timer");
