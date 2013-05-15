@@ -4,7 +4,7 @@
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",
@@ -15,6 +15,7 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "grunt": "0.4.0",
+    "grunt-cli": "~0.1.8",
     "connect": "~2.7.4",
     "es6-module-transpiler": "~0.1.0",
     "grunt-contrib-concat": "~0.1.3",
