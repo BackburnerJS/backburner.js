@@ -98,7 +98,64 @@ module.exports = function(grunt) {
           ]
         }
       }
+    },
+
+    jshint: {
+      all: {
+        // TODO: Run jshint on individual files when jshint supports ES6 modules
+        src: ['Gruntfile.js', 'dist/<%= pkg.name %>-<%= pkg.version %>.js', 'tmp/tests.js'],
+        options: {
+          predef: [
+            "define",
+            "console",
+            "require",
+            "requireModule",
+            "equal",
+            "notEqual",
+            "notStrictEqual",
+            "test",
+            "asyncTest",
+            "testBoth",
+            "testWithDefault",
+            "raises",
+            "throws",
+            "deepEqual",
+            "start",
+            "stop",
+            "ok",
+            "strictEqual",
+            "module",
+            "expect"
+          ],
+          "node" : false,
+          "browser" : true,
+          "boss" : true,
+          "curly": false,
+          "debug": false,
+          "devel": false,
+          "eqeqeq": true,
+          "evil": true,
+          "forin": false,
+          "immed": false,
+          "laxbreak": false,
+          "newcap": true,
+          "noarg": true,
+          "noempty": false,
+          "nonew": false,
+          "nomen": false,
+          "onevar": false,
+          "plusplus": false,
+          "regexp": false,
+          "undef": true,
+          "sub": true,
+          "strict": false,
+          "white": false,
+          "eqnull": true
+        }
+      }
+
     }
+
   });
 
   // Load tasks from npm
@@ -107,8 +164,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
 
-  grunt.registerTask('test', ['connect', 'tests', 'qunit']);
+  grunt.registerTask('test', ['connect', 'tests', 'qunit', 'jshint']);
 
   // Multi-task for wrapping browser version
 
