@@ -33,14 +33,12 @@ var backburner = new Backburner(['render']),
     person = {name: "Erik"};
 
 function updateName() {
-  backburner.deferOnce('render', function() {
-    $('#name').text(person.name);
-  });
+  $('#name').text(person.name);
 }
 
 function setName(name) {
   person.name = name;
-  updateName();
+  backburner.deferOnce('render', updateName);
 }
 
 backburner.run(function() {
