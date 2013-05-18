@@ -455,3 +455,25 @@ test("Prevent Safari double finally", function() {
 
   Backburner.prototype.end = realEnd;
 });
+
+
+test("Queue#flush should be recursive if new items are added", function() {
+  expect(2);
+
+  var bb = new Backburner(['one']), count = 0;
+
+  bb.run(function() {
+    function increment() {
+      if (++count < 3) {
+        bb.schedule('one', increment);
+      }
+    }
+
+    increment();
+    equal(count, 1, 'should not have run yet');
+
+    bb.currentInstance.queues.one.flush();
+    equal(count, 3, 'should have run all scheduled methods, even ones added during flush');
+  });
+
+});
