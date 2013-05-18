@@ -459,7 +459,13 @@ define("backburner/queue",
         }
         if (l && after) { after(); }
 
-        if (queue.length) { this._queue = []; }
+        // check if new items have been added
+        if (queue.length > l) {
+          this._queue = queue.slice(l);
+          this.flush();
+        } else {
+          this._queue.length = 0;
+        }
       },
 
       cancel: function(actionToCancel) {
