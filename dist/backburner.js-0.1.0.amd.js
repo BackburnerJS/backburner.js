@@ -13,6 +13,9 @@ define("backburner",
     function Backburner(queueNames, options) {
       this.queueNames = queueNames;
       this.options = options || {};
+      if (!this.options.defaultQueue) {
+        this.options.defaultQueue = queueNames[0];
+      }
       this.instanceStack = [];
     }
 
@@ -248,7 +251,7 @@ define("backburner",
         fns = timers.splice(0, i);
 
         for (i = 1, l = fns.length; i < l; i += 2) {
-          self.schedule(self.queueNames[0], null, fns[i]); // TODO: make default queue configurable
+          self.schedule(self.options.defaultQueue, null, fns[i]);
         }
       });
 
