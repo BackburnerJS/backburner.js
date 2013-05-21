@@ -458,7 +458,12 @@ define("backburner/queue",
           method = queue[i+1];
           args   = queue[i+2];
 
-          method.apply(target, args); // TODO: error handling
+          // TODO: error handling
+          if (args && args.length > 0) {
+            method.apply(target, args);
+          } else {
+            method.call(target);
+          }
         }
         if (l && after) { after(); }
 
