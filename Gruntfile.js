@@ -196,7 +196,6 @@ module.exports = function(grunt) {
       output.push.apply(output, f.src.map(grunt.file.read));
 
       testFiles.forEach(function(file) {
-        var moduleName = nameFor(file);
         output.push('requireModule("' + nameFor(file) + '");');
       });
 
