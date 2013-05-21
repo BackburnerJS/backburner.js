@@ -490,3 +490,37 @@ test("Default queue can be manually configured", function() {
 
   equal(bb.options.defaultQueue, 'two');
 });
+
+test("onBegin and onEnd are called and passed the correct parameters", function() {
+  expect(2);
+
+  var befores = [],
+      afters = [],
+      expectedBefores = [],
+      expectedAfters = [],
+      outer, inner;
+
+  var bb = new Backburner(['one'], {
+    onBegin: function(current, previous) {
+      befores.push(current);
+      befores.push(previous);
+    },
+    onEnd: function(current, next) {
+      afters.push(current);
+      afters.push(next);
+    }
+  });
+
+  bb.run(function() {
+    outer = bb.currentInstance;
+    bb.run(function() {
+      inner = bb.currentInstance;
+    });
+  });
+
+  expectedBefores = [outer, null, inner, outer];
+  expectedAfters = [inner, outer, outer, null];
+
+  deepEqual(befores, expectedBefores, "before callbacks successful");
+  deepEqual(afters, expectedAfters, "after callback successful");
+});
