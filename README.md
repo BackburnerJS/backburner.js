@@ -48,4 +48,37 @@ backburner.run(function() {
 });
 ```
 
+## Simple Backbone Example
+
+```javascript
+app.TodoView = Backbone.View.extend({
+  // ...
+
+  initialize: function () {
+    this.listenTo(this.model, 'change', this.render);
+  },
+
+  render: function() {
+    // put the rerender on the backburner!
+    backburner.deferOnce('render', this, this.actuallyRender);
+  },
+
+  actuallyRender: function() {
+    // do our DOM manipulations here. will only be called once.
+  }
+
+  // ...
+});
+
+
+// ... somewhere in our app code ...
+backburner.run(function() {
+  model.set('firstName', 'Erik');
+  model.set('lastName',  'Bryn');
+});
+
+// our view has been rerendered only once, thanks to backburner!
+
+```
+
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ebryn/backburner.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
