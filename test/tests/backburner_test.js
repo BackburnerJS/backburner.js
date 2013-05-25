@@ -289,6 +289,11 @@ test("autorun", function() {
   bb.schedule('zomg', null, function() {
     start();
     equal(step, 2);
+    stop();
+    setTimeout(function() {
+      start();
+      ok(!bb.hasTimers(), "The all timers are cleared");
+    });
   });
 
   ok(bb.currentInstance, "The DeferredActionQueues object exists");
