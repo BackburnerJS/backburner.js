@@ -286,6 +286,7 @@ define("backburner",
       backburner.begin();
       autorun = setTimeout(function() {
         backburner.end();
+        autorun = null;
       });
     }
 
@@ -466,7 +467,7 @@ define("backburner/queue",
             options = this.options,
             before = options && options.before,
             after = options && options.after,
-            action, target, method, args, stack, i, l = queue.length;
+            target, method, args, stack, i, l = queue.length;
 
         if (l && before) { before(); }
         for (i = 0; i < l; i += 4) {
