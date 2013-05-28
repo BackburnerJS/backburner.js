@@ -541,5 +541,7 @@ test("DEBUG flag enables stack tagging", function() {
 
   bb.defer('one', function() {});
 
-  ok(typeof bb.currentInstance.queues.one._queue[7] === 'string', "A stack is recorded");
+  if (new Error().stack) { // workaround for CLI runner :(
+    ok(typeof bb.currentInstance.queues.one._queue[7] === 'string', "A stack is recorded");
+  }
 });
