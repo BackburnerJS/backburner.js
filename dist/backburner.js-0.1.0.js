@@ -202,7 +202,7 @@ define("backburner",
           clearTimeout(laterTimer);
           laterTimer = null;
         }
-        laterTimer = setTimeout(function() {
+        laterTimer = window.setTimeout(function() {
           executeTimers(self);
           laterTimer = null;
           laterTimerExpiresAt = null;
@@ -223,7 +223,7 @@ define("backburner",
           if (debouncee[0] === target && debouncee[1] === method) { return; } // do nothing
         }
 
-        var timer = setTimeout(function() {
+        var timer = window.setTimeout(function() {
           self.run.apply(self, args);
 
           // remove debouncee
@@ -284,7 +284,7 @@ define("backburner",
 
     function createAutorun(backburner) {
       backburner.begin();
-      autorun = setTimeout(function() {
+      autorun = window.setTimeout(function() {
         backburner.end();
         autorun = null;
       });
@@ -309,7 +309,7 @@ define("backburner",
       });
 
       if (timers.length) {
-        laterTimer = setTimeout(function() {
+        laterTimer = window.setTimeout(function() {
           executeTimers(self);
           laterTimer = null;
           laterTimerExpiresAt = null;
