@@ -529,3 +529,17 @@ test("onBegin and onEnd are called and passed the correct parameters", function(
   deepEqual(befores, expectedBefores, "before callbacks successful");
   deepEqual(afters, expectedAfters, "after callback successful");
 });
+
+test("DEBUG flag enables stack tagging", function() {
+  var bb = new Backburner(['one']);
+
+  bb.defer('one', function() {});
+
+  ok(!bb.currentInstance.queues.one._queue[3], "No stack is recorded");
+
+  bb.DEBUG = true;
+
+  bb.defer('one', function() {});
+
+  ok(typeof bb.currentInstance.queues.one._queue[7] === 'string', "A stack is recorded");
+});
