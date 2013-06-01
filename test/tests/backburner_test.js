@@ -383,6 +383,15 @@ test("debounce", function() {
   }, 60);
 });
 
+test("cancel - null", function() {
+  // mimic browser behavior: window.clearTimeout(null) -> undefined
+  expect(3);
+  var bb = new Backburner(['cancel']);
+  equal(bb.cancel(), undefined, "cancel with no arguments should return undefined");
+  equal(bb.cancel(null), undefined, "cancel a null timer should return undefined");
+  equal(bb.cancel(undefined), undefined, "cancel an undefined timer should return undefined");
+});
+
 test("cancel - deferOnce", function() {
   expect(3);
 
