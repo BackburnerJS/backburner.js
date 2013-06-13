@@ -8,6 +8,8 @@ var define, requireModule;
     registry[name] = { deps: deps, callback: callback };
   };
 
+  define.registry = registry;
+
   requireModule = function(name) {
     if (seen[name]) { return seen[name]; }
     seen[name] = {};
