@@ -105,57 +105,10 @@ module.exports = function(grunt) {
         // TODO: Run jshint on individual files when jshint supports ES6 modules
         src: ['Gruntfile.js', 'dist/<%= pkg.name %>-<%= pkg.version %>.js', 'tmp/tests.js'],
         options: {
-          predef: [
-            "define",
-            "console",
-            "require",
-            "requireModule",
-            "equal",
-            "notEqual",
-            "notStrictEqual",
-            "test",
-            "asyncTest",
-            "testBoth",
-            "testWithDefault",
-            "raises",
-            "throws",
-            "deepEqual",
-            "start",
-            "stop",
-            "ok",
-            "strictEqual",
-            "module",
-            "expect"
-          ],
-          "node" : false,
-          "browser" : true,
-          "boss" : true,
-          "curly": false,
-          "debug": false,
-          "devel": false,
-          "eqeqeq": true,
-          "evil": true,
-          "forin": false,
-          "immed": false,
-          "laxbreak": false,
-          "newcap": true,
-          "noarg": true,
-          "noempty": false,
-          "nonew": false,
-          "nomen": false,
-          "onevar": false,
-          "plusplus": false,
-          "regexp": false,
-          "undef": true,
-          "sub": true,
-          "strict": false,
-          "white": false,
-          "eqnull": true
+          jshintrc: '.jshintrc'
         }
       }
-
     }
-
   });
 
   // Load tasks from npm
