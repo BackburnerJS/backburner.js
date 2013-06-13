@@ -1,105 +1,13 @@
 import Backburner from "backburner";
-
 var originalDateValueOf = Date.prototype.valueOf;
 
-module("Backburner");
-
-test("run - when passed a function", function() {
-  expect(1);
-
-  var bb = new Backburner(['one']),
-      functionWasCalled = false;
-
-  bb.run(function() {
-    functionWasCalled = true;
-  });
-
-  ok(functionWasCalled, "function was called");
+module("defer", {
+  teardown: function(){
+    Date.prototype.valueOf = originalDateValueOf;
+  }
 });
 
-test("run - when passed a target and method", function() {
-  expect(2);
-
-  var bb = new Backburner(['one']),
-      functionWasCalled = false;
-
-  bb.run({zomg: "hi"}, function() {
-    equal(this.zomg, "hi", "the target was properly set");
-    functionWasCalled = true;
-  });
-
-  ok(functionWasCalled, "function was called");
-});
-
-test("run - when passed a target, method, and arguments", function() {
-  expect(5);
-
-  var bb = new Backburner(['one']),
-      functionWasCalled = false;
-
-  bb.run({zomg: "hi"}, function(a, b, c) {
-    equal(this.zomg, "hi", "the target was properly set");
-    equal(a, 1, "the first arguments was passed in");
-    equal(b, 2, "the second arguments was passed in");
-    equal(c, 3, "the third arguments was passed in");
-    functionWasCalled = true;
-  }, 1, 2, 3);
-
-  ok(functionWasCalled, "function was called");
-});
-
-test("run - nesting run loops preserves the stack", function() {
-  expect(10);
-
-  var bb = new Backburner(['one']),
-    outerBeforeFunctionWasCalled = false,
-    middleBeforeFunctionWasCalled = false,
-    innerFunctionWasCalled = false,
-    middleAfterFunctionWasCalled = false,
-    outerAfterFunctionWasCalled = false;
-
-  bb.run(function () {
-    bb.defer('one', function () {
-      outerBeforeFunctionWasCalled = true;
-    });
-
-    bb.run(function () {
-      bb.defer('one', function () {
-        middleBeforeFunctionWasCalled = true;
-      });
-
-      bb.run(function () {
-        bb.defer('one', function () {
-          innerFunctionWasCalled = true;
-        });
-        ok(!innerFunctionWasCalled, "function is deferred");
-      });
-      ok(innerFunctionWasCalled, "function is called");
-
-      bb.defer('one', function () {
-        middleAfterFunctionWasCalled = true;
-      });
-
-      ok(!middleBeforeFunctionWasCalled, "function is deferred");
-      ok(!middleAfterFunctionWasCalled, "function is deferred");
-    });
-
-    ok(middleBeforeFunctionWasCalled, "function is called");
-    ok(middleAfterFunctionWasCalled, "function is called");
-
-    bb.defer('one', function () {
-      outerAfterFunctionWasCalled = true;
-    });
-
-    ok(!outerBeforeFunctionWasCalled, "function is deferred");
-    ok(!outerAfterFunctionWasCalled, "function is deferred");
-  });
-
-  ok(outerBeforeFunctionWasCalled, "function is called");
-  ok(outerAfterFunctionWasCalled, "function is called");
-});
-
-test("defer - when passed a function", function() {
+test("when passed a function", function() {
   expect(1);
 
   var bb = new Backburner(['one']),
@@ -114,7 +22,7 @@ test("defer - when passed a function", function() {
   ok(functionWasCalled, "function was called");
 });
 
-test("defer - when passed a target and method", function() {
+test("when passed a target and method", function() {
   expect(2);
 
   var bb = new Backburner(['one']),
@@ -130,7 +38,7 @@ test("defer - when passed a target and method", function() {
   ok(functionWasCalled, "function was called");
 });
 
-test("defer - when passed a target, method, and arguments", function() {
+test("when passed a target, method, and arguments", function() {
   expect(5);
 
   var bb = new Backburner(['one']),
@@ -149,7 +57,8 @@ test("defer - when passed a target, method, and arguments", function() {
   ok(functionWasCalled, "function was called");
 });
 
-test("deferOnce - when passed a function", function() {
+module("deferOnce");
+test("when passed a function", function() {
   expect(1);
 
   var bb = new Backburner(['one']),
@@ -164,7 +73,7 @@ test("deferOnce - when passed a function", function() {
   ok(functionWasCalled, "function was called");
 });
 
-test("deferOnce - when passed a target and method", function() {
+test("when passed a target and method", function() {
   expect(2);
 
   var bb = new Backburner(['one']),
@@ -180,7 +89,7 @@ test("deferOnce - when passed a target and method", function() {
   ok(functionWasCalled, "function was called");
 });
 
-test("deferOnce - when passed a target, method, and arguments", function() {
+test("when passed a target, method, and arguments", function() {
   expect(5);
 
   var bb = new Backburner(['one']),
@@ -199,6 +108,7 @@ test("deferOnce - when passed a target, method, and arguments", function() {
   ok(functionWasCalled, "function was called");
 });
 
+module("helpers");
 test("setTimeout", function() {
   expect(6);
 
@@ -262,21 +172,6 @@ test("actions scheduled on previous queue, start over from beginning", function(
   });
 
   equal(step, 4, "4");
-});
-
-test("runs can be nested", function() {
-  expect(2);
-
-  var bb = new Backburner(['one']),
-      step = 0;
-
-  bb.run(function() {
-    equal(step++, 0);
-
-    bb.run(function() {
-      equal(step++, 1);
-    });
-  });
 });
 
 test("autorun", function() {
@@ -392,7 +287,8 @@ test("cancel - null", function() {
   equal(bb.cancel(undefined), undefined, "cancel an undefined timer should return undefined");
 });
 
-test("cancel - deferOnce", function() {
+module("cancel");
+test("deferOnce", function() {
   expect(3);
 
   var bb = new Backburner(['one']),
@@ -409,7 +305,7 @@ test("cancel - deferOnce", function() {
   });
 });
 
-test("cancel - setTimeout", function() {
+test("setTimeout", function() {
   expect(3);
 
   var bb = new Backburner(['one']),
@@ -441,6 +337,7 @@ test("cancelTimers", function() {
   ok(!functionWasCalled, "function was not called");
 });
 
+module("safari bugs");
 test("Prevent Safari double finally", function() {
   expect(1);
 
@@ -470,7 +367,7 @@ test("Prevent Safari double finally", function() {
   Backburner.prototype.end = realEnd;
 });
 
-
+module("Queue");
 test("Queue#flush should be recursive if new items are added", function() {
   expect(2);
 
@@ -539,6 +436,7 @@ test("onBegin and onEnd are called and passed the correct parameters", function(
   deepEqual(afters, expectedAfters, "after callback successful");
 });
 
+module("debug");
 test("DEBUG flag enables stack tagging", function() {
   var bb = new Backburner(['one']);
 
