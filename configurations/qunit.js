@@ -1,7 +1,7 @@
 module.exports = {
-  options: {
-    urls: [
-      'http://localhost:8000/test'
-    ]
+  all: {
+    options: {
+      urls: [ 'test/index.html' ]
+    }
   }
 };
