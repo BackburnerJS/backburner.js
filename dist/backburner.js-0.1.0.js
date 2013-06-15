@@ -460,30 +460,43 @@ define("backburner",
         throttlers.push([target, method, timer]);
       },
 
-      debounce: function(target, method /* , args, wait */) {
+      debounce: function(target, method /* , args, wait, [immediate] */) {
         var self = this,
             args = arguments,
-            wait = pop.call(args),
-            debouncee,
-            index = -1;
+            immediate = pop.call(args),
+            wait,
+            index,
+            debouncee;
 
-        // Remove debouncee
-        for (var i = 0, l = debouncees.length; i < l; i++) {
-          debouncee = debouncees[i];
-          if (debouncee[0] === target && debouncee[1] === method) {
-            index = i;
-            break;
-          }
+        if (typeof immediate === "number") {
+          wait = immediate;
+          immediate = false;
+        } else {
+          wait = pop.call(args);
         }
 
-        if (index > -1) {
+        // Remove debouncee
+        index = findDebouncee(target, method);
+
+        if (index !== -1) {
+          debouncee = debouncees[index];
           debouncees.splice(index, 1);
           clearTimeout(debouncee[2]);
         }
 
         var timer = window.setTimeout(function() {
-          self.run.apply(self, args);
+          if (!immediate) {
+            self.run.apply(self, args);
+          }
+          index = findDebouncee(target, method);
+          if (index) {
+            debouncees.splice(index, 1);
+          }
         }, wait);
+
+        if (immediate && index === -1) {
+          self.run.apply(self, args);
+        }
 
         debouncees.push([target, method, timer]);
       },
@@ -571,6 +584,21 @@ define("backburner",
         }, timers[0] - now);
         laterTimerExpiresAt = timers[0];
       }
+    }
+
+    function findDebouncee(target, method) {
+      var debouncee,
+          index = -1;
+
+      for (var i = 0, l = debouncees.length; i < l; i++) {
+        debouncee = debouncees[i];
+        if (debouncee[0] === target && debouncee[1] === method) {
+          index = i;
+          break;
+        }
+      }
+
+      return index;
     }
 
 
