@@ -59,3 +59,22 @@ test("cancelTimers", function() {
   ok(!bb.hasTimers(), "bb has no scheduled timer");
   ok(!functionWasCalled, "function was not called");
 });
+
+test("cancel during flush", function() {
+  expect(1);
+
+  var bb = new Backburner(['one']),
+  functionWasCalled = false;
+
+  bb.run(function() {
+    var timer1 = bb.deferOnce('one', function() {
+      bb.cancel(timer2);
+    });
+
+    var timer2 = bb.deferOnce('one', function() {
+      functionWasCalled = true;
+    });
+  });
+
+  ok(!functionWasCalled, "function was not called");
+});
