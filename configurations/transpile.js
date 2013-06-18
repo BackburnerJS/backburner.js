@@ -5,7 +5,9 @@ module.exports = {
       format: 'amd'
     },
 
-    src: ["lib/<%= pkg.barename %>.js", "lib/*/**/*.js"],
+    src: ["lib/<%= pkg.barename %>/queue.js",
+          "lib/<%= pkg.barename %>/deferred_action_queues.js",
+          "lib/<%= pkg.barename %>.js"],
     dest: "tmp/<%= pkg.barename %>.amd.js"
   },
 
