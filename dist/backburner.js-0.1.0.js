@@ -261,7 +261,8 @@ define("backburner",
         pop = [].pop,
         debouncees = [],
         timers = [],
-        autorun, laterTimer, laterTimerExpiresAt;
+        autorun, laterTimer, laterTimerExpiresAt,
+        global = this;
 
     function Backburner(queueNames, options) {
       this.queueNames = queueNames;
@@ -418,7 +419,7 @@ define("backburner",
           clearTimeout(laterTimer);
           laterTimer = null;
         }
-        laterTimer = window.setTimeout(function() {
+        laterTimer = global.setTimeout(function() {
           executeTimers(self);
           laterTimer = null;
           laterTimerExpiresAt = null;
@@ -439,7 +440,7 @@ define("backburner",
           if (debouncee[0] === target && debouncee[1] === method) { return; } // do nothing
         }
 
-        var timer = window.setTimeout(function() {
+        var timer = global.setTimeout(function() {
           self.run.apply(self, args);
 
           // remove debouncee
@@ -502,7 +503,7 @@ define("backburner",
 
     function createAutorun(backburner) {
       backburner.begin();
-      autorun = window.setTimeout(function() {
+      autorun = global.setTimeout(function() {
         backburner.end();
         autorun = null;
       });
@@ -527,7 +528,7 @@ define("backburner",
       });
 
       if (timers.length) {
-        laterTimer = window.setTimeout(function() {
+        laterTimer = global.setTimeout(function() {
           executeTimers(self);
           laterTimer = null;
           laterTimerExpiresAt = null;
