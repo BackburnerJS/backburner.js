@@ -220,6 +220,7 @@ define("backburner",
 
     var slice = [].slice,
         pop = [].pop,
+        throttlers = [],
         debouncees = [],
         timers = [],
         autorun, laterTimer, laterTimerExpiresAt,
@@ -390,38 +391,86 @@ define("backburner",
         return fn;
       },
 
-      debounce: function(target, method /* , args, wait */) {
+      throttle: function(target, method /* , args, wait */) {
         var self = this,
             args = arguments,
             wait = pop.call(args),
-            debouncee;
+            throttler;
 
-        for (var i = 0, l = debouncees.length; i < l; i++) {
-          debouncee = debouncees[i];
-          if (debouncee[0] === target && debouncee[1] === method) { return; } // do nothing
+        for (var i = 0, l = throttlers.length; i < l; i++) {
+          throttler = throttlers[i];
+          if (throttler[0] === target && throttler[1] === method) { return; } // do nothing
         }
 
         var timer = global.setTimeout(function() {
           self.run.apply(self, args);
 
-          // remove debouncee
+          // remove throttler
           var index = -1;
-          for (var i = 0, l = debouncees.length; i < l; i++) {
-            debouncee = debouncees[i];
-            if (debouncee[0] === target && debouncee[1] === method) {
+          for (var i = 0, l = throttlers.length; i < l; i++) {
+            throttler = throttlers[i];
+            if (throttler[0] === target && throttler[1] === method) {
               index = i;
               break;
             }
           }
 
-          if (index > -1) { debouncees.splice(index, 1); }
+          if (index > -1) { throttlers.splice(index, 1); }
         }, wait);
+
+        throttlers.push([target, method, timer]);
+      },
+
+      debounce: function(target, method /* , args, wait, [immediate] */) {
+        var self = this,
+            args = arguments,
+            immediate = pop.call(args),
+            wait,
+            index,
+            debouncee;
+
+        if (typeof immediate === "number") {
+          wait = immediate;
+          immediate = false;
+        } else {
+          wait = pop.call(args);
+        }
+
+        // Remove debouncee
+        index = findDebouncee(target, method);
+
+        if (index !== -1) {
+          debouncee = debouncees[index];
+          debouncees.splice(index, 1);
+          clearTimeout(debouncee[2]);
+        }
+
+        var timer = window.setTimeout(function() {
+          if (!immediate) {
+            self.run.apply(self, args);
+          }
+          index = findDebouncee(target, method);
+          if (index) {
+            debouncees.splice(index, 1);
+          }
+        }, wait);
+
+        if (immediate && index === -1) {
+          self.run.apply(self, args);
+        }
 
         debouncees.push([target, method, timer]);
       },
 
       cancelTimers: function() {
-        for (var i = 0, l = debouncees.length; i < l; i++) {
+        var i, len;
+
+        for (i = 0, len = throttlers.length; i < len; i++) {
+          clearTimeout(throttlers[i][2]);
+        }
+        throttlers = [];
+
+        for (i = 0, len = debouncees.length; i < len; i++) {
           clearTimeout(debouncees[i][2]);
         }
         debouncees = [];
@@ -496,6 +545,21 @@ define("backburner",
         }, timers[0] - now);
         laterTimerExpiresAt = timers[0];
       }
+    }
+
+    function findDebouncee(target, method) {
+      var debouncee,
+          index = -1;
+
+      for (var i = 0, l = debouncees.length; i < l; i++) {
+        debouncee = debouncees[i];
+        if (debouncee[0] === target && debouncee[1] === method) {
+          index = i;
+          break;
+        }
+      }
+
+      return index;
     }
 
 
