@@ -22,6 +22,8 @@ More details soon... until then, look at [the source](https://github.com/ebryn/b
 
 `Backburner#debounce` - execute the passed function in a specified amount of time, reset timer upon additional calls
 
+`Backburner#throttle` - rate-limit the passed function for a specified amount of time
+
 `Backburner#cancel` - cancel a `deferOnce` or `setTimeout`
 
 ## Example usage
@@ -82,3 +84,4 @@ backburner.run(function() {
 ```
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ebryn/backburner.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+![](https://d3oi6fmp1dfbdb.cloudfront.net/g.gif?repo=ebryn/backburner.js)
