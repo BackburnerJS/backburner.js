@@ -484,7 +484,7 @@ define("backburner",
           clearTimeout(debouncee[2]);
         }
 
-        var timer = window.setTimeout(function() {
+        var timer = global.setTimeout(function() {
           if (!immediate) {
             self.run.apply(self, args);
           }
@@ -553,8 +553,8 @@ define("backburner",
     function createAutorun(backburner) {
       backburner.begin();
       autorun = global.setTimeout(function() {
-        backburner.end();
         autorun = null;
+        backburner.end();
       });
     }
 
