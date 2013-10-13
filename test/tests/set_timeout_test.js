@@ -56,7 +56,7 @@ module("setTimeout arguments / arity", {
   teardown: function(){
     bb = undefined;
   }
-})
+});
 
 test("[callback]", function(){
   expect(2);
