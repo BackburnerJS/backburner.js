@@ -164,3 +164,34 @@ test("debounce - immediate", function() {
     }, 230);
   }, 120);
 });
+
+test("debounce accept time interval like string numbers", function() {
+
+  var bb = new Backburner(['zomg']),
+      step = 0;
+
+  var wasCalled = false;
+  function debouncee() {
+    ok(!wasCalled);
+    wasCalled = true;
+  }
+
+  bb.debounce(null, debouncee, "40");
+  equal(step++, 0);
+
+  stop();
+  setTimeout(function() {
+    start();
+    equal(step++, 1);
+    ok(!wasCalled);
+    bb.debounce(null, debouncee, "40");
+  }, 10);
+
+  stop();
+  setTimeout(function() {
+    start();
+    equal(step++, 2);
+    ok(wasCalled);
+  }, 60);
+
+});
