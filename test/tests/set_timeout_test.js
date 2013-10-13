@@ -48,93 +48,121 @@ test("setTimeout", function() {
   }, 20);
 });
 
-test("setTimeout arguments / arity", function() {
-  expect(41);
-  var bb = new Backburner(['one']),
-      step = 0,
-      instance;
+var bb;
+module("setTimeout arguments / arity", {
+  setup: function(){
+    bb = new Backburner(['one']);
+  },
+  teardown: function(){
+    bb = undefined;
+  }
+})
 
-  // Force +new Date to return the same result while scheduling
-  // run.later timers. Otherwise: non-determinism!
-  var now = +new Date();
-  Date.prototype.valueOf = function() { return now; };
+test("[callback]", function(){
+  expect(2);
+   stop();
+   bb.setTimeout(function() {
+     start();
+     equal(arguments.length, 0);
+     ok(true, 'was called');
+   });
+});
 
+test("[callback, undefined]", function(){
+  expect(2);
   stop();
-   bb.setTimeout(function() {
-     start();
-     equal(arguments.length, 0);
-     ok(true, 'was called');
-   });
+  bb.setTimeout(function() {
+    start();
+    equal(arguments.length, 1);
+    ok(true, 'was called');
+  }, undefined);
+});
 
-   stop();
-   bb.setTimeout(function() {
-     start();
-     equal(arguments.length, 1);
-     ok(true, 'was called');
-   }, undefined);
+test("[null, callback, undefined]", function(){
+  expect(2);
+  stop();
+  bb.setTimeout(null, function() {
+    start();
+    equal(arguments.length, 0);
+    ok(true, 'was called');
+  });
+});
 
-   stop();
-   bb.setTimeout(null, function() {
-     start();
-     equal(arguments.length, 0);
-     ok(true, 'was called');
-   });
+test("[null, callback, undefined]", function(){
+  expect(2);
+  stop();
+  bb.setTimeout(null, function() {
+    start();
+    equal(arguments.length, 1);
+    ok(true, 'was called');
+  }, undefined);
+});
 
-   stop();
-   bb.setTimeout(null, function() {
-     start();
-     equal(arguments.length, 1);
-     ok(true, 'was called');
-   }, undefined);
+test("[null, callback, undefined]", function(){
+  expect(3);
+  stop();
+  bb.setTimeout(null, function() {
+    start();
+    equal(arguments.length, 1);
+    equal(arguments[0], null);
+    ok(true, 'was called');
+  }, null);
+});
 
-   stop();
-   bb.setTimeout(null, function() {
-     start();
-     equal(arguments.length, 1);
-     equal(arguments[0], null);
-     ok(true, 'was called');
-   }, null);
+test("[null, callback, undefined]", function(){
+  expect(5);
+  stop();
+  bb.setTimeout(function() {
+    start();
+    equal(arguments.length, 3);
+    equal(arguments[0], 'a');
+    equal(arguments[1], 'b');
+    equal(arguments[2], 'c');
+    ok(true, 'was called');
+  }, 'a', 'b', 'c');
+});
 
-   stop();
-   bb.setTimeout(function() {
-     start();
-     equal(arguments.length, 3);
-     equal(arguments[0], 'a');
-     equal(arguments[1], 'b');
-     equal(arguments[2], 'c');
-     ok(true, 'was called');
-   }, 'a', 'b', 'c');
+test("[null, callback, undefined]", function(){
+  expect(5);
+  stop();
+  bb.setTimeout(null, function() {
+    start();
+    equal(arguments.length, 3);
+    equal(arguments[0], 'a');
+    equal(arguments[1], 'b');
+    equal(arguments[2], 'c');
+    ok(true, 'was called');
+  }, 'a', 'b', 'c');
+});
 
-   stop();
-   bb.setTimeout(null, function() {
-     start();
-     equal(arguments.length, 3);
-     equal(arguments[0], 'a');
-     equal(arguments[1], 'b');
-     equal(arguments[2], 'c');
-     ok(true, 'was called');
-   }, 'a', 'b', 'c');
+test("[null, callback, string, string, string, number]", function(){
+  expect(5);
+  stop();
+  bb.setTimeout(null, function() {
+    start();
+    equal(arguments.length, 3);
+    equal(arguments[0], 'a');
+    equal(arguments[1], 'b');
+    equal(arguments[2], 'c');
+    ok(true, 'was called');
+  }, 'a', 'b', 'c', 10);
+});
 
-   stop();
-   bb.setTimeout(null, function() {
-     start();
-     equal(arguments.length, 3);
-     equal(arguments[0], 'a');
-     equal(arguments[1], 'b');
-     equal(arguments[2], 'c');
-     ok(true, 'was called');
-   }, 'a', 'b', 'c', 1);
+test("[null, callback, string, string, string, numericString]", function(){
+  expect(5);
+  stop();
+  bb.setTimeout(null, function() {
+    start();
+    equal(arguments.length, 3);
+    equal(arguments[0], 'a');
+    equal(arguments[1], 'b');
+    equal(arguments[2], 'c');
+    ok(true, 'was called');
+  },  'a', 'b', 'c', '1');
+});
 
-   stop();
-   bb.setTimeout(null, function() {
-     start();
-     equal(arguments.length, 3);
-     equal(arguments[0], 'a');
-     equal(arguments[1], 'b');
-     equal(arguments[2], 'c');
-     ok(true, 'was called');
-   },  'a', 'b', 'c', '1');
-
+test("[callback, string]", function(){
+  expect(1);
   stop();
   bb.setTimeout({
     bro: function(){
@@ -142,7 +170,10 @@ test("setTimeout arguments / arity", function() {
       ok(true, 'was called');
     }
   }, 'bro');
+});
 
+test("[obj, string, value]", function(){
+  expect(3);
   stop();
   bb.setTimeout({
     bro: function(){
@@ -152,7 +183,9 @@ test("setTimeout arguments / arity", function() {
       ok(true, 'was called');
     }
   }, 'bro', 'value');
+});
 
+test("[null, callback, undefined]", function(){
   stop();
   bb.setTimeout({
     bro: function(){
@@ -162,7 +195,9 @@ test("setTimeout arguments / arity", function() {
       ok(true, 'was called');
     }
   }, 'bro', 'value', 1);
+});
 
+test("[null, callback, undefined]", function(){
   stop();
   bb.setTimeout({
     bro: function(){
@@ -173,5 +208,3 @@ test("setTimeout arguments / arity", function() {
     }
   }, 'bro', 'value', '1');
 });
-
-
