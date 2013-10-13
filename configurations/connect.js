@@ -1,8 +1,10 @@
+var port = parseInt(process.env.PORT || 8000, 10);
+
 module.exports = {
   server: {},
   options: {
     hostname: '0.0.0.0',
-    port: 8000,
+    port: port,
     base: '.'
   }
 };
