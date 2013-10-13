@@ -3,7 +3,7 @@ import Backburner from "backburner";
 module("throttle");
 
 test("throttle", function() {
-  expect(14);
+  expect(18);
 
   var bb = new Backburner(['zomg']),
       step = 0;
@@ -82,4 +82,24 @@ test("throttle", function() {
       ok(wasCalled, "Another throttle call with the same function can be executed later");
     }, 110);
   }, 60);
+
+  stop();
+  setTimeout(function() {
+    wasCalled = false; // reset the flag
+
+    // assert call order
+    start();
+    equal(step++, 7);
+
+    // call throttle again that time using a string number like time interval
+    bb.throttle(null, throttler, "100");
+
+    // assert that it is called in the future and not blackholed
+    stop();
+    setTimeout(function() {
+      start();
+      equal(step++, 8);
+      ok(wasCalled, "Throttle accept a string number like time interval");
+    }, 110);
+  }, 180);
 });
