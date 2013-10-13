@@ -65,28 +65,28 @@ test("setTimeout arguments / arity", function() {
      equal(arguments.length, 0);
      ok(true, 'was called');
    });
- 
+
    stop();
    bb.setTimeout(function() {
      start();
      equal(arguments.length, 1);
      ok(true, 'was called');
    }, undefined);
- 
+
    stop();
    bb.setTimeout(null, function() {
      start();
      equal(arguments.length, 0);
      ok(true, 'was called');
    });
- 
+
    stop();
    bb.setTimeout(null, function() {
      start();
      equal(arguments.length, 1);
      ok(true, 'was called');
    }, undefined);
- 
+
    stop();
    bb.setTimeout(null, function() {
      start();
@@ -94,7 +94,7 @@ test("setTimeout arguments / arity", function() {
      equal(arguments[0], null);
      ok(true, 'was called');
    }, null);
- 
+
    stop();
    bb.setTimeout(function() {
      start();
@@ -104,7 +104,7 @@ test("setTimeout arguments / arity", function() {
      equal(arguments[2], 'c');
      ok(true, 'was called');
    }, 'a', 'b', 'c');
- 
+
    stop();
    bb.setTimeout(null, function() {
      start();
@@ -114,7 +114,7 @@ test("setTimeout arguments / arity", function() {
      equal(arguments[2], 'c');
      ok(true, 'was called');
    }, 'a', 'b', 'c');
- 
+
    stop();
    bb.setTimeout(null, function() {
      start();
@@ -124,7 +124,7 @@ test("setTimeout arguments / arity", function() {
      equal(arguments[2], 'c');
      ok(true, 'was called');
    }, 'a', 'b', 'c', 1);
- 
+
    stop();
    bb.setTimeout(null, function() {
      start();
