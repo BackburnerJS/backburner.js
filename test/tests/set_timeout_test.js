@@ -35,7 +35,7 @@ test("setTimeout", function() {
   Date.prototype.valueOf = originalDateValueOf;
 
   stop();
-  setTimeout(function() {
+  bb.setTimeout(null, function() {
     start();
     equal(step++, 2);
 
