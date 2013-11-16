@@ -447,18 +447,7 @@ define("backburner",
 
         timers.splice(i, 0, executeAt, fn);
 
-        if (laterTimer && laterTimerExpiresAt < executeAt) { return fn; }
-
-        if (laterTimer) {
-          clearTimeout(laterTimer);
-          laterTimer = null;
-        }
-        laterTimer = global.setTimeout(function() {
-          executeTimers(self);
-          laterTimer = null;
-          laterTimerExpiresAt = null;
-        }, wait);
-        laterTimerExpiresAt = executeAt;
+        updateLaterTimer(self, executeAt, wait);
 
         return fn;
       },
@@ -523,7 +512,7 @@ define("backburner",
             self.run.apply(self, args);
           }
           index = findDebouncee(target, method);
-          if (index) {
+          if (index !== -1) {
             debouncees.splice(index, 1);
           }
         }, wait);
@@ -592,6 +581,20 @@ define("backburner",
       });
     }
 
+    function updateLaterTimer(self, executeAt, wait) {
+      if (!laterTimer || executeAt < laterTimerExpiresAt) {
+        if (laterTimer) {
+          clearTimeout(laterTimer);
+        }
+        laterTimer = global.setTimeout(function() {
+          laterTimer = null;
+          laterTimerExpiresAt = null;
+          executeTimers(self);
+        }, wait);
+        laterTimerExpiresAt = executeAt;
+      }
+    }
+
     function executeTimers(self) {
       var now = +new Date(),
           time, fns, i, l;
@@ -611,12 +614,7 @@ define("backburner",
       });
 
       if (timers.length) {
-        laterTimer = global.setTimeout(function() {
-          executeTimers(self);
-          laterTimer = null;
-          laterTimerExpiresAt = null;
-        }, timers[0] - now);
-        laterTimerExpiresAt = timers[0];
+        updateLaterTimer(self, timers[0], timers[0] - now);
       }
     }
 
