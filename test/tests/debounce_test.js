@@ -195,3 +195,110 @@ test("debounce accept time interval like string numbers", function() {
   }, 60);
 
 });
+
+test("debounce returns timer information usable for cancelling", function() {
+  expect(3);
+
+  var bb = new Backburner(['batman']),
+      timer;
+
+  var wasCalled = false;
+
+  function debouncee() {
+    ok(false, "this method shouldn't be called");
+    wasCalled = true;
+  }
+
+  timer = bb.debounce(null, debouncee, 1);
+
+  ok(bb.cancel(timer), "the timer is cancelled");
+
+  //should return false second time around
+  ok(!bb.cancel(timer), "the timer no longer exists in the list");
+
+  stop();
+  setTimeout(function() {
+    start();
+    ok(!wasCalled, "the timer wasn't called after waiting");
+  }, 60);
+
+});
+
+test("debounce cancelled after it's executed returns false", function() {
+  expect(3);
+
+  var bb = new Backburner(['darkknight']),
+      timer;
+
+  var wasCalled = false;
+
+  function debouncee() {
+    ok(true, "the debounced method was called");
+    wasCalled = true;
+  }
+
+  timer = bb.debounce(null, debouncee, 1);
+
+  stop();
+  setTimeout(function() {
+    start();
+    ok(!bb.cancel(timer), "no timer existed to cancel");
+    ok(wasCalled, "the timer was actually called");
+  }, 10);
+
+});
+
+test("debounce cancelled doesn't cancel older items", function() {
+  expect(4);
+
+  var bb = new Backburner(['robin']),
+      timer;
+
+  var wasCalled = false;
+
+  function debouncee() {
+    ok(true, "the debounced method was called");
+    wasCalled = true;
+  }
+
+  timer = bb.debounce(null, debouncee, 1);
+
+  stop();
+  setTimeout(function() {
+    start();
+    bb.debounce(null, debouncee, 1);
+    ok(!bb.cancel(timer), "the second timer isn't removed, despite appearing to be the same");
+    ok(wasCalled, "the timer was actually called");
+  }, 10);
+
+});
+
+test("debounce that is immediate, and cancelled and called again happens immediately", function() {
+  expect(3);
+
+  var bb = new Backburner(['robin']),
+      timer;
+
+  var calledCount = 0;
+
+  function debouncee() {
+    calledCount++;
+  }
+
+  timer = bb.debounce(null, debouncee, 1000, true);
+
+  stop();
+  setTimeout(function() { // 10 millisecond delay
+    start();
+    equal(1, calledCount, "debounced method was called");
+    ok(bb.cancel(timer), "debounced delay was cancelled");
+    bb.debounce(null, debouncee, 1000, true);
+
+    stop();
+    setTimeout(function(){ // 10 millisecond delay
+      start();
+      equal(2, calledCount, "debounced method was called again immediately");
+    }, 10);
+  }, 10);
+
+});
