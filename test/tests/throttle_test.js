@@ -103,3 +103,83 @@ test("throttle", function() {
     }, 110);
   }, 180);
 });
+
+test("throttle returns timer information usable for cancelling", function() {
+  expect(3);
+
+  var bb = new Backburner(['batman']),
+      timer;
+
+  var wasCalled = false;
+
+  function throttler() {
+    ok(false, "this method shouldn't be called");
+    wasCalled = true;
+  }
+
+  timer = bb.throttle(null, throttler, 1);
+
+  ok(bb.cancel(timer), "the timer is cancelled");
+
+  //should return false second time around
+  ok(!bb.cancel(timer), "the timer no longer exists in the list");
+
+  stop();
+  setTimeout(function() {
+    start();
+    ok(!wasCalled, "the timer wasn't called after waiting");
+  }, 60);
+
+});
+
+test("throttler cancel after it's executed returns false", function() {
+  expect(3);
+
+  var bb = new Backburner(['darkknight']),
+      timer;
+
+  var wasCalled = false;
+
+  function throttler() {
+    ok(true, "the throttled method was called");
+    wasCalled = true;
+  }
+
+  timer = bb.throttle(null, throttler, 1);
+
+  stop();
+  setTimeout(function() {
+    start();
+    ok(!bb.cancel(timer), "no timer existed to cancel");
+    ok(wasCalled, "the timer was actually called");
+  }, 10);
+
+});
+
+test("throttler returns the appropriate timer to cancel if the old item still exists", function() {
+  expect(5);
+
+  var bb = new Backburner(['robin']),
+      timer,
+      timer2;
+
+  var wasCalled = false;
+
+  function throttler() {
+    ok(true, "the throttled method was called");
+    wasCalled = true;
+  }
+
+  timer = bb.throttle(null, throttler, 1);
+  timer2 = bb.throttle(null, throttler, 1);
+  deepEqual(timer, timer2, "the same timer was returned");
+
+  stop();
+  setTimeout(function() {
+    start();
+    bb.throttle(null, throttler, 1);
+    ok(!bb.cancel(timer), "the second timer isn't removed, despite appearing to be the same item");
+    ok(wasCalled, "the timer was actually called");
+  }, 10);
+
+});
