@@ -16,7 +16,7 @@ test("throttle", function() {
 
   // let's throttle the function `throttler` for 40ms
   // it will be executed in 40ms
-  bb.throttle(null, throttler, 40);
+  bb.throttle(null, throttler, 40, false);
   equal(step++, 0);
 
   // let's schedule `throttler` to run in 10ms
@@ -25,7 +25,7 @@ test("throttle", function() {
     start();
     equal(step++, 1);
     ok(!wasCalled);
-    bb.throttle(null, throttler);
+    bb.throttle(null, throttler, false);
   }, 10);
 
   // let's schedule `throttler` to run again in 20ms
@@ -34,7 +34,7 @@ test("throttle", function() {
     start();
     equal(step++, 2);
     ok(!wasCalled);
-    bb.throttle(null, throttler);
+    bb.throttle(null, throttler, false);
   }, 20);
 
   // let's schedule `throttler` to run yet again in 30ms
@@ -43,7 +43,7 @@ test("throttle", function() {
     start();
     equal(step++, 3);
     ok(!wasCalled);
-    bb.throttle(null, throttler);
+    bb.throttle(null, throttler, false);
   }, 30);
 
   // at 40ms, `throttler` will get called once
@@ -72,7 +72,7 @@ test("throttle", function() {
     equal(step++, 5);
 
     // call throttle for the second time
-    bb.throttle(null, throttler, 100);
+    bb.throttle(null, throttler, 100, false);
 
     // assert that it is called in the future and not blackholed
     stop();
@@ -92,7 +92,7 @@ test("throttle", function() {
     equal(step++, 7);
 
     // call throttle again that time using a string number like time interval
-    bb.throttle(null, throttler, "100");
+    bb.throttle(null, throttler, "100", false);
 
     // assert that it is called in the future and not blackholed
     stop();
@@ -102,6 +102,52 @@ test("throttle", function() {
       ok(wasCalled, "Throttle accept a string number like time interval");
     }, 110);
   }, 180);
+});
+
+test("throttle leading edge", function() {
+  expect(10);
+
+  var bb = new Backburner(['zerg']),
+      throttle,
+      throttle2,
+      wasCalled = false;
+
+  function throttler() {
+    ok(!wasCalled, "throttler hasn't been called yet");
+    wasCalled = true;
+  }
+
+  // let's throttle the function `throttler` for 40ms
+  // it will be executed immediately, but throttled for the future hits
+  throttle = bb.throttle(null, throttler, 40);
+
+  ok(wasCalled, "function was executed immediately");
+
+  wasCalled = false;
+  // let's schedule `throttler` to run again, it shouldn't be allowed to queue for another 40 msec
+  throttle2 = bb.throttle(null, throttler, 40);
+
+  equal(throttle, throttle2, "No new throttle was inserted, returns old throttle");
+
+  stop();
+  setTimeout(function() {
+    start();
+    ok(!wasCalled, "attempt to call throttle again didn't happen");
+    
+    throttle = bb.throttle(null, throttler, 40);
+    ok(wasCalled, "newly inserted throttle after timeout functioned");
+
+    ok(bb.cancel(throttle), "wait time of throttle was cancelled");
+
+    wasCalled = false;
+    throttle2 = bb.throttle(null, throttler, 40);
+    notEqual(throttle, throttle2, "the throttle is different");
+    ok(wasCalled, "throttle was inserted and run immediately after cancel");
+
+    
+
+  }, 60);
+
 });
 
 test("throttle returns timer information usable for cancelling", function() {
@@ -117,7 +163,7 @@ test("throttle returns timer information usable for cancelling", function() {
     wasCalled = true;
   }
 
-  timer = bb.throttle(null, throttler, 1);
+  timer = bb.throttle(null, throttler, 1, false);
 
   ok(bb.cancel(timer), "the timer is cancelled");
 
@@ -183,3 +229,4 @@ test("throttler returns the appropriate timer to cancel if the old item still ex
   }, 10);
 
 });
+
