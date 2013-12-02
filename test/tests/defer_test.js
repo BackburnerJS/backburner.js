@@ -1,4 +1,4 @@
-import Backburner from "backburner";
+import { Backburner } from "backburner";
 var originalDateValueOf = Date.prototype.valueOf;
 
 module("defer", {
