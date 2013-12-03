@@ -25,6 +25,7 @@
     "grunt-contrib-watch": "~0.2.0",
     "grunt-hang": "~0.1.2",
     "grunt-contrib-qunit": "~0.2.1",
-    "grunt-contrib-jshint": "~0.4.3"
+    "grunt-contrib-jshint": "~0.4.3",
+    "grunt-s3": "~0.2.0-alpha.3"
   }
 }

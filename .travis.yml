@@ -1,3 +1,7 @@
----
-language: "node_js"
+language: node_js
 script: npm test
+after_success: grunt s3
+env:
+  global:
+  - secure: hLgTsV1IAaRepWTw+SYMRNCjmVhAJBWD5S7ldM4GbgPIy1knX+dely8pxQDu/4vn6xji848No5NjNVM7q4neyPv2TWpFrJ75w5CLDqQ74xBt+RAaw0WlgDtgxk0dXQYHvmI48gugWJenG1rPKtBqLaCuZQ8kfmJIH5khKugbEH8=
+  - secure: ETMIYpngbZCMTFmOJxlGxaCGEvdIg5l0GdjBOutW0Kaf7BSVpqz3q+EUTF/zI6ujKpO+X1LZbxgH2g/KQ9Q+wbH8Tk4HiVUAkagu58ZbzUGW08AD6Ec4Z9hVyw9OyxL5PgVouRc3p/NbaIVfnDcOJV6WVdFzlPPjNJi5/V+zCIs=

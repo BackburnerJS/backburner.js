@@ -33,7 +33,8 @@ module.exports = function(grunt) {
     connect: config('connect'),
     browser: config('browser'),
     transpile: config('transpile'),
-    buildTests: config('build_tests')
+    buildTests: config('build_tests'),
+    s3: config('s3')
   });
 
   // Load tasks from npm
@@ -43,6 +44,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-s3');
 
   grunt.registerTask('test', ['tests', 'qunit', 'jshint']);
 };
