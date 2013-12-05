@@ -15,16 +15,16 @@
   "license": "BSD",
   "readmeFilename": "README.md",
   "devDependencies": {
-    "grunt": "0.4.0",
+    "grunt": "~0.4.0",
     "grunt-cli": "~0.1.8",
-    "connect": "~2.7.4",
+    "connect": "~2.11.2",
     "es6-module-transpiler": "~0.3.4",
-    "grunt-contrib-concat": "~0.1.3",
-    "grunt-contrib-clean": "~0.4.0",
-    "grunt-contrib-connect": "~0.1.2",
-    "grunt-contrib-watch": "~0.2.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-connect": "~0.5.0",
+    "grunt-contrib-watch": "~0.5.3",
     "grunt-hang": "~0.1.2",
-    "grunt-contrib-qunit": "~0.2.1",
-    "grunt-contrib-jshint": "~0.4.3"
+    "grunt-contrib-qunit": "~0.3.0",
+    "grunt-contrib-jshint": "~0.7.2"
   }
 }
