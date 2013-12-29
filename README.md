@@ -27,7 +27,7 @@ A rewrite of the Ember.js run loop as a generic microlibrary.
 
 `Backburner#throttle` - rate-limit the passed function for a specified amount of time
 
-`Backburner#cancel` - cancel a `deferOnce` or `setTimeout`
+`Backburner#cancel` - cancel a `deferOnce`, `setTimeout`, `debounce` or `throttle`
 
 ## Example usage
 
