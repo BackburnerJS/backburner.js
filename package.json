@@ -12,7 +12,7 @@
     "url": "https://github.com/ebryn/backburner.js.git"
   },
   "author": "Erik Bryn",
-  "license": "BSD",
+  "license": "MIT",
   "readmeFilename": "README.md",
   "devDependencies": {
     "grunt": "~0.4.0",
