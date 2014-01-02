@@ -183,3 +183,49 @@ test("throttler returns the appropriate timer to cancel if the old item still ex
   }, 10);
 
 });
+
+test("throttle immediate", function() {
+  expect(8);
+
+  var bb = new Backburner(['zomg']),
+      step = 0;
+
+  var called = 0;
+  function throttler() {
+    called++;
+  }
+
+  // let's throttle the function `throttler` for 40ms using immediate == true
+  bb.throttle(null, throttler, 40, true);
+  // it should have been called immediately
+  ok(called == 1);
+  equal(step++, 0);
+
+  // let's schedule `throttler` to run again in 20ms
+  stop();
+  setTimeout(function() {
+    start();
+    equal(step++, 1);
+    // this time it should not run until 40ms has passed
+    bb.throttle(null, throttler, 40, true);
+    ok(called == 1);
+  }, 20);
+
+  // at 40ms, `throttler` will get called a second time
+  stop();
+  setTimeout(function() {
+    start();
+    equal(step++, 2);
+    ok(called == 2);
+  }, 50);
+
+  // at 60ms, `throttler` should be called immediately again
+  stop();
+  setTimeout(function() {
+    start();
+    equal(step++, 3);
+    bb.throttle(null, throttler, 40, true);
+    // it should have been called immediately
+    ok(called == 3);
+  }, 60);
+});
