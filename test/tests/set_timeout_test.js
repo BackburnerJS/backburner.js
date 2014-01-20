@@ -22,14 +22,14 @@ test("setTimeout", function() {
 
   stop();
   bb.setTimeout(null, function() {
-    start();
-    instance = bb.currentInstance;
-    equal(step++, 0);
+    equal(step++, 1);
+    equal(instance, bb.currentInstance, "same instance");
   }, 10);
 
   bb.setTimeout(null, function() {
-    equal(step++, 1);
-    equal(instance, bb.currentInstance, "same instance");
+    start();
+    instance = bb.currentInstance;
+    equal(step++, 0);
   }, 10);
 
   Date.prototype.valueOf = originalDateValueOf;
@@ -98,7 +98,7 @@ test("[null, callback, undefined]", function(){
   }, undefined);
 });
 
-test("[null, callback, undefined]", function(){
+test("[null, callback, null]", function(){
   expect(3);
   stop();
   bb.setTimeout(null, function() {
@@ -109,7 +109,7 @@ test("[null, callback, undefined]", function(){
   }, null);
 });
 
-test("[null, callback, undefined]", function(){
+test("[callback, string, string, string]", function(){
   expect(5);
   stop();
   bb.setTimeout(function() {
@@ -122,7 +122,7 @@ test("[null, callback, undefined]", function(){
   }, 'a', 'b', 'c');
 });
 
-test("[null, callback, undefined]", function(){
+test("[null, callback, string, string, string]", function(){
   expect(5);
   stop();
   bb.setTimeout(null, function() {
@@ -161,7 +161,7 @@ test("[null, callback, string, string, string, numericString]", function(){
   },  'a', 'b', 'c', '1');
 });
 
-test("[callback, string]", function(){
+test("[obj, string]", function(){
   expect(1);
   stop();
   bb.setTimeout({
@@ -185,7 +185,7 @@ test("[obj, string, value]", function(){
   }, 'bro', 'value');
 });
 
-test("[null, callback, undefined]", function(){
+test("[obj, string, value, number]", function(){
   stop();
   bb.setTimeout({
     bro: function(){
@@ -197,7 +197,7 @@ test("[null, callback, undefined]", function(){
   }, 'bro', 'value', 1);
 });
 
-test("[null, callback, undefined]", function(){
+test("[obj, string, value, numericString]", function(){
   stop();
   bb.setTimeout({
     bro: function(){
