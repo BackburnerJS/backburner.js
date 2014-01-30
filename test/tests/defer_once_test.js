@@ -50,4 +50,24 @@ test("when passed a target, method, and arguments", function() {
   });
 
   ok(functionWasCalled, "function was called");
+}); 
+
+test("when passed same function twice", function() {
+  expect(2);
+
+  var bb = new Backburner(['one']),
+      i=0,
+      functionWasCalled=false,
+      deferMethod = function(){
+        i++;
+        equal(i, 1, "Function should be called only once");
+        functionWasCalled = true;
+      };
+
+  bb.run(function() {
+    bb.deferOnce('one', deferMethod);
+    bb.deferOnce('one', deferMethod);
+  });
+
+  ok(functionWasCalled, "function was called only once");
 });
