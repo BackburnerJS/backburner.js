@@ -71,3 +71,43 @@ test("when passed same function twice", function() {
 
   ok(functionWasCalled, "function was called only once");
 });
+
+test("when passed same function twice with same arguments", function() {
+  expect(3);
+
+  var bb = new Backburner(['one']),
+      i=0,
+      functionWasCalled=false,
+      deferMethod = function(){
+        i++;
+        equal(i, 1, "Function should be called only once");
+        equal(this["first"], 1, "the target property was set");
+        functionWasCalled = true;
+      },
+      argObj = {"first": 1};
+
+  bb.run(function() {
+    bb.deferOnce('one', argObj, deferMethod);
+    bb.deferOnce('one', argObj, deferMethod);
+  });
+
+  ok(functionWasCalled, "function was called only once");
+});
+
+test("when passed same function twice with different arguments", function() {
+  expect(3);
+
+  var bb = new Backburner(['one']),
+      i=0,
+      deferMethod = function(){
+        i++;
+        equal(this["first"], 1, "the target property was set");
+      };
+
+  bb.run(function() {
+    bb.deferOnce('one', {"first": 1}, deferMethod);
+    bb.deferOnce('one', {"first": 1}, deferMethod);
+  });
+
+  equal(i, 2, "function was called twice");
+});

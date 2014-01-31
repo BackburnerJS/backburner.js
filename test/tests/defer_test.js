@@ -58,15 +58,12 @@ test("when passed a target, method, and arguments", function() {
 });
 
 test("when passed same function twice", function() {
-  expect(3);
+  expect(1);
 
   var bb = new Backburner(['one']),
       i=0,
-      functionWasCalled=false,
       deferMethod = function(){
         i++;
-        ok(i, "Function should be called multiple times");
-        functionWasCalled = true;
       };
 
   bb.run(function() {
@@ -74,5 +71,23 @@ test("when passed same function twice", function() {
     bb.defer('one', deferMethod);
   });
 
-  ok(functionWasCalled, "function was called twice");
+  equal(i, 2, "function was called twice");
+});
+
+
+test("when passed same function twice with arguments", function() {
+  expect(2);
+
+  var bb = new Backburner(['one']),
+      i=0,
+      deferMethod = function(){
+        equal(this["first"], 1, "the target property was set");
+      },
+      argObj = {'first' : 1};
+
+  bb.run(function() {
+    bb.defer('one', argObj, deferMethod);
+    bb.defer('one', argObj, deferMethod);
+  });
+
 });
