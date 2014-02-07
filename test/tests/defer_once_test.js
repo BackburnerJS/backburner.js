@@ -71,3 +71,111 @@ test("when passed same function twice", function() {
 
   ok(functionWasCalled, "function was called only once");
 });
+
+test("when passed same function twice with same target", function() {
+  expect(3);
+
+  var bb = new Backburner(['one']),
+      i=0,
+      functionWasCalled=false,
+      deferMethod = function(){
+        i++;
+        equal(i, 1, "Function should be called only once");
+        equal(this["first"], 1, "the target property was set");
+        functionWasCalled = true;
+      },
+      argObj = {"first": 1};
+
+  bb.run(function() {
+    bb.deferOnce('one', argObj, deferMethod);
+    bb.deferOnce('one', argObj, deferMethod);
+  });
+
+  ok(functionWasCalled, "function was called only once");
+});
+
+test("when passed same function twice with different targets", function() {
+  expect(3);
+
+  var bb = new Backburner(['one']),
+      i=0,
+      deferMethod = function(){
+        i++;
+        equal(this["first"], 1, "the target property was set");
+      };
+
+  bb.run(function() {
+    bb.deferOnce('one', {"first": 1}, deferMethod);
+    bb.deferOnce('one', {"first": 1}, deferMethod);
+  });
+
+  equal(i, 2, "function was called twice");
+});
+
+test("when passed same function twice with same arguments and same target", function() {
+  expect(4);
+
+  var bb = new Backburner(['one']),
+      i=0,
+      deferMethod = function(a, b){
+        i++;
+        equal(a, 1, 'First argument is set only one time');
+        equal(b, 2, 'Second argument remains same');
+        equal(this["first"], 1, "the target property was set");
+      },
+      argObj = {'first': 1};
+
+  bb.run(function() {
+    bb.deferOnce('one', argObj, deferMethod, 1, 2);
+    bb.deferOnce('one', argObj, deferMethod, 1, 2);
+  });
+
+  equal(i, 1, "function was called once");
+});
+
+test("when passed same function twice with same target and different arguments", function() {
+  expect(4);
+
+  var bb = new Backburner(['one']),
+      i=0,
+      deferMethod = function(a, b){
+        i++;
+        equal(a, 3, 'First argument of only second call is set');
+        equal(b, 2, 'Second argument remains same');
+        equal(this["first"], 1, "the target property was set");
+      },
+      argObj = {'first': 1};
+
+  bb.run(function() {
+    bb.deferOnce('one', argObj, deferMethod, 1, 2);
+    bb.deferOnce('one', argObj, deferMethod, 3, 2);
+  });
+
+  equal(i, 1, "function was called once");
+});
+
+test("when passed same function twice with different target and different arguments", function() {
+  expect(7);
+
+  var bb = new Backburner(['one']),
+      i=0,
+      deferMethod = function(a, b){
+        i++;
+        if(i === 1){
+          equal(a, 1, 'First argument set during first call');
+        } else {
+          equal(a, 3, 'First argument set during second call');
+        }
+        equal(b, 2, 'Second argument remains same');
+        equal(this["first"], 1, "the target property was set");
+      },
+      argObj = {'first': 1};
+
+  bb.run(function() {
+    bb.deferOnce('one', {"first": 1}, deferMethod, 1, 2);
+    bb.deferOnce('one', {"first": 1}, deferMethod, 3, 2);
+  });
+
+  equal(i, 2, "function was called twice");
+});
+
