@@ -1,9 +1,15 @@
-module.exports = function(grunt) {
-  grunt.loadTasks('tasks');
+var path = require('path');
 
-  function config(name) {
-    return require('./configurations/' + name);
-  }
+module.exports = function(grunt) {
+  var cwd = process.cwd();
+
+  require('./tasks/browser')(grunt);
+  require('./tasks/build_tests')(grunt);
+  require('./tasks/bytes')(grunt);
+
+  var config = require('load-grunt-config')(grunt, {
+    configPath: path.join(cwd, 'tasks', 'options')
+  });
 
   // Alias tasks for the most common sets of tasks.
   // Most of the time, you will use these.
@@ -13,38 +19,34 @@ module.exports = function(grunt) {
   this.registerTask('default', ['build']);
 
   // Build a new version of the library
-  this.registerTask('build', "Builds a distributable version of <%= pkg.name%>",
-                    ['clean', 'transpile:amd', 'concat:library', 'concat:browser', 'browser:dist', 'bytes']);
+  this.registerTask('build', "Builds a distributable version of <%= package.name %>", [
+    'clean',
+    'transpile:amd',
+    'concat:library',
+    'concat:browser',
+    'browser:dist',
+    'bytes'
+  ]);
 
-  this.registerTask('tests', "Builds the test package",
-                    ['build', 'concat:deps', 'transpile:tests', 'buildTests:dist']);
+  this.registerTask('tests', "Builds the test package", [
+    'build',
+    'concat:deps',
+    'transpile:tests',
+    'concat:tests',
+    'build_tests:dist'
+  ]);
 
   // Run a server. This is ideal for running the QUnit tests in the browser.
-  this.registerTask('server', ['build', 'tests', 'connect', 'watch']);
+  this.registerTask('server', [
+    'build',
+    'tests',
+    'connect',
+    'watch'
+  ]);
 
-  grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
-
-    watch: config('watch'),
-    clean: ["dist"],
-    qunit: config('qunit'),
-    jshint: config('jshint'),
-    concat: config('concat'),
-    connect: config('connect'),
-    browser: config('browser'),
-    transpile: config('transpile'),
-    buildTests: config('build_tests'),
-    s3: config('s3')
-  });
-
-  // Load tasks from npm
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-s3');
-
-  grunt.registerTask('test', ['tests', 'qunit', 'jshint']);
+  this.registerTask('test', [
+    'tests',
+    'jshint',
+    'qunit'
+  ]);
 };

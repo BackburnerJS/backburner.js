@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     return path.match(/^(?:lib|test|test\/tests)\/(.*)\.js$/)[1];
   }
 
-  this.registerMultiTask('buildTests', "Execute the tests", function() {
+  grunt.registerMultiTask('build_tests', "Execute the tests", function() {
     var testFiles = grunt.file.expand('test/tests/**/*_test.js');
 
     this.files.forEach(function(f) {
