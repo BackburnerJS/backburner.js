@@ -1,7 +1,7 @@
 module.exports = {
   all: {
     options: {
-      urls: [ 'test/index.html' ]
+      urls: ['test/index.html']
     }
   }
 };

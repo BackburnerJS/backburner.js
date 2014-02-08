@@ -1,8 +1,8 @@
-var baseDistFile = 'dist/backburner.js-<%= pkg.version %>.';
+var baseDistFile = 'dist/backburner.js-<%= package.version %>.';
 var builds = ['amd.', ''];
 var s3Uploads = [];
 
-builds.forEach(function(build){
+builds.forEach(function(build) {
   var srcFile = baseDistFile + build + 'js';
   s3Uploads.push({ src: srcFile, dest: 'backburner.js/lastest/backburner.' + build + 'js' });
 });
