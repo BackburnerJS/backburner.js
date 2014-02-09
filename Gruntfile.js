@@ -22,6 +22,7 @@ module.exports = function(grunt) {
   this.registerTask('build', "Builds a distributable version of <%= package.name %>", [
     'clean',
     'transpile:amd',
+    'transpile:commonjs',
     'concat:library',
     'concat:browser',
     'browser:dist',
