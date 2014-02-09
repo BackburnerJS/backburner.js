@@ -28,13 +28,9 @@ module.exports = {
     files: [{
       expand: true,
       cwd: 'lib/',
-      src: ['<%= pkg.name %>/**/*.js'],
+      src: ['**/*.js'],
       dest: 'dist/commonjs/',
       ext: '.js'
-    },
-    {
-      src: ['lib/<%= pkg.name %>.js'],
-      dest: 'dist/commonjs/main.js'
     }]
   },
 
