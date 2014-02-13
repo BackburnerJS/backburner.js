@@ -15,7 +15,7 @@ module.exports = {
   },
 
   browser: {
-    src: ['vendor/loader.js', 'tmp/<%= package.barename %>.amd.js'],
+    src: ['vendor/loader.js', 'dist/<%= package.name %>-<%= package.version %>.amd.js'],
     dest: 'tmp/<%= package.barename %>.browser1.js'
   }
 };
