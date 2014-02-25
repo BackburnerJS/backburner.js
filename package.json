@@ -1,6 +1,7 @@
 {
   "name": "backburner.js",
   "barename": "backburner",
+  "globalExportName": "Backburner",
   "version": "0.1.0",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
   "main": "index.js",
