@@ -162,3 +162,19 @@ test("when passed same function twice with different target and different argume
 
   equal(i, 2, "function was called twice");
 });
+
+test("onError", function() {
+  expect(1);
+
+  function onError(error) {
+    equal("test error", error.message);
+  }
+
+  var bb = new Backburner(['errors'], { onError: onError });
+
+  bb.run(function() {
+    bb.defer('errors', function() {
+      throw new Error("test error");
+    });
+  });
+});

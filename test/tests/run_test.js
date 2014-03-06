@@ -111,3 +111,29 @@ test("runs can be nested", function() {
     });
   });
 });
+
+test("onError", function() {
+  expect(1);
+
+  function onError(error) {
+    equal("test error", error.message);
+  }
+
+  var bb = new Backburner(['errors'], { onError: onError });
+
+  bb.run(function() { throw new Error("test error"); });
+});
+
+test("onError set after start", function() {
+  expect(2);
+
+  var bb = new Backburner(['errors']);
+
+  bb.run(function() { ok(true); });
+
+  bb.options.onError = function(error) {
+    equal("test error", error.message);
+  };
+
+  bb.run(function() { throw new Error("test error"); });
+});

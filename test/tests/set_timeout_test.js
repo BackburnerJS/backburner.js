@@ -208,3 +208,18 @@ test("[obj, string, value, numericString]", function(){
     }
   }, 'bro', 'value', '1');
 });
+
+test("onError", function() {
+  expect(1);
+
+  function onError(error) {
+    equal("test error", error.message);
+    start();
+  }
+
+  var bb = new Backburner(['errors'], { onError: onError });
+
+  bb.setTimeout(function() { throw new Error("test error"); }, 1);
+
+  stop();
+});

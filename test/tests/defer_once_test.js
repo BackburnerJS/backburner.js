@@ -50,7 +50,7 @@ test("when passed a target, method, and arguments", function() {
   });
 
   ok(functionWasCalled, "function was called");
-}); 
+});
 
 test("when passed same function twice", function() {
   expect(2);
@@ -177,5 +177,21 @@ test("when passed same function twice with different target and different argume
   });
 
   equal(i, 2, "function was called twice");
+});
+
+test("onError", function() {
+  expect(1);
+
+  function onError(error) {
+    equal("test error", error.message);
+  }
+
+  var bb = new Backburner(['errors'], { onError: onError });
+
+  bb.run(function() {
+    bb.deferOnce('errors', function() {
+      throw new Error("test error");
+    });
+  });
 });
 

@@ -133,7 +133,7 @@ test("throttle leading edge", function() {
   setTimeout(function() {
     start();
     ok(!wasCalled, "attempt to call throttle again didn't happen");
-    
+
     throttle = bb.throttle(null, throttler, 40);
     ok(wasCalled, "newly inserted throttle after timeout functioned");
 
@@ -144,7 +144,7 @@ test("throttle leading edge", function() {
     notEqual(throttle, throttle2, "the throttle is different");
     ok(wasCalled, "throttle was inserted and run immediately after cancel");
 
-    
+
 
   }, 60);
 
@@ -230,3 +230,14 @@ test("throttler returns the appropriate timer to cancel if the old item still ex
 
 });
 
+test("onError", function() {
+  expect(1);
+
+  function onError(error) {
+    equal("test error", error.message);
+  }
+
+  var bb = new Backburner(['errors'], { onError: onError });
+
+  bb.throttle(null, function() { throw new Error("test error"); }, 20);
+});
