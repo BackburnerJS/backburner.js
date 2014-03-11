@@ -302,3 +302,18 @@ test("debounce that is immediate, and cancelled and called again happens immedia
   }, 10);
 
 });
+
+test("onError", function() {
+  expect(1);
+
+  function onError(error) {
+    equal("test error", error.message);
+    start();
+  }
+
+  var bb = new Backburner(['errors'], { onError: onError });
+
+  bb.debounce(null, function() { throw new Error("test error"); }, 20);
+
+  stop();
+});
