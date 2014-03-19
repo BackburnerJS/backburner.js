@@ -137,3 +137,22 @@ test("onError set after start", function() {
 
   bb.run(function() { throw new Error("test error"); });
 });
+
+test("onError with target and action", function() {
+  expect(2);
+
+  var target = {};
+
+  var bb = new Backburner(['errors'], {
+    onErrorTarget: target,
+    onErrorMethod: 'onerror'
+  });
+
+  bb.run(function() { ok(true); });
+
+  target.onerror = function(error) {
+    equal("test error", error.message);
+  };
+
+  bb.run(function() { throw new Error("test error"); });
+});
