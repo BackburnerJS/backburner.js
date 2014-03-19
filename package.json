@@ -1,7 +1,7 @@
 {
   "name": "backburner.js",
   "barename": "backburner",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
   "main": "index.js",
   "scripts": {
