@@ -33,6 +33,10 @@ test("setTimeout", function() {
   }, 10);
 
   Date.prototype.valueOf = originalDateValueOf;
+  // spin so that when we execute timers (+new Date()) will be greater than the
+  // time scheduled above; not a problem in real life as we will never "wait"
+  // 0ms
+  while((+ new Date()) <= now + 10);
 
   stop();
   bb.setTimeout(null, function() {
