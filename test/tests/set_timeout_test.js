@@ -22,14 +22,14 @@ test("setTimeout", function() {
 
   stop();
   bb.setTimeout(null, function() {
-    equal(step++, 1);
-    equal(instance, bb.currentInstance, "same instance");
-  }, 10);
-
-  bb.setTimeout(null, function() {
     start();
     instance = bb.currentInstance;
     equal(step++, 0);
+  }, 10);
+
+  bb.setTimeout(null, function() {
+    equal(step++, 1);
+    equal(instance, bb.currentInstance, "same instance");
   }, 10);
 
   Date.prototype.valueOf = originalDateValueOf;
