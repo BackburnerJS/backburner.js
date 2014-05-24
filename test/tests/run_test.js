@@ -112,6 +112,16 @@ test("runs can be nested", function() {
   });
 });
 
+test("run returns value", function() {
+  var bb = new Backburner(['one']);
+
+  var value = bb.run(function() {
+    return 'hi';
+  });
+
+  equal(value, 'hi');
+});
+
 test("onError", function() {
   expect(1);
 
