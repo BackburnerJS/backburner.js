@@ -29,9 +29,14 @@ test("deferOnce", function() {
 });
 
 test("setTimeout", function() {
-  expect(3);
+  expect(5);
 
-  var bb = new Backburner(['one']),
+  var called = false,
+      bb = new Backburner(['one'], {
+        onBegin: function() {
+          called = true;
+        }
+      }),
       functionWasCalled = false;
 
   var timer = bb.setTimeout(function() {
@@ -40,7 +45,85 @@ test("setTimeout", function() {
 
   ok(timer, "Timer object was returned");
   ok(bb.cancel(timer), "Cancel returned true");
-  ok(!functionWasCalled, "function was not called");
+  ok(!called, 'onBegin was not called');
+
+  stop();
+  setTimeout(function () {
+    start();
+    ok(!functionWasCalled, "function was not called");
+    ok(!called, 'onBegin was not called');
+  }, 0);
+});
+
+test("setTimeout with multiple pending", function() {
+  expect(7);
+
+  var called = false,
+    bb = new Backburner(['one'], {
+      onBegin: function () {
+        called = true;
+      }
+    }),
+    function1WasCalled = false,
+    function2WasCalled = false;
+
+  var timer1 = bb.setTimeout(function () {
+    function1WasCalled = true;
+  }, 0);
+
+  var timer2 = bb.setTimeout(function () {
+    function2WasCalled = true;
+  }, 1);
+
+  ok(timer1, "Timer object 2 was returned");
+  ok(bb.cancel(timer1), "Cancel for timer 1 returned true");
+  ok(timer2, "Timer object 2 was returned");
+  ok(!called, 'onBegin was not called');
+
+  stop();
+  setTimeout(function () {
+    start();
+
+    ok(!function1WasCalled, "function 1 was not called");
+    ok(function2WasCalled, "function 2 was called");
+    ok(called, 'onBegin was called');
+  }, 10);
+});
+
+test("setTimeout and creating a new setTimeout", function() {
+  expect(7);
+
+  var called = false,
+    bb = new Backburner(['one'], {
+      onBegin: function () {
+        called = true;
+      }
+    }),
+    function1WasCalled = false,
+    function2WasCalled = false;
+
+  var timer1 = bb.setTimeout(function () {
+    function1WasCalled = true;
+  }, 0);
+
+  ok(timer1, "Timer object 2 was returned");
+  ok(bb.cancel(timer1), "Cancel for timer 1 returned true");
+
+  var timer2 = bb.setTimeout(function () {
+    function2WasCalled = true;
+  }, 1);
+
+  ok(timer2, "Timer object 2 was returned");
+  ok(!called, 'onBegin was not called');
+
+  stop();
+  setTimeout(function () {
+    start();
+
+    ok(!function1WasCalled, "function 1 was not called");
+    ok(function2WasCalled, "function 2 was called");
+    ok(called, 'onBegin was called');
+  }, 50);
 });
 
 test("cancelTimers", function() {
