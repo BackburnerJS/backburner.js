@@ -296,3 +296,39 @@ test("setTimeout doesn't hang when timeout is unfulfilled", function() { // See 
   }, 50);
 });
 
+test("setTimeout with two Backburner instances", function() {
+  expect(8);
+
+  var steps = 0,
+
+    bb1 = new Backburner(['one'], {
+      onBegin: function() {
+        equal(++steps, 4);
+      }
+    }),
+    bb2 = new Backburner(['one'], {
+      onBegin: function() {
+        equal(++steps, 6);
+      }
+    });
+
+  equal(++steps, 1);
+
+  bb1.setTimeout(function() {
+    equal(++steps, 5);
+  }, 10);
+
+  equal(++steps, 2);
+
+  bb2.setTimeout(function() {
+    equal(++steps, 7);
+  }, 10);
+
+  equal(++steps, 3);
+
+  stop();
+  setTimeout(function () {
+    start();
+    equal(++steps, 8);
+  }, 50);
+});
