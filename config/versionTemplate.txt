@@ -1,0 +1,8 @@
+/*!
+ * @overview Backburner - A rewrite of the Ember.js run loop as a generic microlibrary
+
+ * @copyright Copyright (c) 2014 Erik Bryn and contributors
+ * @license   Licensed under MIT license
+ *            See https://raw.githubusercontent.com/ebryn/backburner.js/master/LICENSE
+ * @version   VERSION_PLACEHOLDER_STRING
+ */

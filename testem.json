@@ -1,0 +1,6 @@
+{
+  "test_page": "test/index.html",
+  "parallel": 5,
+  "before_tests": "npm run build",
+  "launch_in_ci":  ["PhantomJS"]
+}
