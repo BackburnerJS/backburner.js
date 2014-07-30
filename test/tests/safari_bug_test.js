@@ -1,13 +1,13 @@
-import { Backburner } from "backburner";
+import Backburner from "backburner";
 
 module("safari bug");
 
 test("Prevent Safari double finally in run", function() {
   expect(1);
 
-  var bb = new Backburner(['one']),
-      count = 0,
-      realEnd = Backburner.prototype.end;
+  var bb = new Backburner(['one']);
+  var count = 0;
+  var realEnd = Backburner.prototype.end;
 
   Backburner.prototype.end = function() {
     count++;
@@ -35,7 +35,6 @@ test("Prevent Safari double finally in end", function() {
   expect(1);
 
   var count = 0;
-
   var bb = new Backburner(['one'], {
         onEnd: function() {
           count++;

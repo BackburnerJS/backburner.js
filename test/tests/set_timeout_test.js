@@ -1,4 +1,4 @@
-import { Backburner } from "backburner";
+import Backburner from "backburner";
 
 var originalDateValueOf = Date.prototype.valueOf;
 
@@ -11,9 +11,9 @@ module("setTimeout",{
 test("setTimeout", function() {
   expect(6);
 
-  var bb = new Backburner(['one']),
-      step = 0,
-      instance;
+  var bb = new Backburner(['one']);
+  var step = 0;
+  var instance;
 
   // Force +new Date to return the same result while scheduling
   // run.later timers. Otherwise: non-determinism!
@@ -231,11 +231,11 @@ test("onError", function() {
 test("setTimeout doesn't trigger twice with earlier setTimeout", function() {
   expect(3);
 
-  var bb = new Backburner(['one']),
-      called1 = 0,
-      called2 = 0,
-      calls = 0,
-      oldRun = bb.run;
+  var bb = new Backburner(['one']);
+  var called1 = 0;
+  var called2 = 0;
+  var calls = 0;
+  var oldRun = bb.run;
 
   // Count run() calls and relay them to original function
   bb.run = function () {
@@ -263,11 +263,11 @@ test("setTimeout doesn't trigger twice with earlier setTimeout", function() {
 test("setTimeout doesn't hang when timeout is unfulfilled", function() { // See issue #86
   expect(3);
 
-  var bb = new Backburner(['one']),
-    called1 = 0,
-    called2 = 0,
-    calls = 0,
-    oldRun = bb.run;
+  var bb = new Backburner(['one']);
+  var called1 = 0;
+  var called2 = 0;
+  var calls = 0;
+  var oldRun = bb.run;
 
   // Count run() calls and relay them to original function
   bb.run = function () {
@@ -299,18 +299,17 @@ test("setTimeout doesn't hang when timeout is unfulfilled", function() { // See 
 test("setTimeout with two Backburner instances", function() {
   expect(8);
 
-  var steps = 0,
-
-    bb1 = new Backburner(['one'], {
-      onBegin: function() {
-        equal(++steps, 4);
-      }
-    }),
-    bb2 = new Backburner(['one'], {
-      onBegin: function() {
-        equal(++steps, 6);
-      }
-    });
+  var steps = 0;
+  var bb1 = new Backburner(['one'], {
+    onBegin: function() {
+      equal(++steps, 4);
+    }
+  });
+  var bb2 = new Backburner(['one'], {
+    onBegin: function() {
+      equal(++steps, 6);
+    }
+  });
 
   equal(++steps, 1);
 

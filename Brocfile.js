@@ -32,6 +32,8 @@ if (process.env.ENV === 'production') {
   }), {
     compilation_level: 'ADVANCED_OPTIMIZATIONS',
   }));
+} else {
+
 }
 
 var distTree = mergeTrees(trees.concat('config'));

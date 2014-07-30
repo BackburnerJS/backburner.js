@@ -1,12 +1,12 @@
-import { Backburner } from "backburner";
+import Backburner from "backburner";
 
 module("debounce");
 
 test("debounce", function() {
   expect(14);
 
-  var bb = new Backburner(['zomg']),
-      step = 0;
+  var bb = new Backburner(['zomg']);
+  var step = 0;
 
   var wasCalled = false;
   function debouncee() {
@@ -84,8 +84,8 @@ test("debounce", function() {
 test("debounce - immediate", function() {
   expect(16);
 
-  var bb = new Backburner(['zomg']),
-      step = 0;
+  var bb = new Backburner(['zomg']);
+  var step = 0;
 
   var wasCalled = false;
   function debouncee() {
@@ -167,8 +167,8 @@ test("debounce - immediate", function() {
 
 test("debounce accept time interval like string numbers", function() {
 
-  var bb = new Backburner(['zomg']),
-      step = 0;
+  var bb = new Backburner(['zomg']);
+  var step = 0;
 
   var wasCalled = false;
   function debouncee() {
@@ -199,9 +199,8 @@ test("debounce accept time interval like string numbers", function() {
 test("debounce returns timer information usable for cancelling", function() {
   expect(3);
 
-  var bb = new Backburner(['batman']),
-      timer;
-
+  var bb = new Backburner(['batman']);
+  var timer;
   var wasCalled = false;
 
   function debouncee() {
@@ -227,8 +226,8 @@ test("debounce returns timer information usable for cancelling", function() {
 test("debounce cancelled after it's executed returns false", function() {
   expect(3);
 
-  var bb = new Backburner(['darkknight']),
-      timer;
+  var bb = new Backburner(['darkknight']);
+  var timer;
 
   var wasCalled = false;
 
@@ -251,8 +250,8 @@ test("debounce cancelled after it's executed returns false", function() {
 test("debounce cancelled doesn't cancel older items", function() {
   expect(4);
 
-  var bb = new Backburner(['robin']),
-      timer;
+  var bb = new Backburner(['robin']);
+  var timer;
 
   var wasCalled = false;
 
@@ -276,8 +275,8 @@ test("debounce cancelled doesn't cancel older items", function() {
 test("debounce that is immediate, and cancelled and called again happens immediately", function() {
   expect(3);
 
-  var bb = new Backburner(['robin']),
-      timer;
+  var bb = new Backburner(['robin']);
+  var timer;
 
   var calledCount = 0;
 
@@ -311,7 +310,9 @@ test("onError", function() {
     start();
   }
 
-  var bb = new Backburner(['errors'], { onError: onError });
+  var bb = new Backburner(['errors'], {
+    onError: onError
+  });
 
   bb.debounce(null, function() { throw new Error("test error"); }, 20);
 

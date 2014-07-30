@@ -1,10 +1,10 @@
-import { Backburner } from "backburner";
+import Backburner from "backburner";
 
 module("autorun");
 
 test("autorun", function() {
-  var bb = new Backburner(['zomg']),
-      step = 0;
+  var bb = new Backburner(['zomg']);
+  var step = 0;
 
   ok(!bb.currentInstance, "The DeferredActionQueues object is lazily instaniated");
   equal(step++, 0);

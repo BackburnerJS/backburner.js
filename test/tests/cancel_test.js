@@ -1,4 +1,4 @@
-import { Backburner } from "backburner";
+import Backburner from "backburner";
 
 module("cancel");
 
@@ -14,8 +14,8 @@ test("null", function() {
 test("deferOnce", function() {
   expect(3);
 
-  var bb = new Backburner(['one']),
-      functionWasCalled = false;
+  var bb = new Backburner(['one']);
+  var functionWasCalled = false;
 
   bb.run(function() {
     var timer = bb.deferOnce('one', function() {
