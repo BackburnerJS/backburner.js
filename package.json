@@ -10,7 +10,8 @@
   "scripts": {
     "build": "ember build",
     "test": "testem ci",
-    "test-server": "testem"
+    "test-server": "testem",
+    "start": "ember server"
   },
   "author": "Erik Bryn",
   "license": "MIT",
@@ -26,6 +27,7 @@
     "broccoli-string-replace": "0.0.2",
     "ember-cli": "0.0.40",
     "es6-module-transpiler-amd-formatter": "0.0.1",
-    "express": "^4.6.1"
+    "express": "^4.6.1",
+    "testem": "^0.6.17"
   }
 }
