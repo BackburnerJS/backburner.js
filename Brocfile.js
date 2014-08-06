@@ -4,13 +4,52 @@ var closureCompiler = require('broccoli-closure-compiler');
 var compileModules = require('broccoli-compile-modules');
 var mergeTrees = require('broccoli-merge-trees');
 var moveFile = require('broccoli-file-mover');
+var pickFiles = require('broccoli-static-compiler');
+var jshint = require('broccoli-jshint');
 
 var concat           = require('broccoli-concat');
 var replace          = require('broccoli-string-replace');
-var calculateVersion = require('./lib/calculateVersion');
+var calculateVersion = require('./config/calculateVersion');
 var path             = require('path');
 
-var trees = [];
+var bower = 'bower_components';
+var loader = pickFiles(bower, {
+  srcDir: '/loader',
+  files: [ 'loader.js' ],
+  destDir: '/tests'
+});
+
+var qunit = pickFiles(bower, {
+  srcDir: '/qunit/qunit',
+  destDir: '/tests'
+});
+
+var testLoader = pickFiles(bower, {
+  srcDir: 'ember-cli-test-loader',
+  files: [ 'test-loader.js' ],
+  destDir: '/tests'
+});
+
+var testIndex = pickFiles('tests', {
+  srcDir: '/',
+  files: ['index.html'],
+  destDir: '/tests/'
+});
+
+var configTree = pickFiles('config', {
+  srcDir: '/',
+  files: [ 'versionTemplate.txt' ],
+  destDir: '/'
+});
+
+var testsTree = pickFiles('tests', {
+  srcDir: '/',
+  files: [ '**/*.js' ],
+  destDir: '/'
+});
+
+var jshintLib = jshint('lib');
+var jshintTests = jshint(testsTree);
 
 var bundle = compileModules('lib', {
   inputFiles: ['backburner.umd.js'],
@@ -18,12 +57,53 @@ var bundle = compileModules('lib', {
   formatter: 'bundle',
 });
 
-trees.push(bundle);
-trees.push(compileModules('lib', {
-  inputFiles: ['**/*.js'],
-  output: '/amd/',
-  formatter: new AMDFormatter()
-}));
+
+bundle = concat(mergeTrees([bundle, configTree]), {
+  inputFiles: [
+    'versionTemplate.txt',
+    'backburner.js'
+  ],
+  outputFile: '/backburner.js'
+});
+
+bundle = replace(bundle, {
+  files: [ 'backburner.js' ],
+  pattern: {
+    match: /VERSION_PLACEHOLDER_STRING/g,
+    replacement: calculateVersion()
+  }
+});
+
+function generateNamedAMDTree(inputTree, outputFile) {
+  var workingTree = compileModules(inputTree, {
+    inputFiles: ['**/*.js'],
+    output: '/',
+    formatter: new AMDFormatter()
+  });
+
+  workingTree = concat(mergeTrees([workingTree, configTree]), {
+    inputFiles: [
+      'versionTemplate.txt',
+      '**/*.js'
+    ],
+    outputFile: '/' + outputFile
+  });
+
+  workingTree = replace(workingTree, {
+    files: [ outputFile ],
+    pattern: {
+      match: /VERSION_PLACEHOLDER_STRING/g,
+      replacement: calculateVersion()
+    }
+  });
+
+  return workingTree;
+}
+
+var namedAMDTree = generateNamedAMDTree('lib', 'backburner.amd.js');
+var namedAMDTestTree = generateNamedAMDTree(mergeTrees(['lib', testsTree, jshintLib, jshintTests]), 'backburner-tests.amd.js');
+
+var trees = [qunit, loader, testIndex, testLoader, bundle, namedAMDTree, namedAMDTestTree];
 
 if (process.env.ENV === 'production') {
   trees.push(closureCompiler(moveFile(bundle, {
@@ -32,42 +112,6 @@ if (process.env.ENV === 'production') {
   }), {
     compilation_level: 'ADVANCED_OPTIMIZATIONS',
   }));
-} else {
-
 }
 
-var distTree = mergeTrees(trees.concat('config'));
-var distTrees = [];
-
-distTrees.push(concat(distTree, {
-  inputFiles: [
-    'versionTemplate.txt',
-    'backburner.js'
-  ],
-  outputFile: '/backburner.js'
-}));
-
-if (process.env.ENV === 'production') {
-  distTrees.push(concat(distTree, {
-    inputFiles: [
-      'versionTemplate.txt',
-      'rsvp.min.js'
-    ],
-    outputFile: '/rsvp.min.js'
-  }));
-}
-
-
-distTree = mergeTrees(distTrees);
-var distTree = replace(distTree, {
-  files: [
-    'backburner.js',
-    'backburner.min.js'
-  ],
-  pattern: {
-    match: /VERSION_PLACEHOLDER_STRING/g,
-    replacement: calculateVersion()
-  }
-});
-
-module.exports = distTree;
+module.exports = mergeTrees(trees);

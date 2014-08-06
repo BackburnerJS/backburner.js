@@ -1,0 +1,9 @@
+{
+  "name": "backburner.js",
+  "devDependencies": {
+    "loader": "stefanpenner/loader.js#1.0.1",
+    "qunit": "~1.14.0",
+    "ember-cli-test-loader": "rwjblue/ember-cli-test-loader#0.0.4"
+  }
+}
+

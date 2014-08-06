@@ -1,6 +1,6 @@
 {
   "name": "backburner.js",
-  "version": "0.2.1",
+  "version": "0.2.2+pre",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
   "main": "index.js",
   "repository": {
@@ -8,9 +8,9 @@
     "url": "https://github.com/ebryn/backburner.js.git"
   },
   "scripts": {
-    "build": "ember build",
-    "test": "testem ci",
-    "test-server": "testem",
+    "build": "ember build --environment=production",
+    "test": "ember test",
+    "test-server": "ember test --server",
     "start": "ember server"
   },
   "author": "Erik Bryn",
@@ -21,9 +21,9 @@
     "broccoli-compile-modules": "git://github.com/eventualbuddha/broccoli-compile-modules",
     "broccoli-concat": "0.0.7",
     "broccoli-file-mover": "^0.4.0",
-    "broccoli-jshint": "^0.5.1",
+    "broccoli-jshint": "~0.5.1",
     "broccoli-merge-trees": "^0.1.4",
-    "broccoli-static-compiler": "^0.1.4",
+    "broccoli-static-compiler": "~0.1.4",
     "broccoli-string-replace": "0.0.2",
     "ember-cli": "0.0.40",
     "es6-module-transpiler-amd-formatter": "0.0.1",
