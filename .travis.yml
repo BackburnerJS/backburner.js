@@ -1,5 +1,8 @@
 language: node_js
 script: npm test
+before_script:
+  - npm install -g bower
+  - bower install
 after_success: grunt s3
 env:
   global:
