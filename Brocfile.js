@@ -1,6 +1,7 @@
 /* jshint node:true, undef:true, unused:true */
 var AMDFormatter = require('es6-module-transpiler-amd-formatter');
 var closureCompiler = require('broccoli-closure-compiler');
+var env = process.env.EMBER_ENV;
 var compileModules = require('broccoli-compile-modules');
 var mergeTrees = require('broccoli-merge-trees');
 var moveFile = require('broccoli-file-mover');
@@ -25,7 +26,7 @@ trees.push(compileModules('lib', {
   formatter: new AMDFormatter()
 }));
 
-if (process.env.ENV === 'production') {
+if (env === 'production') {
   trees.push(closureCompiler(moveFile(bundle, {
     srcFile: 'backburner.js',
     destFile: 'backburner.min.js'
@@ -47,13 +48,13 @@ distTrees.push(concat(distTree, {
   outputFile: '/backburner.js'
 }));
 
-if (process.env.ENV === 'production') {
+if (env === 'production') {
   distTrees.push(concat(distTree, {
     inputFiles: [
       'versionTemplate.txt',
-      'rsvp.min.js'
+      'backburner.min.js'
     ],
-    outputFile: '/rsvp.min.js'
+    outputFile: '/backburner.min.js'
   }));
 }
 
