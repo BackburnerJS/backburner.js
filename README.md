@@ -48,7 +48,7 @@ The following code will only cause a single DOM manipulation:
     <script src="backburner.js"></script>
 
     <script>
-      var bb = new backburner.Backburner(['render']),
+      var backburner = new Backburner(['render']),
           person = {name: "Erik"};
 
       function updateName() {
@@ -57,10 +57,10 @@ The following code will only cause a single DOM manipulation:
 
       function setName(name) {
         person.name = name;
-        bb.deferOnce('render', updateName);
+        backburner.deferOnce('render', updateName);
       }
 
-      bb.run(function() {
+      backburner.run(function() {
         setName("Kris");
         setName("Tom");
         setName("Yehuda");
