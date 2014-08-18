@@ -33,24 +33,41 @@ A rewrite of the Ember.js run loop as a generic microlibrary.
 
 The following code will only cause a single DOM manipulation:
 
-```javascript
-var backburner = new Backburner(['render']),
-    person = {name: "Erik"};
+```html
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Backburner demo</title>
+  </head>
+  <body>
 
-function updateName() {
-  $('#name').text(person.name);
-}
+   <div id="name"></div>
 
-function setName(name) {
-  person.name = name;
-  backburner.deferOnce('render', updateName);
-}
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="backburner.js"></script>
 
-backburner.run(function() {
-  setName("Kris");
-  setName("Tom");
-  setName("Yehuda");
-});
+    <script>
+      var bb = new backburner.Backburner(['render']),
+          person = {name: "Erik"};
+
+      function updateName() {
+        $('#name').text(person.name);
+      }
+
+      function setName(name) {
+        person.name = name;
+        bb.deferOnce('render', updateName);
+      }
+
+      bb.run(function() {
+        setName("Kris");
+        setName("Tom");
+        setName("Yehuda");
+      });
+    </script>
+  </body>
+</html>
 ```
 
 ## Simple Backbone Example
