@@ -1,12 +1,12 @@
-import { Backburner } from "backburner";
+import Backburner from "backburner";
 
 module("throttle");
 
 test("throttle", function() {
   expect(18);
 
-  var bb = new Backburner(['zomg']),
-      step = 0;
+  var bb = new Backburner(['zomg']);
+  var step = 0;
 
   var wasCalled = false;
   function throttler() {
@@ -107,10 +107,10 @@ test("throttle", function() {
 test("throttle leading edge", function() {
   expect(10);
 
-  var bb = new Backburner(['zerg']),
-      throttle,
-      throttle2,
-      wasCalled = false;
+  var bb = new Backburner(['zerg']);
+  var throttle;
+  var throttle2;
+  var wasCalled = false;
 
   function throttler() {
     ok(!wasCalled, "throttler hasn't been called yet");
@@ -143,9 +143,6 @@ test("throttle leading edge", function() {
     throttle2 = bb.throttle(null, throttler, 40);
     notEqual(throttle, throttle2, "the throttle is different");
     ok(wasCalled, "throttle was inserted and run immediately after cancel");
-
-
-
   }, 60);
 
 });
@@ -153,9 +150,8 @@ test("throttle leading edge", function() {
 test("throttle returns timer information usable for cancelling", function() {
   expect(3);
 
-  var bb = new Backburner(['batman']),
-      timer;
-
+  var bb = new Backburner(['batman']);
+  var timer;
   var wasCalled = false;
 
   function throttler() {
@@ -181,8 +177,8 @@ test("throttle returns timer information usable for cancelling", function() {
 test("throttler cancel after it's executed returns false", function() {
   expect(3);
 
-  var bb = new Backburner(['darkknight']),
-      timer;
+  var bb = new Backburner(['darkknight']);
+  var timer;
 
   var wasCalled = false;
 
@@ -205,9 +201,9 @@ test("throttler cancel after it's executed returns false", function() {
 test("throttler returns the appropriate timer to cancel if the old item still exists", function() {
   expect(5);
 
-  var bb = new Backburner(['robin']),
-      timer,
-      timer2;
+  var bb = new Backburner(['robin']);
+  var timer;
+  var timer2;
 
   var wasCalled = false;
 
@@ -237,7 +233,9 @@ test("onError", function() {
     equal("test error", error.message);
   }
 
-  var bb = new Backburner(['errors'], { onError: onError });
+  var bb = new Backburner(['errors'], {
+    onError: onError
+  });
 
   bb.throttle(null, function() { throw new Error("test error"); }, 20);
 });

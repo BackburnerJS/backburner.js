@@ -1,12 +1,12 @@
-import { Backburner } from "backburner";
+import Backburner from "backburner";
 
 module("Queue");
 
 test("actions scheduled on previous queue, start over from beginning", function() {
   expect(5);
 
-  var bb = new Backburner(['one', 'two']),
-      step = 0;
+  var bb = new Backburner(['one', 'two']);
+  var step = 0;
 
   bb.run(function() {
     equal(step++, 0, "0");
@@ -30,7 +30,8 @@ test("actions scheduled on previous queue, start over from beginning", function(
 test("Queue#flush should be recursive if new items are added", function() {
   expect(2);
 
-  var bb = new Backburner(['one']), count = 0;
+  var bb = new Backburner(['one']);
+  var count = 0;
 
   bb.run(function() {
     function increment() {
@@ -64,11 +65,11 @@ test("Default queue can be manually configured", function() {
 test("onBegin and onEnd are called and passed the correct parameters", function() {
   expect(2);
 
-  var befores = [],
-      afters = [],
-      expectedBefores = [],
-      expectedAfters = [],
-      outer, inner;
+  var befores = [];
+  var afters = [];
+  var expectedBefores = [];
+  var expectedAfters = [];
+  var outer, inner;
 
   var bb = new Backburner(['one'], {
     onBegin: function(current, previous) {
@@ -88,11 +89,10 @@ test("onBegin and onEnd are called and passed the correct parameters", function(
     });
   });
 
-  expectedBefores = [outer, null, inner, outer];
+  expectedBefores = [outer, undefined, inner, outer];
   expectedAfters = [inner, outer, outer, null];
 
   deepEqual(befores, expectedBefores, "before callbacks successful");
   deepEqual(afters, expectedAfters, "after callback successful");
 });
-
 

@@ -1,12 +1,12 @@
-import { Backburner } from "backburner";
+import Backburner from "backburner";
 
 module("run");
 
 test("when passed a function", function() {
   expect(1);
 
-  var bb = new Backburner(['one']),
-      functionWasCalled = false;
+  var bb = new Backburner(['one']);
+  var functionWasCalled = false;
 
   bb.run(function() {
     functionWasCalled = true;
@@ -18,8 +18,8 @@ test("when passed a function", function() {
 test("when passed a target and method", function() {
   expect(2);
 
-  var bb = new Backburner(['one']),
-      functionWasCalled = false;
+  var bb = new Backburner(['one']);
+  var functionWasCalled = false;
 
   bb.run({zomg: "hi"}, function() {
     equal(this.zomg, "hi", "the target was properly set");
@@ -32,8 +32,8 @@ test("when passed a target and method", function() {
 test("when passed a target, method, and arguments", function() {
   expect(5);
 
-  var bb = new Backburner(['one']),
-      functionWasCalled = false;
+  var bb = new Backburner(['one']);
+  var functionWasCalled = false;
 
   bb.run({zomg: "hi"}, function(a, b, c) {
     equal(this.zomg, "hi", "the target was properly set");
@@ -49,12 +49,12 @@ test("when passed a target, method, and arguments", function() {
 test("nesting run loops preserves the stack", function() {
   expect(10);
 
-  var bb = new Backburner(['one']),
-    outerBeforeFunctionWasCalled = false,
-    middleBeforeFunctionWasCalled = false,
-    innerFunctionWasCalled = false,
-    middleAfterFunctionWasCalled = false,
-    outerAfterFunctionWasCalled = false;
+  var bb = new Backburner(['one']);
+  var outerBeforeFunctionWasCalled = false;
+  var middleBeforeFunctionWasCalled = false;
+  var innerFunctionWasCalled = false;
+  var middleAfterFunctionWasCalled = false;
+  var outerAfterFunctionWasCalled = false;
 
   bb.run(function () {
     bb.defer('one', function () {
@@ -100,8 +100,8 @@ test("nesting run loops preserves the stack", function() {
 test("runs can be nested", function() {
   expect(2);
 
-  var bb = new Backburner(['one']),
-      step = 0;
+  var bb = new Backburner(['one']);
+  var step = 0;
 
   bb.run(function() {
     equal(step++, 0);
@@ -129,9 +129,13 @@ test("onError", function() {
     equal("test error", error.message);
   }
 
-  var bb = new Backburner(['errors'], { onError: onError });
+  var bb = new Backburner(['errors'], {
+    onError: onError
+  });
 
-  bb.run(function() { throw new Error("test error"); });
+  bb.run(function() {
+    throw new Error("test error");
+  });
 });
 
 test("onError set after start", function() {
@@ -139,13 +143,17 @@ test("onError set after start", function() {
 
   var bb = new Backburner(['errors']);
 
-  bb.run(function() { ok(true); });
+  bb.run(function() {
+    ok(true);
+  });
 
   bb.options.onError = function(error) {
     equal("test error", error.message);
   };
 
-  bb.run(function() { throw new Error("test error"); });
+  bb.run(function() {
+    throw new Error("test error");
+  });
 });
 
 test("onError with target and action", function() {
@@ -158,11 +166,15 @@ test("onError with target and action", function() {
     onErrorMethod: 'onerror'
   });
 
-  bb.run(function() { ok(true); });
+  bb.run(function() {
+    ok(true);
+  });
 
   target.onerror = function(error) {
     equal("test error", error.message);
   };
 
-  bb.run(function() { throw new Error("test error"); });
+  bb.run(function() {
+    throw new Error("test error");
+  });
 });

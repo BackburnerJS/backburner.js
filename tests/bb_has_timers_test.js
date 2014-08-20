@@ -1,13 +1,13 @@
-import { Backburner } from "backburner";
+import Backburner from "backburner";
 
 module("hasTimers");
 
 test("hasTimers", function () {
-  var bb = new Backburner(['ohai']),
-      timer,
-      target = {
-        fn: function () {}
-      };
+  var bb = new Backburner(['ohai']);
+  var timer;
+  var target = {
+    fn: function () {}
+  };
 
   bb.schedule('ohai', null, function () {
     ok(!bb.hasTimers(), "Initially there are no timers");
