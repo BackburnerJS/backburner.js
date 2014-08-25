@@ -179,6 +179,29 @@ test("when passed same function twice with different target and different argume
   equal(i, 2, "function was called twice");
 });
 
+test("when passed same function with same target after already triggering in current loop (GUID_KEY)", function() {
+  expect(5);
+
+  var bb = new Backburner(['one', 'two'], { 'GUID_KEY': 'GUID_KEY' });
+  var i=0;
+  var deferMethod = function(a){
+    i++;
+    equal(a, i, 'Correct argument is set');
+    equal(this["first"], 1, "the target property was set");
+  };
+  var scheduleMethod = function() {
+    bb.deferOnce('one', argObj, deferMethod, 2);
+  };
+  var argObj = {'first': 1, GUID_KEY: '1'};
+
+  bb.run(function() {
+    bb.deferOnce('one', argObj, deferMethod, 1);
+    bb.deferOnce('two', argObj, scheduleMethod);
+  });
+
+  equal(i, 2, "function was called twice");
+});
+
 test("onError", function() {
   expect(1);
 
