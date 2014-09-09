@@ -6,6 +6,7 @@ var mergeTrees = require('broccoli-merge-trees');
 var moveFile = require('broccoli-file-mover');
 var pickFiles = require('broccoli-static-compiler');
 var jshint = require('broccoli-jshint');
+var env = process.env.EMBER_ENV;
 
 var concat           = require('broccoli-concat');
 var replace          = require('broccoli-string-replace');
@@ -105,7 +106,7 @@ var namedAMDTestTree = generateNamedAMDTree(mergeTrees(['lib', testsTree, jshint
 
 var trees = [qunit, loader, testIndex, testLoader, bundle, namedAMDTree, namedAMDTestTree];
 
-if (process.env.ENV === 'production') {
+if (env === 'production') {
   trees.push(closureCompiler(moveFile(bundle, {
     srcFile: 'backburner.js',
     destFile: 'backburner.min.js'
