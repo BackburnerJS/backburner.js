@@ -220,3 +220,34 @@ test("onError", function() {
   });
 });
 
+test("cancel", function() {
+  expect(3);
+
+  var obj = {
+    ___FOO___: 1
+  };
+
+  var bb = new Backburner(['action'], {
+    GUID_KEY: '___FOO___'
+  });
+
+  var wasCalled = 0;
+
+  function fn () {
+    wasCalled++;
+  }
+
+  bb.run(function() {
+    var timer = bb.scheduleOnce('action', obj, fn);
+
+    equal(wasCalled, 0);
+
+    bb.cancel(timer);
+
+    bb.scheduleOnce('action', obj, fn);
+
+    equal(wasCalled, 0);
+  });
+  equal(wasCalled, 1);
+
+});
