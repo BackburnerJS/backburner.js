@@ -162,7 +162,7 @@ test("cancel during flush", function() {
   ok(!functionWasCalled, "function was not called");
 });
 
-test("with GUID_KEY", function() {
+test("with GUID_KEY and target", function() {
   expect(3);
 
   var obj = {
@@ -187,6 +187,64 @@ test("with GUID_KEY", function() {
     bb.cancel(timer);
 
     bb.scheduleOnce('action', obj, fn);
+
+    equal(wasCalled, 0);
+  });
+  equal(wasCalled, 1);
+
+});
+
+test("with GUID_KEY and a target without meta", function() {
+  expect(3);
+
+  var obj = { };
+
+  var bb = new Backburner(['action'], {
+    GUID_KEY: '___FOO___'
+  });
+
+  var wasCalled = 0;
+
+  function fn () {
+    wasCalled++;
+  }
+
+  bb.run(function() {
+    var timer = bb.scheduleOnce('action', obj, fn);
+
+    equal(wasCalled, 0);
+
+    bb.cancel(timer);
+
+    bb.scheduleOnce('action', obj, fn);
+
+    equal(wasCalled, 0);
+  });
+  equal(wasCalled, 1);
+
+});
+
+test("with GUID_KEY no target", function() {
+  expect(3);
+
+  var bb = new Backburner(['action'], {
+    GUID_KEY: '___FOO___'
+  });
+
+  var wasCalled = 0;
+
+  function fn () {
+    wasCalled++;
+  }
+
+  bb.run(function() {
+    var timer = bb.scheduleOnce('action', fn);
+
+    equal(wasCalled, 0);
+
+    bb.cancel(timer);
+
+    bb.scheduleOnce('action', fn);
 
     equal(wasCalled, 0);
   });
