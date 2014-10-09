@@ -32,7 +32,6 @@ test("Queue#flush should be recursive if new items are added", function() {
 
   var bb = new Backburner(['one']);
   var count = 0;
-  var count2 = 0;
 
   bb.run(function() {
     function increment() {
