@@ -32,10 +32,16 @@ test("Queue#flush should be recursive if new items are added", function() {
 
   var bb = new Backburner(['one']);
   var count = 0;
+  var count2 = 0;
 
   bb.run(function() {
     function increment() {
       if (++count < 3) {
+        bb.schedule('one', increment);
+      }
+
+      if (count === 3) {
+
         bb.schedule('one', increment);
       }
     }
@@ -44,7 +50,7 @@ test("Queue#flush should be recursive if new items are added", function() {
     equal(count, 1, 'should not have run yet');
 
     bb.currentInstance.queues.one.flush();
-    equal(count, 3, 'should have run all scheduled methods, even ones added during flush');
+    equal(count, 4, 'should have run all scheduled methods, even ones added during flush');
   });
 
 });
