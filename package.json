@@ -18,7 +18,7 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "broccoli-closure-compiler": "^0.2.0",
-    "broccoli-compile-modules": "git://github.com/eventualbuddha/broccoli-compile-modules",
+    "broccoli-compile-modules": "^1.0.0",
     "broccoli-concat": "0.0.7",
     "broccoli-file-mover": "^0.4.0",
     "broccoli-jshint": "~0.5.1",
@@ -27,7 +27,7 @@
     "broccoli-string-replace": "0.0.2",
     "ember-cli": "0.0.40",
     "ember-publisher": "0.0.7",
-    "es6-module-transpiler-amd-formatter": "0.0.1",
+    "es6-module-transpiler-amd-formatter": "0.2.2",
     "express": "^4.6.1",
     "testem": "^0.6.17"
   }
