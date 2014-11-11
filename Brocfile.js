@@ -10,7 +10,7 @@ var env = process.env.EMBER_ENV;
 
 var concat           = require('broccoli-concat');
 var replace          = require('broccoli-string-replace');
-var calculateVersion = require('./config/calculateVersion');
+var calculateVersion = require('git-repo-version');
 var path             = require('path');
 
 var bower = 'bower_components';
@@ -71,7 +71,7 @@ bundle = replace(bundle, {
   files: [ 'backburner.js' ],
   pattern: {
     match: /VERSION_PLACEHOLDER_STRING/g,
-    replacement: calculateVersion()
+    replacement: calculateVersion(10)
   }
 });
 
@@ -94,7 +94,7 @@ function generateNamedAMDTree(inputTree, outputFile) {
     files: [ outputFile ],
     pattern: {
       match: /VERSION_PLACEHOLDER_STRING/g,
-      replacement: calculateVersion()
+      replacement: calculateVersion(10)
     }
   });
 
