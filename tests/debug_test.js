@@ -13,12 +13,12 @@ test("DEBUG flag enables stack tagging", function() {
 
   bb.defer('one', function() {});
 
-  if (new Error().stack) { // workaround for CLI runner :(
     expect(4);
-    var stack = bb.currentInstance.queues.one._queue[7].stack;
-    ok(typeof stack === 'string', "A stack is recorded");
+    //var stack = bb.currentInstance.queues.one._queue[7].stack;
+    //ok(typeof stack === 'string', "A stack is recorded");
 
     var onError = function(error, errorRecordedForStack){
+      debugger;
       ok(errorRecordedForStack, 'errorRecordedForStack passed to error function');
       ok(errorRecordedForStack.stack, 'stack is recorded');
     };
@@ -28,8 +28,11 @@ test("DEBUG flag enables stack tagging", function() {
 
     bb.run(function(){
       bb.defer('errors', function(){
-        throw new Error('message!');
+        bb.defer('errors', function inception(){
+          bb.defer('errors', function weHaveToGoDeeper(){
+            throw new Error('message!');
+          });
+        });
       });
     });
-  }
 });
