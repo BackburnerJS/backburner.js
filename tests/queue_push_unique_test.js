@@ -1,10 +1,10 @@
-import Queue from "backburner/queue";
+import Queue from 'backburner/queue';
 
-module("Queue.prototpye.pushUnique");
+module('Queue.prototpye.pushUnique');
 var slice = [].slice;
 
-test("pushUnique: 2 different targets", function() {
-  var queue = new Queue("foo");
+test('pushUnique: 2 different targets', function() {
+  var queue = new Queue('foo');
   var target1fooWasCalled = [];
   var target2fooWasCalled = [];
   var target1 = {
@@ -33,8 +33,8 @@ test("pushUnique: 2 different targets", function() {
   deepEqual(target2fooWasCalled[0], ['b']);
 });
 
-test("pushUnique: 1 target, 2 different methods", function() {
-  var queue = new Queue("foo");
+test('pushUnique: 1 target, 2 different methods', function() {
+  var queue = new Queue('foo');
   var target1fooWasCalled = [];
   var target1barWasCalled = [];
   var target1 = {
@@ -60,8 +60,8 @@ test("pushUnique: 1 target, 2 different methods", function() {
   deepEqual(target1barWasCalled[0], ['b']);
 });
 
-test("pushUnique: 1 target, 1 different methods called twice", function() {
-  var queue = new Queue("foo");
+test('pushUnique: 1 target, 1 different methods called twice', function() {
+  var queue = new Queue('foo');
   var target1fooWasCalled = [];
   var target1 = {
     foo: function() {
@@ -80,8 +80,8 @@ test("pushUnique: 1 target, 1 different methods called twice", function() {
   deepEqual(target1fooWasCalled[0], ['b']);
 });
 
-test("pushUnique: 2 different targets (GUID_KEY)", function() {
-  var queue = new Queue("foo", {}, { GUID_KEY: 'GUID_KEY' });
+test('pushUnique: 2 different targets (GUID_KEY)', function() {
+  var queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
   var target1fooWasCalled = [];
   var target2fooWasCalled = [];
   var target1 = {
@@ -112,8 +112,8 @@ test("pushUnique: 2 different targets (GUID_KEY)", function() {
   deepEqual(target2fooWasCalled[0], ['b']);
 });
 
-test("pushUnique: 1 target, 2 different methods (GUID_KEY)", function() {
-  var queue = new Queue("foo", {}, { GUID_KEY: 'GUID_KEY' });
+test('pushUnique: 1 target, 2 different methods (GUID_KEY)', function() {
+  var queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
   var target1fooWasCalled = [];
   var target1barWasCalled = [];
   var target1 = {
@@ -140,8 +140,8 @@ test("pushUnique: 1 target, 2 different methods (GUID_KEY)", function() {
   deepEqual(target1barWasCalled[0], ['b']);
 });
 
-test("pushUnique: 1 target, 1 diffe`rent methods called twice (GUID_KEY)", function() {
-  var queue = new Queue("foo", {}, { GUID_KEY: 'GUID_KEY' });
+test('pushUnique: 1 target, 1 diffe`rent methods called twice (GUID_KEY)', function() {
+  var queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
   var target1fooWasCalled = [];
   var target1 = {
     GUID_KEY: 'target1',
@@ -161,8 +161,8 @@ test("pushUnique: 1 target, 1 diffe`rent methods called twice (GUID_KEY)", funct
   deepEqual(target1fooWasCalled[0], ['b']);
 });
 
-test("pushUnique: 1 target, 2 different methods, second one called twice (GUID_KEY)", function() {
-  var queue = new Queue("foo", {}, { GUID_KEY: 'GUID_KEY' });
+test('pushUnique: 1 target, 2 different methods, second one called twice (GUID_KEY)', function() {
+  var queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
   var target1barWasCalled = [];
   var target1 = {
     GUID_KEY: 'target1',

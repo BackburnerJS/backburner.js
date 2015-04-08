@@ -1,17 +1,17 @@
-import Backburner from "backburner";
+import Backburner from 'backburner';
 
-module("cancel");
+module('cancel');
 
-test("null", function() {
+test('null', function() {
   // mimic browser behavior: window.clearTimeout(null) -> undefined
   expect(3);
   var bb = new Backburner(['cancel']);
-  equal(bb.cancel(), undefined, "cancel with no arguments should return undefined");
-  equal(bb.cancel(null), undefined, "cancel a null timer should return undefined");
-  equal(bb.cancel(undefined), undefined, "cancel an undefined timer should return undefined");
+  equal(bb.cancel(), undefined, 'cancel with no arguments should return undefined');
+  equal(bb.cancel(null), undefined, 'cancel a null timer should return undefined');
+  equal(bb.cancel(undefined), undefined, 'cancel an undefined timer should return undefined');
 });
 
-test("deferOnce", function() {
+test('deferOnce', function() {
   expect(3);
 
   var bb = new Backburner(['one']);
@@ -22,13 +22,13 @@ test("deferOnce", function() {
       functionWasCalled = true;
     });
 
-    ok(timer, "Timer object was returned");
-    ok(bb.cancel(timer), "Cancel returned true");
-    ok(!functionWasCalled, "function was not called");
+    ok(timer, 'Timer object was returned');
+    ok(bb.cancel(timer), 'Cancel returned true');
+    ok(!functionWasCalled, 'function was not called');
   });
 });
 
-test("setTimeout", function() {
+test('setTimeout', function() {
   expect(5);
 
   var called = false,
@@ -43,19 +43,19 @@ test("setTimeout", function() {
     functionWasCalled = true;
   }, 0);
 
-  ok(timer, "Timer object was returned");
-  ok(bb.cancel(timer), "Cancel returned true");
+  ok(timer, 'Timer object was returned');
+  ok(bb.cancel(timer), 'Cancel returned true');
   ok(!called, 'onBegin was not called');
 
   stop();
   setTimeout(function () {
     start();
-    ok(!functionWasCalled, "function was not called");
+    ok(!functionWasCalled, 'function was not called');
     ok(!called, 'onBegin was not called');
   }, 0);
 });
 
-test("setTimeout with multiple pending", function() {
+test('setTimeout with multiple pending', function() {
   expect(7);
 
   var called = false,
@@ -75,22 +75,22 @@ test("setTimeout with multiple pending", function() {
     function2WasCalled = true;
   }, 1);
 
-  ok(timer1, "Timer object 2 was returned");
-  ok(bb.cancel(timer1), "Cancel for timer 1 returned true");
-  ok(timer2, "Timer object 2 was returned");
+  ok(timer1, 'Timer object 2 was returned');
+  ok(bb.cancel(timer1), 'Cancel for timer 1 returned true');
+  ok(timer2, 'Timer object 2 was returned');
   ok(!called, 'onBegin was not called');
 
   stop();
   setTimeout(function () {
     start();
 
-    ok(!function1WasCalled, "function 1 was not called");
-    ok(function2WasCalled, "function 2 was called");
+    ok(!function1WasCalled, 'function 1 was not called');
+    ok(function2WasCalled, 'function 2 was called');
     ok(called, 'onBegin was called');
   }, 10);
 });
 
-test("setTimeout and creating a new setTimeout", function() {
+test('setTimeout and creating a new setTimeout', function() {
   expect(7);
 
   var called = false,
@@ -106,27 +106,27 @@ test("setTimeout and creating a new setTimeout", function() {
     function1WasCalled = true;
   }, 0);
 
-  ok(timer1, "Timer object 2 was returned");
-  ok(bb.cancel(timer1), "Cancel for timer 1 returned true");
+  ok(timer1, 'Timer object 2 was returned');
+  ok(bb.cancel(timer1), 'Cancel for timer 1 returned true');
 
   var timer2 = bb.setTimeout(function () {
     function2WasCalled = true;
   }, 1);
 
-  ok(timer2, "Timer object 2 was returned");
+  ok(timer2, 'Timer object 2 was returned');
   ok(!called, 'onBegin was not called');
 
   stop();
   setTimeout(function () {
     start();
 
-    ok(!function1WasCalled, "function 1 was not called");
-    ok(function2WasCalled, "function 2 was called");
+    ok(!function1WasCalled, 'function 1 was not called');
+    ok(function2WasCalled, 'function 2 was called');
     ok(called, 'onBegin was called');
   }, 50);
 });
 
-test("cancelTimers", function() {
+test('cancelTimers', function() {
   var bb = new Backburner(['one']),
       functionWasCalled = false;
 
@@ -134,16 +134,16 @@ test("cancelTimers", function() {
     functionWasCalled = true;
   }, 0);
 
-  ok(timer, "Timer object was returned");
-  ok(bb.hasTimers(), "bb has scheduled timer");
+  ok(timer, 'Timer object was returned');
+  ok(bb.hasTimers(), 'bb has scheduled timer');
 
   bb.cancelTimers();
 
-  ok(!bb.hasTimers(), "bb has no scheduled timer");
-  ok(!functionWasCalled, "function was not called");
+  ok(!bb.hasTimers(), 'bb has no scheduled timer');
+  ok(!functionWasCalled, 'function was not called');
 });
 
-test("cancel during flush", function() {
+test('cancel during flush', function() {
   expect(1);
 
   var bb = new Backburner(['one']),
@@ -159,10 +159,10 @@ test("cancel during flush", function() {
     });
   });
 
-  ok(!functionWasCalled, "function was not called");
+  ok(!functionWasCalled, 'function was not called');
 });
 
-test("with GUID_KEY and target", function() {
+test('with GUID_KEY and target', function() {
   expect(3);
 
   var obj = {
@@ -194,7 +194,7 @@ test("with GUID_KEY and target", function() {
 
 });
 
-test("with GUID_KEY and a target without meta", function() {
+test('with GUID_KEY and a target without meta', function() {
   expect(3);
 
   var obj = { };
@@ -224,7 +224,7 @@ test("with GUID_KEY and a target without meta", function() {
 
 });
 
-test("with GUID_KEY no target", function() {
+test('with GUID_KEY no target', function() {
   expect(3);
 
   var bb = new Backburner(['action'], {

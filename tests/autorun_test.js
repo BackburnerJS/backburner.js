@@ -1,12 +1,12 @@
-import Backburner from "backburner";
+import Backburner from 'backburner';
 
-module("autorun");
+module('autorun');
 
-test("autorun", function() {
+test('autorun', function() {
   var bb = new Backburner(['zomg']);
   var step = 0;
 
-  ok(!bb.currentInstance, "The DeferredActionQueues object is lazily instaniated");
+  ok(!bb.currentInstance, 'The DeferredActionQueues object is lazily instaniated');
   equal(step++, 0);
 
   bb.schedule('zomg', null, function() {
@@ -15,11 +15,11 @@ test("autorun", function() {
     stop();
     setTimeout(function() {
       start();
-      ok(!bb.hasTimers(), "The all timers are cleared");
+      ok(!bb.hasTimers(), 'The all timers are cleared');
     });
   });
 
-  ok(bb.currentInstance, "The DeferredActionQueues object exists");
+  ok(bb.currentInstance, 'The DeferredActionQueues object exists');
   equal(step++, 1);
   stop();
 });
