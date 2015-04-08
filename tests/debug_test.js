@@ -1,13 +1,13 @@
-import Backburner from "backburner";
+import Backburner from 'backburner';
 
-module("debug");
+module('debug');
 
-test("DEBUG flag enables stack tagging", function() {
+test('DEBUG flag enables stack tagging', function() {
   var bb = new Backburner(['one']);
 
   bb.defer('one', function() {});
 
-  ok(!bb.currentInstance.queues.one._queue[3], "No stack is recorded");
+  ok(!bb.currentInstance.queues.one._queue[3], 'No stack is recorded');
 
   bb.DEBUG = true;
 
@@ -16,7 +16,7 @@ test("DEBUG flag enables stack tagging", function() {
   if (new Error().stack) { // workaround for CLI runner :(
     expect(4);
     var stack = bb.currentInstance.queues.one._queue[7].stack;
-    ok(typeof stack === 'string', "A stack is recorded");
+    ok(typeof stack === 'string', 'A stack is recorded');
 
     var onError = function(error, errorRecordedForStack){
       ok(errorRecordedForStack, 'errorRecordedForStack passed to error function');

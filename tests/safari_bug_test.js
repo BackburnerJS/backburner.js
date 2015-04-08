@@ -1,8 +1,8 @@
-import Backburner from "backburner";
+import Backburner from 'backburner';
 
-module("safari bug");
+module('safari bug');
 
-test("Prevent Safari double finally in run", function() {
+test('Prevent Safari double finally in run', function() {
   expect(1);
 
   var bb = new Backburner(['one']);
@@ -31,7 +31,7 @@ test("Prevent Safari double finally in run", function() {
   Backburner.prototype.end = realEnd;
 });
 
-test("Prevent Safari double finally in end", function() {
+test('Prevent Safari double finally in end', function() {
   expect(1);
 
   var count = 0;

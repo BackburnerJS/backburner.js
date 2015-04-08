@@ -1,12 +1,12 @@
-import Backburner from "backburner";
+import Backburner from 'backburner';
 
-module("join");
+module('join');
 
 function depth(bb) {
   return bb.instanceStack.length + (bb.currentInstance ? 1 : 0);
 }
 
-test("outside of a run loop", function() {
+test('outside of a run loop', function() {
   expect(4);
 
   var bb = new Backburner(['one']);
@@ -14,13 +14,13 @@ test("outside of a run loop", function() {
   equal(depth(bb), 0);
   var result = bb.join(function() {
     equal(depth(bb), 1);
-    return "result";
+    return 'result';
   });
-  equal(result, "result");
+  equal(result, 'result');
   equal(depth(bb), 0);
 });
 
-test("inside of a run loop", function() {
+test('inside of a run loop', function() {
   expect(4);
 
   var bb = new Backburner(['one']);
@@ -29,14 +29,14 @@ test("inside of a run loop", function() {
   bb.run(function() {
     var result = bb.join(function() {
       equal(depth(bb), 1);
-      return "result";
+      return 'result';
     });
-    equal(result, "result");
+    equal(result, 'result');
   });
   equal(depth(bb), 0);
 });
 
-test("nested join calls", function() {
+test('nested join calls', function() {
   expect(7);
 
   var bb = new Backburner(['one']);
@@ -56,7 +56,7 @@ test("nested join calls", function() {
   equal(depth(bb), 0);
 });
 
-test("nested run loops", function() {
+test('nested run loops', function() {
   expect(7);
 
   var bb = new Backburner(['one']);
@@ -76,7 +76,7 @@ test("nested run loops", function() {
   equal(depth(bb), 0);
 });
 
-test("queue execution order", function() {
+test('queue execution order', function() {
   expect(1);
 
   var bb = new Backburner(['one']);

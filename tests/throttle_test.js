@@ -1,8 +1,8 @@
-import Backburner from "backburner";
+import Backburner from 'backburner';
 
-module("throttle");
+module('throttle');
 
-test("throttle", function() {
+test('throttle', function() {
   expect(18);
 
   var bb = new Backburner(['zomg']);
@@ -79,7 +79,7 @@ test("throttle", function() {
     setTimeout(function() {
       start();
       equal(step++, 6);
-      ok(wasCalled, "Another throttle call with the same function can be executed later");
+      ok(wasCalled, 'Another throttle call with the same function can be executed later');
     }, 110);
   }, 60);
 
@@ -92,19 +92,19 @@ test("throttle", function() {
     equal(step++, 7);
 
     // call throttle again that time using a string number like time interval
-    bb.throttle(null, throttler, "100", false);
+    bb.throttle(null, throttler, '100', false);
 
     // assert that it is called in the future and not blackholed
     stop();
     setTimeout(function() {
       start();
       equal(step++, 8);
-      ok(wasCalled, "Throttle accept a string number like time interval");
+      ok(wasCalled, 'Throttle accept a string number like time interval');
     }, 110);
   }, 180);
 });
 
-test("throttle leading edge", function() {
+test('throttle leading edge', function() {
   expect(10);
 
   var bb = new Backburner(['zerg']);
@@ -113,7 +113,7 @@ test("throttle leading edge", function() {
   var wasCalled = false;
 
   function throttler() {
-    ok(!wasCalled, "throttler hasn't been called yet");
+    ok(!wasCalled, 'throttler hasn\'t been called yet');
     wasCalled = true;
   }
 
@@ -121,33 +121,33 @@ test("throttle leading edge", function() {
   // it will be executed immediately, but throttled for the future hits
   throttle = bb.throttle(null, throttler, 40);
 
-  ok(wasCalled, "function was executed immediately");
+  ok(wasCalled, 'function was executed immediately');
 
   wasCalled = false;
   // let's schedule `throttler` to run again, it shouldn't be allowed to queue for another 40 msec
   throttle2 = bb.throttle(null, throttler, 40);
 
-  equal(throttle, throttle2, "No new throttle was inserted, returns old throttle");
+  equal(throttle, throttle2, 'No new throttle was inserted, returns old throttle');
 
   stop();
   setTimeout(function() {
     start();
-    ok(!wasCalled, "attempt to call throttle again didn't happen");
+    ok(!wasCalled, 'attempt to call throttle again didn\'t happen');
 
     throttle = bb.throttle(null, throttler, 40);
-    ok(wasCalled, "newly inserted throttle after timeout functioned");
+    ok(wasCalled, 'newly inserted throttle after timeout functioned');
 
-    ok(bb.cancel(throttle), "wait time of throttle was cancelled");
+    ok(bb.cancel(throttle), 'wait time of throttle was cancelled');
 
     wasCalled = false;
     throttle2 = bb.throttle(null, throttler, 40);
-    notEqual(throttle, throttle2, "the throttle is different");
-    ok(wasCalled, "throttle was inserted and run immediately after cancel");
+    notEqual(throttle, throttle2, 'the throttle is different');
+    ok(wasCalled, 'throttle was inserted and run immediately after cancel');
   }, 60);
 
 });
 
-test("throttle returns timer information usable for cancelling", function() {
+test('throttle returns timer information usable for cancelling', function() {
   expect(3);
 
   var bb = new Backburner(['batman']);
@@ -155,26 +155,26 @@ test("throttle returns timer information usable for cancelling", function() {
   var wasCalled = false;
 
   function throttler() {
-    ok(false, "this method shouldn't be called");
+    ok(false, 'this method shouldn\'t be called');
     wasCalled = true;
   }
 
   timer = bb.throttle(null, throttler, 1, false);
 
-  ok(bb.cancel(timer), "the timer is cancelled");
+  ok(bb.cancel(timer), 'the timer is cancelled');
 
   //should return false second time around
-  ok(!bb.cancel(timer), "the timer no longer exists in the list");
+  ok(!bb.cancel(timer), 'the timer no longer exists in the list');
 
   stop();
   setTimeout(function() {
     start();
-    ok(!wasCalled, "the timer wasn't called after waiting");
+    ok(!wasCalled, 'the timer wasn\'t called after waiting');
   }, 60);
 
 });
 
-test("throttler cancel after it's executed returns false", function() {
+test('throttler cancel after it\'s executed returns false', function() {
   expect(3);
 
   var bb = new Backburner(['darkknight']);
@@ -183,7 +183,7 @@ test("throttler cancel after it's executed returns false", function() {
   var wasCalled = false;
 
   function throttler() {
-    ok(true, "the throttled method was called");
+    ok(true, 'the throttled method was called');
     wasCalled = true;
   }
 
@@ -192,13 +192,13 @@ test("throttler cancel after it's executed returns false", function() {
   stop();
   setTimeout(function() {
     start();
-    ok(!bb.cancel(timer), "no timer existed to cancel");
-    ok(wasCalled, "the timer was actually called");
+    ok(!bb.cancel(timer), 'no timer existed to cancel');
+    ok(wasCalled, 'the timer was actually called');
   }, 10);
 
 });
 
-test("throttler returns the appropriate timer to cancel if the old item still exists", function() {
+test('throttler returns the appropriate timer to cancel if the old item still exists', function() {
   expect(5);
 
   var bb = new Backburner(['robin']);
@@ -208,34 +208,34 @@ test("throttler returns the appropriate timer to cancel if the old item still ex
   var wasCalled = false;
 
   function throttler() {
-    ok(true, "the throttled method was called");
+    ok(true, 'the throttled method was called');
     wasCalled = true;
   }
 
   timer = bb.throttle(null, throttler, 1);
   timer2 = bb.throttle(null, throttler, 1);
-  deepEqual(timer, timer2, "the same timer was returned");
+  deepEqual(timer, timer2, 'the same timer was returned');
 
   stop();
   setTimeout(function() {
     start();
     bb.throttle(null, throttler, 1);
-    ok(!bb.cancel(timer), "the second timer isn't removed, despite appearing to be the same item");
-    ok(wasCalled, "the timer was actually called");
+    ok(!bb.cancel(timer), 'the second timer isn\'t removed, despite appearing to be the same item');
+    ok(wasCalled, 'the timer was actually called');
   }, 10);
 
 });
 
-test("onError", function() {
+test('onError', function() {
   expect(1);
 
   function onError(error) {
-    equal("test error", error.message);
+    equal('test error', error.message);
   }
 
   var bb = new Backburner(['errors'], {
     onError: onError
   });
 
-  bb.throttle(null, function() { throw new Error("test error"); }, 20);
+  bb.throttle(null, function() { throw new Error('test error'); }, 20);
 });

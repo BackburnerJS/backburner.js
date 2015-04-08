@@ -1,14 +1,14 @@
-import Backburner from "backburner";
+import Backburner from 'backburner';
 
 var originalDateValueOf = Date.prototype.valueOf;
 
-module("setTimeout",{
+module('setTimeout',{
   teardown: function(){
     Date.prototype.valueOf = originalDateValueOf;
   }
 });
 
-test("setTimeout", function() {
+test('setTimeout', function() {
   expect(6);
 
   var bb = new Backburner(['one']);
@@ -29,12 +29,12 @@ test("setTimeout", function() {
 
   bb.setTimeout(null, function() {
     equal(step++, 1);
-    equal(instance, bb.currentInstance, "same instance");
+    equal(instance, bb.currentInstance, 'same instance');
   }, 10);
 
   Date.prototype.valueOf = originalDateValueOf;
   // spin so that when we execute timers (+new Date()) will be greater than the
-  // time scheduled above; not a problem in real life as we will never "wait"
+  // time scheduled above; not a problem in real life as we will never 'wait'
   // 0ms
   while((+ new Date()) <= now + 10);
 
@@ -47,13 +47,13 @@ test("setTimeout", function() {
     bb.setTimeout(null, function() {
       start();
       equal(step++, 3);
-      ok(true, "Another later will execute correctly");
+      ok(true, 'Another later will execute correctly');
     }, 1);
   }, 20);
 });
 
 var bb;
-module("setTimeout arguments / arity", {
+module('setTimeout arguments / arity', {
   setup: function(){
     bb = new Backburner(['one']);
   },
@@ -62,7 +62,7 @@ module("setTimeout arguments / arity", {
   }
 });
 
-test("[callback]", function(){
+test('[callback]', function(){
   expect(2);
    stop();
    bb.setTimeout(function() {
@@ -72,7 +72,7 @@ test("[callback]", function(){
    });
 });
 
-test("[callback, undefined]", function(){
+test('[callback, undefined]', function(){
   expect(2);
   stop();
   bb.setTimeout(function() {
@@ -82,7 +82,7 @@ test("[callback, undefined]", function(){
   }, undefined);
 });
 
-test("[null, callback, undefined]", function(){
+test('[null, callback, undefined]', function(){
   expect(2);
   stop();
   bb.setTimeout(null, function() {
@@ -92,7 +92,7 @@ test("[null, callback, undefined]", function(){
   });
 });
 
-test("[null, callback, undefined]", function(){
+test('[null, callback, undefined]', function(){
   expect(2);
   stop();
   bb.setTimeout(null, function() {
@@ -102,7 +102,7 @@ test("[null, callback, undefined]", function(){
   }, undefined);
 });
 
-test("[null, callback, null]", function(){
+test('[null, callback, null]', function(){
   expect(3);
   stop();
   bb.setTimeout(null, function() {
@@ -113,7 +113,7 @@ test("[null, callback, null]", function(){
   }, null);
 });
 
-test("[callback, string, string, string]", function(){
+test('[callback, string, string, string]', function(){
   expect(5);
   stop();
   bb.setTimeout(function() {
@@ -126,7 +126,7 @@ test("[callback, string, string, string]", function(){
   }, 'a', 'b', 'c');
 });
 
-test("[null, callback, string, string, string]", function(){
+test('[null, callback, string, string, string]', function(){
   expect(5);
   stop();
   bb.setTimeout(null, function() {
@@ -139,7 +139,7 @@ test("[null, callback, string, string, string]", function(){
   }, 'a', 'b', 'c');
 });
 
-test("[null, callback, string, string, string, number]", function(){
+test('[null, callback, string, string, string, number]', function(){
   expect(5);
   stop();
   bb.setTimeout(null, function() {
@@ -152,7 +152,7 @@ test("[null, callback, string, string, string, number]", function(){
   }, 'a', 'b', 'c', 10);
 });
 
-test("[null, callback, string, string, string, numericString]", function(){
+test('[null, callback, string, string, string, numericString]', function(){
   expect(5);
   stop();
   bb.setTimeout(null, function() {
@@ -165,7 +165,7 @@ test("[null, callback, string, string, string, numericString]", function(){
   },  'a', 'b', 'c', '1');
 });
 
-test("[obj, string]", function(){
+test('[obj, string]', function(){
   expect(1);
   stop();
   bb.setTimeout({
@@ -176,7 +176,7 @@ test("[obj, string]", function(){
   }, 'bro');
 });
 
-test("[obj, string, value]", function(){
+test('[obj, string, value]', function(){
   expect(3);
   stop();
   bb.setTimeout({
@@ -189,7 +189,7 @@ test("[obj, string, value]", function(){
   }, 'bro', 'value');
 });
 
-test("[obj, string, value, number]", function(){
+test('[obj, string, value, number]', function(){
   stop();
   bb.setTimeout({
     bro: function(){
@@ -201,7 +201,7 @@ test("[obj, string, value, number]", function(){
   }, 'bro', 'value', 1);
 });
 
-test("[obj, string, value, numericString]", function(){
+test('[obj, string, value, numericString]', function(){
   stop();
   bb.setTimeout({
     bro: function(){
@@ -213,22 +213,22 @@ test("[obj, string, value, numericString]", function(){
   }, 'bro', 'value', '1');
 });
 
-test("onError", function() {
+test('onError', function() {
   expect(1);
 
   function onError(error) {
-    equal("test error", error.message);
+    equal('test error', error.message);
     start();
   }
 
   var bb = new Backburner(['errors'], { onError: onError });
 
-  bb.setTimeout(function() { throw new Error("test error"); }, 1);
+  bb.setTimeout(function() { throw new Error('test error'); }, 1);
 
   stop();
 });
 
-test("setTimeout doesn't trigger twice with earlier setTimeout", function() {
+test('setTimeout doesn\'t trigger twice with earlier setTimeout', function() {
   expect(3);
 
   var bb = new Backburner(['one']);
@@ -254,13 +254,13 @@ test("setTimeout doesn't trigger twice with earlier setTimeout", function() {
   stop();
   setTimeout(function () {
     start();
-    equal(called1, 1, "timeout 1 was called once");
-    equal(called2, 1, "timeout 2 was called once");
-    equal(calls, 2, "run() was called twice");
+    equal(called1, 1, 'timeout 1 was called once');
+    equal(called2, 1, 'timeout 2 was called once');
+    equal(calls, 2, 'run() was called twice');
   }, 100);
 });
 
-test("setTimeout doesn't hang when timeout is unfulfilled", function() { // See issue #86
+test('setTimeout doesn\'t hang when timeout is unfulfilled', function() { // See issue #86
   expect(3);
 
   var bb = new Backburner(['one']);
@@ -290,13 +290,13 @@ test("setTimeout doesn't hang when timeout is unfulfilled", function() { // See 
   stop();
   setTimeout(function () {
     start();
-    equal(called1, 1, "timeout 1 was called once");
-    equal(called2, 1, "timeout 2 was called once");
-    equal(calls, 1, "run() was called once"); // both at once
+    equal(called1, 1, 'timeout 1 was called once');
+    equal(called2, 1, 'timeout 2 was called once');
+    equal(calls, 1, 'run() was called once'); // both at once
   }, 50);
 });
 
-test("setTimeout with two Backburner instances", function() {
+test('setTimeout with two Backburner instances', function() {
   expect(8);
 
   var steps = 0;
