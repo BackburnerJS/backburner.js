@@ -1,8 +1,5 @@
 language: node_js
 script: npm test
-before_script:
-- npm install -g bower
-- bower install
 after_success:
 - npm build
 - "./bin/publish_to_s3.js"

@@ -1,4 +1,4 @@
-import Backburner from 'backburner';
+import Backburner from '../lib/backburner';
 
 module('Queue');
 

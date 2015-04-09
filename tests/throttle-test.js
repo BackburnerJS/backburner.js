@@ -1,4 +1,4 @@
-import Backburner from 'backburner';
+import Backburner from '../lib/backburner';
 
 module('throttle');
 
@@ -237,5 +237,7 @@ test('onError', function() {
     onError: onError
   });
 
-  bb.throttle(null, function() { throw new Error('test error'); }, 20);
+  bb.throttle(null, function() {
+    throw new Error('test error');
+  }, 20);
 });
