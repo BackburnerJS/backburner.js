@@ -20,11 +20,11 @@ loader = stew.rename(loader, path.basename);
 // folded bundle
 var bundled = compileModules(lib, {
   format: 'bundle',
-  entry:  'backburner.umd.js',
+  entry:  'backburner.umd',
   output: 'backburner.js'
 });
 
-var amd = new ES6Modules(find(mv(lib, 'lib/', '/'), '!*.umd.js'), {
+var amd = new ES6Modules(find(mv(lib, 'lib/', '/'), '!*.umd'), {
   esperantoOptions: {
     absolutePaths: true,
     strict: true
