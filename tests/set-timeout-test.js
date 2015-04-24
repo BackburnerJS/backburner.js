@@ -285,7 +285,7 @@ test('setTimeout doesn\'t hang when timeout is unfulfilled', function() { // See
 
   bb.setTimeout(function() {
     called2++;
-  }, 10);
+  }, 50);
 
   stop();
   setTimeout(function () {
@@ -293,7 +293,7 @@ test('setTimeout doesn\'t hang when timeout is unfulfilled', function() { // See
     equal(called1, 1, 'timeout 1 was called once');
     equal(called2, 1, 'timeout 2 was called once');
     equal(calls, 2, 'run() was called twice');
-  }, 50);
+  }, 100);
 });
 
 test('setTimeout with two Backburner instances', function() {
