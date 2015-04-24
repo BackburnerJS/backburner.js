@@ -292,7 +292,7 @@ test('setTimeout doesn\'t hang when timeout is unfulfilled', function() { // See
     start();
     equal(called1, 1, 'timeout 1 was called once');
     equal(called2, 1, 'timeout 2 was called once');
-    equal(calls, 1, 'run() was called once'); // both at once
+    equal(calls, 2, 'run() was called twice');
   }, 50);
 });
 
