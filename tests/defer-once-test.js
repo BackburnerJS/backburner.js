@@ -33,6 +33,26 @@ test('when passed a target and method', function() {
   ok(functionWasCalled, 'function was called');
 });
 
+test('when passed a target and method name', function() {
+  expect(2);
+
+  var bb = new Backburner(['one']);
+  var functionWasCalled = false;
+  var targetObject = {
+    zomg: 'hi',
+    checkFunction: function() {
+      equal(this.zomg, 'hi', 'the target was properly set');
+      functionWasCalled = true;
+    }
+  };
+
+  bb.run(function() {
+    bb.deferOnce('one', targetObject, 'checkFunction');
+  });
+
+  ok(functionWasCalled, 'function was called');
+});
+
 test('when passed a target, method, and arguments', function() {
   expect(5);
 
