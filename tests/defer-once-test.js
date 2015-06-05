@@ -53,6 +53,54 @@ test('when passed a target and method name', function() {
   ok(functionWasCalled, 'function was called');
 });
 
+test('throws when passed a null method', function() {
+  expect(1);
+
+  function onError(error) {
+    equal('You attempted to schedule an action in a queue (deferErrors) for a method doesn\'t exist', error.message);
+  }
+
+  var bb = new Backburner(['deferErrors'], {
+    onError: onError
+  });
+
+  bb.run(function() {
+    bb.deferOnce('deferErrors', {zomg: 'hi'}, null);
+  });
+});
+
+test('throws when passed an undefined method', function() {
+  expect(1);
+
+  function onError(error) {
+    equal('You attempted to schedule an action in a queue (deferErrors) for a method doesn\'t exist', error.message);
+  }
+
+  var bb = new Backburner(['deferErrors'], {
+    onError: onError
+  });
+
+  bb.run(function() {
+    bb.deferOnce('deferErrors', {zomg: 'hi'}, undefined);
+  });
+});
+
+test('throws when passed an method name that does not exists on the target', function() {
+  expect(1);
+
+  function onError(error) {
+    equal('You attempted to schedule an action in a queue (deferErrors) for a method doesn\'t exist', error.message);
+  }
+
+  var bb = new Backburner(['deferErrors'], {
+    onError: onError
+  });
+
+  bb.run(function() {
+    bb.deferOnce('deferErrors', {zomg: 'hi'}, 'checkFunction');
+  });
+});
+
 test('when passed a target, method, and arguments', function() {
   expect(5);
 
