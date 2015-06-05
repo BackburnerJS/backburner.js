@@ -62,7 +62,7 @@ test('throws when passed a null method', function() {
   expect(1);
 
   function onError(error) {
-    equal('You attempted to schedule an action in a queue (deferErrors) for a method doesn\'t exist', error.message);
+    equal('You attempted to schedule an action in a queue (deferErrors) for a method that doesn\'t exist', error.message);
   }
 
   var bb = new Backburner(['deferErrors'], {
@@ -78,7 +78,7 @@ test('throws when passed an undefined method', function() {
   expect(1);
 
   function onError(error) {
-    equal('You attempted to schedule an action in a queue (deferErrors) for a method doesn\'t exist', error.message);
+    equal('You attempted to schedule an action in a queue (deferErrors) for a method that doesn\'t exist', error.message);
   }
 
   var bb = new Backburner(['deferErrors'], {
@@ -94,7 +94,7 @@ test('throws when passed an method name that does not exists on the target', fun
   expect(1);
 
   function onError(error) {
-    equal('You attempted to schedule an action in a queue (deferErrors) for a method doesn\'t exist', error.message);
+    equal('You attempted to schedule an action in a queue (deferErrors) for a method that doesn\'t exist', error.message);
   }
 
   var bb = new Backburner(['deferErrors'], {
