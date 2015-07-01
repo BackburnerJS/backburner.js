@@ -331,3 +331,31 @@ test('setTimeout with two Backburner instances', function() {
     equal(++steps, 8);
   }, 50);
 });
+
+test('expired timeout doesn\'t hang when setting a new timeout', function() {
+  expect(3);
+
+  var called1At = 0;
+  var called2At = 0;
+
+  bb.setTimeout(function() {
+    called1At = Date.now();
+  }, 1);
+
+  // Block JS to simulate https://github.com/ebryn/backburner.js/issues/135
+  var waitUntil = Date.now() + 5;
+  while (Date.now() < waitUntil)
+    ;
+
+  bb.setTimeout(function() {
+    called2At = Date.now();
+  }, 50);
+
+  stop();
+  setTimeout(function () {
+    start();
+    ok(called1At !== 0, 'timeout 1 was called');
+    ok(called2At !== 0, 'timeout 2 was called');
+    ok(called2At - called1At > 10, 'timeout 1 did not wait for timeout 2');
+  }, 60);
+});
