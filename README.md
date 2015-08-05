@@ -29,6 +29,13 @@ A rewrite of the Ember.js run loop as a generic microlibrary.
 
 `Backburner#cancel` - cancel a `deferOnce`, `setTimeout`, `debounce` or `throttle`
 
+`Backburner#on` - Add an event callback. Supports the following events:
+
+* `begin` - Fires whenever the runloop begins. Callbacks are passed the current instance and the previous instance.
+* `end` - Fires whenever the runloop ends. Callbacks are passed the current instance and the next instance.
+
+`Backburner#off` - Removes an event callback
+
 ## Example usage
 
 The following code will only cause a single DOM manipulation:
