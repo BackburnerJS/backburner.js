@@ -36,6 +36,14 @@ A rewrite of the Ember.js run loop as a generic microlibrary.
 
 `Backburner#off` - Removes an event callback
 
+#### Alias
+
+`Backburner#schedule` - same as `defer`
+
+`Backburner#scheduleOnce` - same as `deferOnce`
+
+`Backburner#later` - same as `setTimeout`
+
 ## Example usage
 
 The following code will only cause a single DOM manipulation:
