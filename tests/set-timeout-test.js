@@ -260,42 +260,6 @@ test('setTimeout doesn\'t trigger twice with earlier setTimeout', function() {
   }, 100);
 });
 
-test('setTimeout doesn\'t hang when timeout is unfulfilled', function() { // See issue #86
-  expect(3);
-
-  var bb = new Backburner(['one']);
-  var called1 = 0;
-  var called2 = 0;
-  var calls = 0;
-  var oldRun = bb.run;
-
-  // Count run() calls and relay them to original function
-  bb.run = function () {
-    calls++;
-    oldRun.apply(bb, arguments);
-  };
-
-  bb.setTimeout(function() {
-    called1++;
-  }, 0);
-
-  // Manually pass time and clear timeout
-  clearTimeout(bb._laterTimer);
-  bb._laterTimerExpiresAt = +(new Date()) - 5000;
-
-  bb.setTimeout(function() {
-    called2++;
-  }, 10);
-
-  stop();
-  setTimeout(function () {
-    start();
-    equal(called1, 1, 'timeout 1 was called once');
-    equal(called2, 1, 'timeout 2 was called once');
-    equal(calls, 1, 'run() was called once'); // both at once
-  }, 50);
-});
-
 test('setTimeout with two Backburner instances', function() {
   expect(8);
 
