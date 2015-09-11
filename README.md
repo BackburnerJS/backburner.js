@@ -36,6 +36,8 @@ A rewrite of the Ember.js run loop as a generic microlibrary.
 
 `Backburner#off` - Removes an event callback
 
+`Backburner#join` - Join the passed method with an existing queue and execute immediately, if there isn't one use `Backburner#run`.
+
 #### Alias
 
 `Backburner#schedule` - same as `defer`
