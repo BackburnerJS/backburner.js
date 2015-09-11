@@ -1,3 +1,4 @@
+/* globals module */
 import Backburner from './backburner';
 import platform from './backburner/platform';
 

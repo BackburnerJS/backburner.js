@@ -1,29 +1,11 @@
 {
   "predef": [
-    "define",
-    "console",
-    "require",
-    "requireModule",
-    "equal",
-    "notEqual",
-    "notStrictEqual",
-    "test",
-    "asyncTest",
-    "testBoth",
-    "testWithDefault",
-    "raises",
-    "throws",
-    "deepEqual",
-    "start",
-    "stop",
-    "ok",
-    "strictEqual",
-    "module",
-    "expect",
-    "process"
+    "setTimeout", "clearTimeout"
   ],
+  "esnext": true,
   "node" : false,
-  "browser" : true,
+  "browser" : false,
+
   "boss" : true,
   "curly": false,
   "debug": false,
@@ -46,5 +28,6 @@
   "strict": false,
   "white": false,
   "eqnull": true,
-  "esnext": true
+  "trailing": true,
+  "unused": "vars"
 }
