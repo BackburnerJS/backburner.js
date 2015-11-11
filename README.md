@@ -11,7 +11,12 @@ A rewrite of the Ember.js run loop as a generic microlibrary.
 
 ### Constructor
 
-`new Backburner()` - instantiate a Backburner instance with an array of queue names
+`new Backburner([queue names], options)` - instantiate a Backburner instance with an array of queue names
+
+### options
+
+`yieldInterval` - [integer] sets a time interval for task yielding. Omitting or setting to zero instructs backburner to flush all queues without stopping until all taskes have been processed. This is the fastest way to process your app's tasks, however, this approach can lead to Jank in the UI if it takes longer than say >50ms for your app's tasks to run. Assinging a value between 10 and 100 will substantially reduce Jank in your app by creating pauses in task processing which allows the browser to run it's normal paint cycle.  The flip side is that it will increase the time it takes for all your app's tasks to be processed (paint time can add up).
+
 
 ### Instance methods
 
