@@ -13,10 +13,10 @@ test('We can configure a custom platform', function() {
   };
 
   var bb = new Backburner(['one'], {
-    platform: fakePlatform
+    _platform: fakePlatform
   });
 
-  ok(bb.options.platform.isFakePlatform, 'We can pass in a custom platform');
+  ok(bb.options._platform.isFakePlatform, 'We can pass in a custom platform');
 });
 
 test('We can use a custom setTimeout', function() {
@@ -24,7 +24,7 @@ test('We can use a custom setTimeout', function() {
 
   var customTimeoutWasUsed = false;
   var bb = new Backburner(['one'], {
-    platform: {
+    _platform: {
       setTimeout: function customSetTimeout(method, wait) {
         customTimeoutWasUsed = true;
         return GlobalContext.setTimeout(method, wait);
@@ -39,7 +39,7 @@ test('We can use a custom setTimeout', function() {
   stop();
   bb.deferOnce('one', function() {
     start();
-    ok(bb.options.platform.isFakePlatform, 'we are using the fake platform');
+    ok(bb.options._platform.isFakePlatform, 'we are using the fake platform');
     ok(customTimeoutWasUsed , 'custom setTimeout was used');
   });
 });
@@ -51,7 +51,7 @@ test('We can use a custom clearTimeout', function() {
   var functionWasCalled = false;
   var customClearTimeoutWasUsed = false;
   var bb = new Backburner(['one'], {
-    platform: {
+    _platform: {
       setTimeout: function customSetTimeout(method, wait) {
         return GlobalContext.setTimeout(method, wait);
       },
