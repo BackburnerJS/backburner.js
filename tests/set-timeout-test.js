@@ -323,3 +323,27 @@ test('expired timeout doesn\'t hang when setting a new timeout', function() {
     ok(called2At - called1At > 10, 'timeout 1 did not wait for timeout 2');
   }, 60);
 });
+
+test('NaN timeout doesn\'t hang other timeouts', function() {
+  expect(2);
+
+  var called1At = 0;
+  var called2At = 0;
+
+  bb.setTimeout(function() {
+    called1At = Date.now();
+  }, 1);
+
+  bb.setTimeout(function() {}, NaN);
+
+  bb.setTimeout(function() {
+    called2At = Date.now();
+  }, 10);
+
+  stop();
+  setTimeout(function () {
+    start();
+    ok(called1At !== 0, 'timeout 1 was called');
+    ok(called2At !== 0, 'timeout 2 was called');
+  }, 20);
+});
