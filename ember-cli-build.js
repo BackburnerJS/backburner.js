@@ -3,7 +3,7 @@ module.exports = function(defaults) {
   var compileModules = require('broccoli-es6-module-transpiler');
   var AMDFormatter = require('es6-module-transpiler-amd-formatter');
   var ES6Modules = require('broccoli-es6modules');
-  var concat = require('broccoli-sourcemap-concat');
+  var concat = require('broccoli-concat');
   var path = require('path');
   var mv = stew.mv;
   var find = stew.find;
@@ -25,7 +25,7 @@ module.exports = function(defaults) {
     output: 'backburner.js'
   });
 
-  var amd = new ES6Modules(find(mv(lib, 'lib/', '/'), '!*.umd'), {
+  var amd = new ES6Modules(find(mv(lib, 'lib/', '/'), '!**/*.umd'), {
     esperantoOptions: {
       absolutePaths: true,
       strict: true
