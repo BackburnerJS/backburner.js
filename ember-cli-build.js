@@ -1,7 +1,6 @@
 module.exports = function(defaults) {
   var stew = require('broccoli-stew');
   var compileModules = require('broccoli-es6-module-transpiler');
-  var AMDFormatter = require('es6-module-transpiler-amd-formatter');
   var ES6Modules = require('broccoli-es6modules');
   var concat = require('broccoli-sourcemap-concat');
   var path = require('path');
