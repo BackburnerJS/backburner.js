@@ -29,5 +29,5 @@
   "white": false,
   "eqnull": true,
   "trailing": true,
-  "unused": "vars"
+  "unused": true
 }

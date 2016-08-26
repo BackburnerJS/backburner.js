@@ -1,4 +1,4 @@
-import Queue from '../lib/backburner/queue';
+import { Queue } from 'backburner';
 
 module('Queue.prototpye.pushUnique');
 var slice = [].slice;

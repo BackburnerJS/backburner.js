@@ -11,12 +11,10 @@
   <script src="qunit.js"></script>
   <script src="/testem.js"></script>
   <script src="loader.js"></script>
-  <script src="../backburner.concat.amd.js"></script>
+  <script src="backburner.js"></script>
   <script src="tests.js"></script>
   <script>
-    Object.keys(require.entries).filter(function(a) {
-      return /-test$/.test(a);
-    }).map(require);
+    require('backburner-tests');
   </script>
 </body>
 </html>

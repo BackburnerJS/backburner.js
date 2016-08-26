@@ -1,4 +1,4 @@
-import Backburner from '../lib/backburner';
+import Backburner from 'backburner';
 
 module('deferOnce');
 

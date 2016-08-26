@@ -1,8 +1,9 @@
 {
   "name": "backburner.js",
-  "version": "0.2.2+pre",
+  "version": "0.3.0",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
-  "main": "index.js",
+  "main": "dist/backburner.js",
+  "jsnext:main": "dist/es6/backburner.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/ebryn/backburner.js.git"
@@ -10,19 +11,22 @@
   "scripts": {
     "build": "ember build --environment=production",
     "test": "ember test",
-    "test:server": "ember test --server"
+    "test:server": "ember test --server",
+    "lint": "jshint lib/*"
   },
   "author": "Erik Bryn",
   "license": "MIT",
   "readmeFilename": "README.md",
   "devDependencies": {
-    "broccoli-es6-module-transpiler": "^0.5.0",
-    "broccoli-es6modules": "^1.2.2",
-    "broccoli-sourcemap-concat": "^1.0.2",
-    "broccoli-stew": "^0.2.1",
-    "broccoli-uglify-js": "^0.1.3",
-    "ember-cli": "^1.13.8",
+    "broccoli-funnel": "^1.0.6",
+    "broccoli-merge-trees": "^1.1.4",
+    "broccoli-plugin": "^1.2.1",
+    "broccoli-rollup": "^1.0.2",
+    "ember-cli": "2.7.0",
+    "jshint": "^2.9.3",
     "loader.js": "^3.3.0",
-    "qunitjs": "^1.19.0"
+    "mkdirp": "^0.5.1",
+    "qunitjs": "^1.19.0",
+    "walk-sync": "^0.3.1"
   }
 }

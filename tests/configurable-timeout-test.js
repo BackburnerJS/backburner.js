@@ -1,5 +1,4 @@
-import Backburner from '../lib/backburner';
-import GlobalContext from '../lib/backburner/platform';
+import Backburner from 'backburner';
 
 module('configurable platform.setTimeout');
 
@@ -27,10 +26,10 @@ test('We can use a custom setTimeout', function() {
     _platform: {
       setTimeout: function customSetTimeout(method, wait) {
         customTimeoutWasUsed = true;
-        return GlobalContext.setTimeout(method, wait);
+        return setTimeout(method, wait);
       },
       clearTimeout: function customClearTimeout(timer) {
-        return GlobalContext.clearTimeout(timer);
+        return clearTimeout(timer);
       },
       isFakePlatform: true
     }
@@ -53,11 +52,11 @@ test('We can use a custom clearTimeout', function() {
   var bb = new Backburner(['one'], {
     _platform: {
       setTimeout: function customSetTimeout(method, wait) {
-        return GlobalContext.setTimeout(method, wait);
+        return setTimeout(method, wait);
       },
       clearTimeout: function customClearTimeout(timer) {
         customClearTimeoutWasUsed = true;
-        return GlobalContext.clearTimeout(timer);
+        return clearTimeout(timer);
       }
     }
   });
