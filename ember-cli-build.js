@@ -6,7 +6,6 @@ const Rollup = require('broccoli-rollup');
 const Plugin = require('broccoli-plugin');
 const path = require('path');
 
-
 const walkSync = require('walk-sync');
 const fs = require('fs');
 const mkdirp = require('mkdirp').sync;

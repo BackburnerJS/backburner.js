@@ -8,5 +8,7 @@ TODOs
 /bin/
 /config/
 /lib/
-/tests/
-/dist/tests/
+tests/
+.travis.yml
+.npmignore
+.gitignore

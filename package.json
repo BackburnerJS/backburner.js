@@ -1,6 +1,6 @@
 {
   "name": "backburner.js",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
   "main": "dist/backburner.js",
   "jsnext:main": "dist/es6/backburner.js",
@@ -9,7 +9,7 @@
     "url": "https://github.com/ebryn/backburner.js.git"
   },
   "scripts": {
-    "build": "ember build --environment=production",
+    "prepublish": "ember build --environment=production",
     "test": "ember test",
     "test:server": "ember test --server",
     "lint": "jshint lib/*"
