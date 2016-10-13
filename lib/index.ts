@@ -470,7 +470,7 @@ export default class Backburner {
     }, wait);
 
     if (immediate) {
-      this.run.apply(this, args);
+      this.join.apply(this, args);
     }
 
     throttler = [target, method, timer];
