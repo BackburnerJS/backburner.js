@@ -12,7 +12,8 @@
     "prepublish": "ember build --environment=production",
     "test": "ember test",
     "test:server": "ember test --server",
-    "lint": "jshint lib/*"
+    "lint": "jshint lib/*",
+    "bench": "ember build && node ./bench/index.js"
   },
   "author": "Erik Bryn",
   "license": "MIT",
@@ -22,7 +23,9 @@
     "broccoli-merge-trees": "^1.1.4",
     "broccoli-plugin": "^1.2.1",
     "broccoli-rollup": "^1.0.2",
+    "do-you-even-bench": "^1.0.2",
     "ember-cli": "2.7.0",
+    "glob": "^7.1.1",
     "jshint": "^2.9.3",
     "loader.js": "^3.3.0",
     "mkdirp": "^0.5.1",
