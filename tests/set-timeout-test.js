@@ -1,9 +1,11 @@
 import Backburner from 'backburner';
 
+var originalDateNow = Date.now;
 var originalDateValueOf = Date.prototype.valueOf;
 
 module('setTimeout',{
   teardown: function(){
+    Date.now = originalDateNow;
     Date.prototype.valueOf = originalDateValueOf;
   }
 });
@@ -50,6 +52,21 @@ test('setTimeout', function() {
       ok(true, 'Another later will execute correctly');
     }, 1);
   }, 20);
+});
+
+test('setTimeout can continue when `Date.now` is monkey-patched', function() {
+  expect(1);
+
+  var arbitraryTime = +new Date();
+  var bb = new Backburner(['one']);
+
+  Date.now = function() { return arbitraryTime; };
+
+  stop();
+  bb.setTimeout(function() {
+    start();
+    ok(true);
+  }, 1);
 });
 
 var bb;
