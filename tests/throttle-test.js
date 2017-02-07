@@ -104,6 +104,24 @@ test('throttle', function() {
   }, 180);
 });
 
+test('throttle with cancelTimers', function() {
+  expect(1);
+
+  var count = 0;
+  var bb = new Backburner(['zomg']);
+
+  // Throttle a no-op 10ms
+  bb.throttle(null, function(){ /* no-op */ }, 10, false);
+
+  try {
+    bb.cancelTimers();
+  } catch(e) {
+    count++;
+  }
+
+  equal(count, 0, 'calling cancelTimers while something is being throttled does not throw an error');
+});
+
 test('throttle leading edge', function() {
   expect(10);
 
