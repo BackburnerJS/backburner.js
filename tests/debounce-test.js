@@ -2,6 +2,7 @@ import Backburner from 'backburner';
 
 module('debounce');
 
+// TODO: test should use stubbed timer for absolute control (via platform)
 test('debounce', function() {
   expect(14);
 

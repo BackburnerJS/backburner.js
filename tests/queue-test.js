@@ -1,4 +1,4 @@
-import Backburner from 'backburner';
+import Backburner, { Queue } from 'backburner';
 
 module('Queue');
 
@@ -99,5 +99,41 @@ test('onBegin and onEnd are called and passed the correct parameters', function(
 
   deepEqual(befores, expectedBefores, 'before callbacks successful');
   deepEqual(afters, expectedAfters, 'after callback successful');
+});
+
+test('size', function() {
+  var queue = new Queue('foo');
+  equal(queue.size, 0);
+  queue.push({}, '', []);
+  equal(queue.size, 1);
+  queue.push({}, '', []);
+  equal(queue.size, 2);
+});
+
+module('Queue.incrementalFlush');
+test('empty', function() {
+  var queue = new Queue('foo');
+  var iterator = queue.incrementalFlush();
+  equal(iterator.done, true);
+  equal(typeof iterator.next, 'function');
+
+  throws(function() {
+    iterator.next();
+  }, /iterator drained/);
+});
+
+test('snapshots for iterator, and purges queue (depending on choice could go either way)', function() {
+  var queue = new Queue('foo');
+  queue.push({}, 'foo', []);
+  equal(queue.size, 1);
+  var iterator = queue.incrementalFlush();
+  equal(queue.size, 0);
+  equal(iterator.done, false);
+
+  deepEqual(iterator.next(), [{},'foo', [], undefined]);
+  equal(iterator.done, true);
+
+  queue.push({}, 'foo', []);
+  equal(iterator.done, true);
 });
 
