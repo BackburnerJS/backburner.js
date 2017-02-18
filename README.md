@@ -38,6 +38,8 @@ A rewrite of the Ember.js run loop as a generic microlibrary.
 
 `Backburner#join` - Join the passed method with an existing queue and execute immediately, if there isn't one use `Backburner#run`.
 
+`Backburner#rollover` - Schedule work to be completed after yielding control back to the main thread, however as a greater priority ensure that the work is compelted before the next runloop begins.
+
 #### Alias
 
 `Backburner#schedule` - same as `defer`
