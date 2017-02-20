@@ -22,7 +22,7 @@
     "broccoli-funnel": "^1.0.6",
     "broccoli-merge-trees": "^1.1.4",
     "broccoli-plugin": "^1.2.1",
-    "broccoli-rollup": "^1.0.2",
+    "broccoli-rollup": "1.0.3",
     "do-you-even-bench": "^1.0.2",
     "ember-cli": "2.7.0",
     "glob": "^7.1.1",
