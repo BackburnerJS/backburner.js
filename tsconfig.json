@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es6",
+    "moduleResolution": "node",
+    "rootDir": "lib",
+    "removeComments": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "lib/**/*"
+  ],
+  "exclude": [
+    "tmp",
+    "node_modules"
+  ]
+}

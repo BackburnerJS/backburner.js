@@ -1,67 +1,57 @@
-/* globals module, require */
-'use strict';
-const MergeTrees = require('broccoli-merge-trees');
-const Funnel = require('broccoli-funnel');
-const Rollup = require('broccoli-rollup');
-const path = require('path');
+module.exports = function(defaults) {
+  var stew = require('broccoli-stew');
+  var compileModules = require('broccoli-es6-module-transpiler');
+  var AMDFormatter = require('es6-module-transpiler-amd-formatter');
+  var ES6Modules = require('broccoli-es6modules');
+  var concat = require('broccoli-sourcemap-concat');
+  var path = require('path');
+  var mv = stew.mv;
+  var find = stew.find;
+  var log = stew.log;
 
-const walkSync = require('walk-sync');
-const fs = require('fs');
-const mkdirp = require('mkdirp').sync;
+  var lib       = find('lib');
+  var tests     = find('tests');
+  var testIndex = find('tests/{index.html}');
+  var qunit     = find(path.dirname(require.resolve('qunitjs'))   + '/qunit.{js,css}');
+  var loader    = find(path.dirname(require.resolve('loader.js')) + '/{loader.js}');
 
+  qunit  = stew.rename(qunit, path.basename);
+  loader = stew.rename(loader, path.basename);
 
-module.exports = function () {
-  return new MergeTrees([
-    new Rollup('lib', {
-      rollup: {
-        entry: 'backburner.js',
-        targets: [{
-          dest: 'backburner.js',
-          format: 'cjs'
-        }, {
-          dest: 'es6/backburner.js',
-          format: 'es'
-        }]
-      }
-    }),
-    new Rollup('lib', {
-      rollup: {
-        entry: 'backburner.tests.js',
-        targets: [{
-          dest: 'tests/backburner.js',
-          format: 'amd',
-          moduleId: 'backburner',
-          exports: 'named' // for private export Queue
-        }]
-      }
-    }),
-    new Rollup(new Funnel('tests', { include: ['**/*.js'], destDir: 'tests' }), {
-      rollup: {
-        entry: 'tests/index.js',
-        external: ['backburner'],
-        targets: [{
-          dest: 'tests/tests.js',
-          format: 'amd',
-          moduleId: 'backburner-tests'
-        }]
-      },
-      annotation: 'tests/tests.js'
-    }),
-    new Funnel(path.dirname(require.resolve('qunitjs')), {
-      annotation: 'tests/qunit.{js,css}',
-      files: ['qunit.css', 'qunit.js'],
-      destDir: 'tests'
-    }),
-    new Funnel(path.dirname(require.resolve('loader.js')), {
-      annotation: 'tests/loader.js',
-      files: ['loader.js'],
-      destDir: 'tests'
-    }),
-    new Funnel('tests', {
-      files: ['index.html'],
-      destDir: 'tests'
-    })
-  ], {
-    annotation: 'dist'
+  // folded bundle
+  var bundled = compileModules(lib, {
+    format: 'bundle',
+    entry:  'backburner.umd',
+    output: 'backburner.js'
   });
+
+  var amd = new ES6Modules(find(mv(lib, 'lib/', '/'), '!*.umd'), {
+    esperantoOptions: {
+      absolutePaths: true,
+      strict: true
+    }
+  });
+
+  var amdTests = new ES6Modules(find(tests, '**/*-test.js'), {
+    esperantoOptions: {
+      absolutePaths: true,
+      strict: true,
+    }
+  });
+
+  return stew.find([
+    bundled,
+    concat(amd, {
+      inputFiles: ['**/*.js'],
+      outputFile: 'backburner.concat.amd.js'
+    }),
+    mv(amd, 'amd'),
+    testIndex,
+    mv(qunit, 'tests'),
+    mv(loader, 'tests'),
+    concat(amdTests, {
+      inputFiles: ['**/*.js'],
+      outputFile: 'tests/tests.js'
+    })
+  ]);
 };
