@@ -8,14 +8,27 @@
     "url": "https://github.com/BackburnerJS/backburner"
   },
   "scripts": {
-    "build": "ember build --environment=production",
+    "prepublish": "ember build --environment=production",
     "test": "ember test",
-    "test:server": "ember test --server"
+    "test:server": "ember test --server",
+    "lint": "jshint lib/*",
+    "bench": "ember build && node ./bench/index.js"
   },
   "author": "Erik Bryn",
   "license": "MIT",
   "readmeFilename": "README.md",
   "devDependencies": {
+    "broccoli-funnel": "^1.0.6",
+    "broccoli-merge-trees": "^1.1.4",
+    "broccoli-plugin": "^1.2.1",
+    "broccoli-rollup": "^1.0.2",
+    "do-you-even-bench": "^1.0.2",
+    "glob": "^7.1.1",
+    "jshint": "^2.9.3",
+    "loader.js": "^3.3.0",
+    "mkdirp": "^0.5.1",
+    "qunitjs": "^1.19.0",
+    "walk-sync": "^0.3.1",
     "broccoli-es6-module-transpiler": "^0.5.0",
     "broccoli-es6modules": "^1.2.2",
     "broccoli-sourcemap-concat": "^1.0.2",
