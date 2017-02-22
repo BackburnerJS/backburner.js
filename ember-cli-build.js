@@ -3,34 +3,12 @@
 const MergeTrees = require('broccoli-merge-trees');
 const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
-const Plugin = require('broccoli-plugin');
 const path = require('path');
 
 const walkSync = require('walk-sync');
 const fs = require('fs');
 const mkdirp = require('mkdirp').sync;
 
-class TestIndex extends Plugin {
-  constructor(input) {
-    super([input], {
-      persistentOutput: true,
-      annotation: 'tests/index.js'
-    });
-  }
-
-  build() {
-    let inputPath = this.inputPaths[0];
-    let outputPath = this.outputPath + '/tests';
-    let testModules = walkSync(inputPath, {
-      globs: ['**/*.js']
-    }).map(file => {
-      let moduleId = file.slice(0, -3);
-      return `import './${moduleId}';`;
-    }).join('\n');
-    mkdirp(outputPath);
-    fs.writeFileSync(outputPath + '/index.js', testModules);
-  }
-}
 
 module.exports = function () {
   return new MergeTrees([
@@ -57,13 +35,7 @@ module.exports = function () {
         }]
       }
     }),
-    new Rollup(new MergeTrees([
-      new TestIndex('tests'),
-      new Funnel('tests', {
-        include: ['**/*.js'],
-        destDir: 'tests'
-      })
-    ]), {
+    new Rollup(new Funnel('tests', { include: ['**/*.js'], destDir: 'tests' }), {
       rollup: {
         entry: 'tests/index.js',
         external: ['backburner'],
