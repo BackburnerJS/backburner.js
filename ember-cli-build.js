@@ -10,6 +10,8 @@ const walkSync = require('walk-sync');
 const fs = require('fs');
 const mkdirp = require('mkdirp').sync;
 
+
+//TMP DIRECTORY
 class TestIndex extends Plugin {
   constructor(input) {
     super([input], {
@@ -32,9 +34,15 @@ class TestIndex extends Plugin {
   }
 }
 
+
+const TESTS = new MergeTrees([ new TestIndex('tests'), new Funnel('tests', { include: ['**/*.js'], destDir: 'tests' })]);
+
+
+
+
 module.exports = function () {
   return new MergeTrees([
-    new Rollup('lib', {
+    new Rollup('dist', {
       rollup: {
         entry: 'backburner.js',
         targets: [{
@@ -46,7 +54,7 @@ module.exports = function () {
         }]
       }
     }),
-    new Rollup('lib', {
+    new Rollup('dist', {
       rollup: {
         entry: 'backburner.tests.js',
         targets: [{
@@ -57,13 +65,7 @@ module.exports = function () {
         }]
       }
     }),
-    new Rollup(new MergeTrees([
-      new TestIndex('tests'),
-      new Funnel('tests', {
-        include: ['**/*.js'],
-        destDir: 'tests'
-      })
-    ]), {
+    new Rollup(TESTS, {
       rollup: {
         entry: 'tests/index.js',
         external: ['backburner'],
