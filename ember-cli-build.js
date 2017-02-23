@@ -5,11 +5,6 @@ const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
 const path = require('path');
 
-const walkSync = require('walk-sync');
-const fs = require('fs');
-const mkdirp = require('mkdirp').sync;
-
-
 module.exports = function () {
   return new MergeTrees([
     new Rollup('lib', {

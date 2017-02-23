@@ -1,18 +1,19 @@
 {
   "name": "backburner.js",
-  "version": "1.0.0",
+  "version": "0.3.1",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
-  "main": "index.js",
+  "main": "dist/backburner.js",
+  "jsnext:main": "dist/es6/backburner.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/BackburnerJS/backburner"
+    "url": "https://github.com/ebryn/backburner.js.git"
   },
   "scripts": {
     "prepublish": "ember build --environment=production",
     "test": "ember test",
     "test:server": "ember test --server",
-    "bench": "ember build && node ./bench/index.js",
-    "tsc": "tsc --watch"
+    "lint": "jshint lib/*",
+    "bench": "ember build && node ./bench/index.js"
   },
   "author": "Erik Bryn",
   "license": "MIT",
@@ -21,24 +22,13 @@
     "broccoli-funnel": "^1.0.6",
     "broccoli-merge-trees": "^1.1.4",
     "broccoli-plugin": "^1.2.1",
-    "broccoli-rollup": "^1.1.0",
+    "broccoli-rollup": "^1.0.2",
     "do-you-even-bench": "^1.0.2",
+    "ember-cli": "2.7.0",
     "glob": "^7.1.1",
     "jshint": "^2.9.3",
     "loader.js": "^3.3.0",
-    "mkdirp": "^0.5.1",
     "qunitjs": "^1.19.0",
-    "walk-sync": "^0.3.1",
-    "broccoli-es6-module-transpiler": "^0.5.0",
-    "broccoli-es6modules": "^1.2.2",
-    "broccoli-sourcemap-concat": "^1.0.2",
-    "broccoli-stew": "^0.2.1",
-    "broccoli-uglify-js": "^0.1.3",
-    "es6-module-transpiler-amd-formatter": "^0.3.0",
-    "ember-cli": "^2.11.1",
     "typescript": "^2.1.6"
   }
 }
-
-
-
