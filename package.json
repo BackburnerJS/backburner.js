@@ -9,11 +9,12 @@
     "url": "https://github.com/ebryn/backburner.js.git"
   },
   "scripts": {
-    "prepublish": "ember build --environment=production",
+    "prepublish": "tsc && ember build --environment=production",
     "test": "ember test",
     "test:server": "ember test --server",
     "lint": "jshint lib/*",
-    "bench": "ember build && node ./bench/index.js"
+    "bench": "ember build && node ./bench/index.js",
+    "tsc": "tsc --watch"
   },
   "author": "Erik Bryn",
   "license": "MIT",
