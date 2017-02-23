@@ -7,19 +7,7 @@ const path = require('path');
 
 module.exports = function () {
   return new MergeTrees([
-    new Rollup('ts-dist', {
-      rollup: {
-        entry: 'backburner.js',
-        targets: [{
-          dest: 'backburner.js',
-          format: 'cjs'
-        }, {
-          dest: 'es6/backburner.js',
-          format: 'es'
-        }]
-      }
-    }),
-    new Rollup('ts-dist', {
+    new Rollup('dist', {
       rollup: {
         entry: 'backburner.tests.js',
         targets: [{

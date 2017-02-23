@@ -1,12 +1,12 @@
 {
   "name": "backburner.js",
-  "version": "0.3.1",
+  "version": "1.0.0",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
-  "main": "dist/backburner.js",
-  "jsnext:main": "dist/es6/backburner.js",
+  "main": "ts-dist/backburner.js",
+  "jsnext:main": "ts-dist/backburner.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ebryn/backburner.js.git"
+    "url": "https://github.com/BackburnerJS/backburner"
   },
   "scripts": {
     "prepublish": "tsc && ember build --environment=production",

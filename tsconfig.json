@@ -5,7 +5,7 @@
     "moduleResolution": "node",
     "rootDir": "lib",
     "removeComments": true,
-    "outDir": "ts-dist"
+    "outDir": "dist"
   },
   "include": [
     "lib/**/*"
