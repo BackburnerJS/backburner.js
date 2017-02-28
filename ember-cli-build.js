@@ -27,6 +27,10 @@ module.exports = function () {
           dest: 'backburner.js',
           format: 'es',
           exports: 'named'
+        },{
+          dest: 'es6/backburner.js',
+          format: 'es',
+          exports: 'named'
         }]
       }
     }),
