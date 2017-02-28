@@ -3,19 +3,36 @@
 const MergeTrees = require('broccoli-merge-trees');
 const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
+const stew = require('broccoli-stew');
 const path = require('path');
+const typescript = require('broccoli-typescript-compiler');
+
+var lib = stew.find('lib');
+var ts = typescript(lib);
+
 
 module.exports = function () {
   return new MergeTrees([
-    new Rollup('dist', {
+    new Rollup(ts, {
       rollup: {
-        entry: 'backburner.tests.js',
+        entry: 'lib/index.js',
         targets: [{
-          dest: 'tests/backburner.js',
-          format: 'amd',
-          moduleId: 'backburner',
-          exports: 'named' // for private export Queue
-        }]
+          dest: 'backburner.js',
+          format: 'es',
+        }],
+        moduleId: 'backburner-ts',
+        moduleName: 'Backburner-ts'
+      }
+    }),
+    new Rollup(ts, {
+      rollup: {
+        entry: 'lib/backburner.tests.js',
+        targets: [{
+          dest: './tests/backburner.js',
+          format: 'es'
+        }],
+        moduleId: 'backburner-test',
+        moduleName: 'Backburner-test'
       }
     }),
     new Rollup(new Funnel('tests', { include: ['**/*.js'], destDir: 'tests' }), {

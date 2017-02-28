@@ -1,1 +1,1 @@
-export { default, Queue } from './backburner/index';
+export { default, Queue } from './index';

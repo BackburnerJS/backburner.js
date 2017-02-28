@@ -5,12 +5,12 @@ import {
   isNumber,
   isCoercableNumber,
   now
-} from './utils';
+} from './backburner/utils';
 
-import searchTimer from './binary-search';
-import DeferredActionQueues from './deferred-action-queues';
+import searchTimer from './backburner/binary-search';
+import DeferredActionQueues from './backburner/deferred-action-queues';
 
-export { default as Queue } from './queue';
+export { default as Queue } from './backburner/queue';
 
 export default function Backburner(queueNames, options) {
   this.queueNames = queueNames;
