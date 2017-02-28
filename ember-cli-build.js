@@ -6,7 +6,16 @@ const Rollup = require('broccoli-rollup');
 const stew = require('broccoli-stew');
 const path = require('path');
 const typescript = require('broccoli-typescript-compiler');
-const ts = typescript(stew.find('lib'));
+const ts = typescript(stew.find('lib'), {
+  tsconfig: {
+    compilerOptions: {
+      module: 'es6',
+      target: 'es6',
+      removeComments: true,
+      moduleResolution: 'node'
+    }
+  }
+});
 
 
 module.exports = function () {
@@ -17,9 +26,8 @@ module.exports = function () {
         targets: [{
           dest: 'backburner.js',
           format: 'es',
-        }],
-        moduleId: 'backburner-ts',
-        moduleName: 'Backburner-ts'
+          exports: 'named'
+        }]
       }
     }),
     new Rollup(ts, {
@@ -28,10 +36,9 @@ module.exports = function () {
         targets: [{
           dest: 'tests/backburner.js',
           format: 'amd',
+          moduleId: 'backburner',
           exports: 'named'
-        }],
-        moduleId: 'backburner-test',
-        moduleName: 'Backburner-test'
+        }]
       }
     }),
     new Rollup(new Funnel('tests', { include: ['**/*.js'], destDir: 'tests' }), {
