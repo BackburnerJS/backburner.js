@@ -6,9 +6,7 @@ const Rollup = require('broccoli-rollup');
 const stew = require('broccoli-stew');
 const path = require('path');
 const typescript = require('broccoli-typescript-compiler');
-
-var lib = stew.find('lib');
-var ts = typescript(lib);
+const ts = typescript(stew.find('lib'));
 
 
 module.exports = function () {
@@ -26,10 +24,11 @@ module.exports = function () {
     }),
     new Rollup(ts, {
       rollup: {
-        entry: 'lib/backburner.tests.js',
+        entry: 'lib/index.js',
         targets: [{
-          dest: './tests/backburner.js',
-          format: 'es'
+          dest: 'tests/backburner.js',
+          format: 'amd',
+          exports: 'named'
         }],
         moduleId: 'backburner-test',
         moduleName: 'Backburner-test'
