@@ -3,10 +3,11 @@
 const MergeTrees = require('broccoli-merge-trees');
 const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
-const stew = require('broccoli-stew');
 const path = require('path');
 const typescript = require('broccoli-typescript-compiler');
-const ts = typescript(stew.find('lib'), {
+const stew = require('broccoli-stew');
+
+const ts = typescript(__dirname + 'lib', {
   tsconfig: {
     compilerOptions: {
       module: 'es6',
