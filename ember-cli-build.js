@@ -7,7 +7,7 @@ const path = require('path');
 const typescript = require('broccoli-typescript-compiler');
 const stew = require('broccoli-stew');
 
-const ts = typescript(__dirname + 'lib', {
+const ts = typescript(stew.find('lib'), {
   tsconfig: {
     compilerOptions: {
       module: 'es6',
@@ -17,7 +17,6 @@ const ts = typescript(__dirname + 'lib', {
     }
   }
 });
-
 
 module.exports = function () {
   return new MergeTrees([
