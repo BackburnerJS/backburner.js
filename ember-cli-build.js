@@ -5,24 +5,23 @@ const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
 const path = require('path');
 const typescript = require('broccoli-typescript-compiler');
-const stew = require('broccoli-stew');
 
-const ts = typescript(stew.find('lib'), {
-  tsconfig: {
-    compilerOptions: {
-      module: 'es6',
-      target: 'es6',
-      removeComments: true,
-      moduleResolution: 'node'
+
+module.exports = function () {  
+  const lib = typescript(path.join(__dirname, '/lib'), {
+    tsconfig: {
+      compilerOptions: {
+        module: 'es6',
+        target: 'es6',
+        removeComments: true,
+        moduleResolution: 'node'
+      }
     }
-  }
-});
-
-module.exports = function () {
+  });
   return new MergeTrees([
-    new Rollup(ts, {
+    new Rollup(lib, {
       rollup: {
-        entry: 'lib/index.js',
+        entry: 'index.js',
         targets: [{
           dest: 'backburner.js',
           format: 'es',
@@ -34,9 +33,9 @@ module.exports = function () {
         }]
       }
     }),
-    new Rollup(ts, {
+    new Rollup(lib, {
       rollup: {
-        entry: 'lib/index.js',
+        entry: 'index.js',
         targets: [{
           dest: 'tests/backburner.js',
           format: 'amd',
@@ -67,7 +66,7 @@ module.exports = function () {
       files: ['loader.js'],
       destDir: 'tests'
     }),
-    new Funnel('tests', {
+    new Funnel(path.join(__dirname, '/tests'), {
       files: ['index.html'],
       destDir: 'tests'
     })
