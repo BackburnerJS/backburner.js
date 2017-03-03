@@ -3,67 +3,48 @@
 const MergeTrees = require('broccoli-merge-trees');
 const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
-const Plugin = require('broccoli-plugin');
 const path = require('path');
+const typescript = require('broccoli-typescript-compiler');
 
-const walkSync = require('walk-sync');
-const fs = require('fs');
-const mkdirp = require('mkdirp').sync;
 
-class TestIndex extends Plugin {
-  constructor(input) {
-    super([input], {
-      persistentOutput: true,
-      annotation: 'tests/index.js'
-    });
-  }
-
-  build() {
-    let inputPath = this.inputPaths[0];
-    let outputPath = this.outputPath + '/tests';
-    let testModules = walkSync(inputPath, {
-      globs: ['**/*.js']
-    }).map(file => {
-      let moduleId = file.slice(0, -3);
-      return `import './${moduleId}';`;
-    }).join('\n');
-    mkdirp(outputPath);
-    fs.writeFileSync(outputPath + '/index.js', testModules);
-  }
-}
-
-module.exports = function () {
+module.exports = function () {  
+  const lib = typescript(path.join(__dirname, '/lib'), {
+    tsconfig: {
+      compilerOptions: {
+        module: 'es6',
+        target: 'es6',
+        removeComments: true,
+        moduleResolution: 'node'
+      }
+    }
+  });
   return new MergeTrees([
-    new Rollup('lib', {
+    new Rollup(lib, {
       rollup: {
-        entry: 'backburner.js',
+        entry: 'index.js',
         targets: [{
           dest: 'backburner.js',
-          format: 'cjs'
-        }, {
+          format: 'es',
+          exports: 'named'
+        },{
           dest: 'es6/backburner.js',
-          format: 'es'
+          format: 'es',
+          exports: 'named'
         }]
       }
     }),
-    new Rollup('lib', {
+    new Rollup(lib, {
       rollup: {
-        entry: 'backburner.tests.js',
+        entry: 'index.js',
         targets: [{
           dest: 'tests/backburner.js',
           format: 'amd',
           moduleId: 'backburner',
-          exports: 'named' // for private export Queue
+          exports: 'named'
         }]
       }
     }),
-    new Rollup(new MergeTrees([
-      new TestIndex('tests'),
-      new Funnel('tests', {
-        include: ['**/*.js'],
-        destDir: 'tests'
-      })
-    ]), {
+    new Rollup(new Funnel('tests', { include: ['**/*.js'], destDir: 'tests' }), {
       rollup: {
         entry: 'tests/index.js',
         external: ['backburner'],
@@ -85,7 +66,7 @@ module.exports = function () {
       files: ['loader.js'],
       destDir: 'tests'
     }),
-    new Funnel('tests', {
+    new Funnel(path.join(__dirname, '/tests'), {
       files: ['index.html'],
       destDir: 'tests'
     })
