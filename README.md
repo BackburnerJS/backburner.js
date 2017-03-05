@@ -1,11 +1,9 @@
-# backburner.js [![Build Status](https://travis-ci.org/ebryn/backburner.js.png?branch=master)](https://travis-ci.org/ebryn/backburner.js)
+# backburner.js [![Build Status](https://travis-ci.org/backburnerjs/backburner.js.png?branch=master)](https://travis-ci.org/ebryn/backburner.js)
 A rewrite of the Ember.js run loop as a generic microlibrary.
-
 
 ## Downloads
 
 * master: [globals](http://builds.emberjs.com.s3.amazonaws.com/backburner.js/lastest/backburner.js), [AMD](http://builds.emberjs.com.s3.amazonaws.com/backburner.js/lastest/backburner.amd.js)
-
 
 ## API
 
@@ -119,6 +117,3 @@ backburner.run(function() {
 // our view has been rerendered only once, thanks to backburner!
 
 ```
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ebryn/backburner.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-![](https://d3oi6fmp1dfbdb.cloudfront.net/g.gif?repo=ebryn/backburner.js)
