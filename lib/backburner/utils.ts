@@ -20,6 +20,6 @@ export function isNumber(suspect) {
   return typeof suspect === 'number';
 }
 
-export function isCoercableNumber(number) {
-  return isNumber(number) || NUMBER.test(number);
+export function isCoercableNumber(suspect) {
+  return isNumber(suspect) || NUMBER.test(suspect);
 }

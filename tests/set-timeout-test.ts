@@ -3,7 +3,7 @@ import Backburner from 'backburner';
 var originalDateNow = Date.now;
 var originalDateValueOf = Date.prototype.valueOf;
 
-QUnit.module('setTimeout',{
+QUnit.module('setTimeout', {
   teardown: function(){
     Date.now = originalDateNow;
     Date.prototype.valueOf = originalDateValueOf;
@@ -38,7 +38,7 @@ test('setTimeout', function() {
   // spin so that when we execute timers (+new Date()) will be greater than the
   // time scheduled above; not a problem in real life as we will never 'wait'
   // 0ms
-  while((+ new Date()) <= now + 10);
+  while ((+ new Date()) <= now + 10) {};
 
   stop();
   bb.setTimeout(null, function() {
@@ -81,12 +81,12 @@ QUnit.module('setTimeout arguments / arity', {
 
 test('[callback]', function(){
   expect(2);
-   stop();
-   bb.setTimeout(function() {
-     start();
-     equal(arguments.length, 0);
-     ok(true, 'was called');
-   });
+  stop();
+  bb.setTimeout(function() {
+    start();
+    equal(arguments.length, 0);
+    ok(true, 'was called');
+  });
 });
 
 test('[callback, undefined]', function(){
@@ -238,7 +238,7 @@ test('onError', function() {
     start();
   }
 
-  var bb = new Backburner(['errors'], { onError: onError });
+  bb = new Backburner(['errors'], { onError: onError });
 
   bb.setTimeout(function() { throw new Error('test error'); }, 1);
 
@@ -248,7 +248,7 @@ test('onError', function() {
 test('setTimeout doesn\'t trigger twice with earlier setTimeout', function() {
   expect(3);
 
-  var bb = new Backburner(['one']);
+  bb = new Backburner(['one']);
   var called1 = 0;
   var called2 = 0;
   var calls = 0;
@@ -325,8 +325,7 @@ test('expired timeout doesn\'t hang when setting a new timeout', function() {
 
   // Block JS to simulate https://github.com/ebryn/backburner.js/issues/135
   var waitUntil = Date.now() + 5;
-  while (Date.now() < waitUntil)
-    ;
+  while (Date.now() < waitUntil) {}
 
   bb.setTimeout(function() {
     called2At = Date.now();

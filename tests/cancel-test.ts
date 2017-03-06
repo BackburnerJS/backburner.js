@@ -31,13 +31,13 @@ test('deferOnce', function() {
 test('setTimeout', function() {
   expect(5);
 
-  var called = false,
-      bb = new Backburner(['one'], {
-        onBegin: function() {
-          called = true;
-        }
-      }),
-      functionWasCalled = false;
+  var called = false;
+  var bb = new Backburner(['one'], {
+    onBegin: function() {
+      called = true;
+    }
+  });
+  var functionWasCalled = false;
 
   var timer = bb.setTimeout(function() {
     functionWasCalled = true;
@@ -58,14 +58,14 @@ test('setTimeout', function() {
 test('setTimeout with multiple pending', function() {
   expect(7);
 
-  var called = false,
-    bb = new Backburner(['one'], {
-      onBegin: function () {
-        called = true;
-      }
-    }),
-    function1WasCalled = false,
-    function2WasCalled = false;
+  var called = false;
+  var bb = new Backburner(['one'], {
+    onBegin: function () {
+      called = true;
+    }
+  });
+  var function1WasCalled = false;
+  var function2WasCalled = false;
 
   var timer1 = bb.setTimeout(function () {
     function1WasCalled = true;
@@ -93,14 +93,14 @@ test('setTimeout with multiple pending', function() {
 test('setTimeout and creating a new setTimeout', function() {
   expect(7);
 
-  var called = false,
-    bb = new Backburner(['one'], {
-      onBegin: function () {
-        called = true;
-      }
-    }),
-    function1WasCalled = false,
-    function2WasCalled = false;
+  var called = false;
+  var bb = new Backburner(['one'], {
+    onBegin: function () {
+      called = true;
+    }
+  });
+  var function1WasCalled = false;
+  var function2WasCalled = false;
 
   var timer1 = bb.setTimeout(function () {
     function1WasCalled = true;
@@ -127,8 +127,8 @@ test('setTimeout and creating a new setTimeout', function() {
 });
 
 test('cancelTimers', function() {
-  var bb = new Backburner(['one']),
-      functionWasCalled = false;
+  var bb = new Backburner(['one']);
+  var functionWasCalled = false;
 
   var timer = bb.setTimeout(function() {
     functionWasCalled = true;
@@ -146,8 +146,8 @@ test('cancelTimers', function() {
 test('cancel during flush', function() {
   expect(1);
 
-  var bb = new Backburner(['one']),
-  functionWasCalled = false;
+  var bb = new Backburner(['one']);
+  var functionWasCalled = false;
 
   bb.run(function() {
     var timer1 = bb.deferOnce('one', function() {

@@ -74,7 +74,8 @@ test('onBegin and onEnd are called and passed the correct parameters', function(
   var afters = [];
   var expectedBefores = [];
   var expectedAfters = [];
-  var outer, inner;
+  var outer;
+  var inner;
 
   var bb = new Backburner(['one'], {
     onBegin: function(current, previous) {
@@ -100,4 +101,3 @@ test('onBegin and onEnd are called and passed the correct parameters', function(
   deepEqual(befores, expectedBefores, 'before callbacks successful');
   deepEqual(afters, expectedAfters, 'after callback successful');
 });
-

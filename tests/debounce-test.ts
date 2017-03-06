@@ -212,7 +212,7 @@ test('debounce returns timer information usable for cancelling', function() {
 
   ok(bb.cancel(timer), 'the timer is cancelled');
 
-  //should return false second time around
+  // should return false second time around
   ok(!bb.cancel(timer), 'the timer no longer exists in the list');
 
   stop();
@@ -228,7 +228,6 @@ test('debounce cancelled after it\'s executed returns false', function() {
 
   var bb = new Backburner(['darkknight']);
   var timer;
-
   var wasCalled = false;
 
   function debouncee() {

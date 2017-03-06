@@ -14,11 +14,11 @@ test('end event should fire after runloop completes', function() {
 
   var funcOne = function() {
     equal(callNumber, 0);
-  }
+  };
 
   var funcTwo = function() {
     equal(callNumber, 0);
-  }
+  };
 
   bb.run(function() {
     bb.schedule('one', null, funcOne);
@@ -44,11 +44,11 @@ test('end event should fire before onEnd', function() {
 
   var funcOne = function() {
     equal(callNumber, 0);
-  }
+  };
 
   var funcTwo = function() {
     equal(callNumber, 0);
-  }
+  };
 
   bb.run(function() {
     bb.schedule('one', null, funcOne);
@@ -83,7 +83,7 @@ test('end event should be passed the current and next instance', function() {
     bb.schedule('one', null, function() {});
   });
 });
-//blah
+// blah
 
 test('begin event should fire before runloop begins', function() {
   expect(4);
@@ -97,11 +97,11 @@ test('begin event should fire before runloop begins', function() {
 
   var funcOne = function() {
     equal(callNumber, 1);
-  }
+  };
 
   var funcTwo = function() {
     equal(callNumber, 1);
-  }
+  };
 
   equal(callNumber, 0);
   bb.run(function() {
@@ -160,7 +160,7 @@ test('begin event should be passed the current and previous instance', function(
   });
 });
 
-//blah
+// blah
 test('events should work with multiple callbacks', function() {
   expect(2);
   var firstCalled = false;
@@ -174,7 +174,7 @@ test('events should work with multiple callbacks', function() {
 
   var second = function() {
     secondCalled = true;
-  }
+  };
 
   bb.on('end', first);
   bb.on('end', second);
@@ -200,7 +200,7 @@ test('off should unregister specific callback', function() {
 
   var second = function() {
     secondCalled = true;
-  }
+  };
 
   bb.on('end', first);
   bb.on('end', second);
