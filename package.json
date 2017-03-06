@@ -12,7 +12,7 @@
     "prepublish": "ember build --environment=production",
     "test": "ember test",
     "test:server": "ember test --server",
-    "lint": "jshint lib/*",
+    "lint": "tslint lib/**/*.ts tests/**/*.ts",
     "bench": "ember build && node ./bench/index.js"
   },
   "author": "Erik Bryn",
@@ -28,12 +28,10 @@
     "do-you-even-bench": "^1.0.2",
     "ember-cli": "2.7.0",
     "glob": "^7.1.1",
-    "jshint": "^2.9.3",
     "loader.js": "^3.3.0",
     "qunitjs": "^1.19.0",
-    "typescript": "^2.1.6"
-  },
-  "dependencies": {
+    "tslint": "^4.5.1",
+    "typescript": "^2.1.6",
     "@types/qunit": "1"
   }
 }

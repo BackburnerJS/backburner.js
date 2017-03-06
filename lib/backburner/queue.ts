@@ -28,11 +28,11 @@ Queue.prototype = {
 
     for (var i = 0, l = queue.length; i < l; i += 4) {
       var currentTarget = queue[i];
-      var currentMethod = queue[i+1];
+      var currentMethod = queue[i + 1];
 
       if (currentTarget === target && currentMethod === method) {
-        queue[i+2] = args;  // replace args
-        queue[i+3] = stack; // replace stack
+        queue[i + 2] = args;  // replace args
+        queue[i + 3] = stack; // replace stack
         return;
       }
     }
@@ -113,7 +113,7 @@ Queue.prototype = {
       } else {
         method.call(target);
       }
-    } catch(error) {
+    } catch (error) {
       onError(error, errorRecordedForStack);
     }
   },
@@ -132,7 +132,10 @@ Queue.prototype = {
     var after = options && options.after;
     var onError = globalOptions.onError || (globalOptions.onErrorTarget &&
                                             globalOptions.onErrorTarget[globalOptions.onErrorMethod]);
-    var target, method, args, errorRecordedForStack;
+    var target;
+    var method;
+    var args;
+    var errorRecordedForStack;
     var invoke = onError ? this.invokeWithOnError : this.invoke;
 
     this.targetQueues = Object.create(null);
@@ -145,9 +148,9 @@ Queue.prototype = {
 
     for (var i = 0; i < length; i += 4) {
       target                = queueItems[i];
-      method                = queueItems[i+1];
-      args                  = queueItems[i+2];
-      errorRecordedForStack = queueItems[i+3]; // Debugging assistance
+      method                = queueItems[i + 1];
+      args                  = queueItems[i + 2];
+      errorRecordedForStack = queueItems[i + 3]; // Debugging assistance
 
       if (isString(method)) {
         method = target[method];
@@ -188,7 +191,11 @@ Queue.prototype = {
   },
 
   cancel: function(actionToCancel) {
-    var queue = this._queue, currentTarget, currentMethod, i, l;
+    var queue = this._queue;
+    var currentTarget;
+    var currentMethod;
+    var i;
+    var l;
     var target = actionToCancel.target;
     var method = actionToCancel.method;
     var GUID_KEY = this.globalOptions.GUID_KEY;
@@ -207,7 +214,7 @@ Queue.prototype = {
 
     for (i = 0, l = queue.length; i < l; i += 4) {
       currentTarget = queue[i];
-      currentMethod = queue[i+1];
+      currentMethod = queue[i + 1];
 
       if (currentTarget === target &&
           currentMethod === method) {
@@ -226,13 +233,13 @@ Queue.prototype = {
 
     for (i = 0, l = queue.length; i < l; i += 4) {
       currentTarget = queue[i];
-      currentMethod = queue[i+1];
+      currentMethod = queue[i + 1];
 
       if (currentTarget === target &&
           currentMethod === method) {
         // don't mess with array during flush
         // just nullify the method
-        queue[i+1] = null;
+        queue[i + 1] = null;
         return true;
       }
     }

@@ -1,7 +1,7 @@
+import Queue from './queue';
 import {
   each
 } from './utils';
-import Queue from './queue';
 
 export default function DeferredActionQueues(queueNames, options) {
   var queues = this.queues = {};
@@ -45,7 +45,8 @@ DeferredActionQueues.prototype = {
   flush: function() {
     var queues = this.queues;
     var queueNames = this.queueNames;
-    var queueName, queue;
+    var queueName;
+    var queue;
     var queueNameIndex = 0;
     var numberOfQueues = queueNames.length;
 

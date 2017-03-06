@@ -142,16 +142,15 @@ test('when passed same function twice', function() {
   equal(i, 2, 'function was called twice');
 });
 
-
 test('when passed same function twice with arguments', function() {
   expect(2);
 
   var bb = new Backburner(['one']);
-  var i=0;
+  var i = 0;
   var deferMethod = function(){
         equal(this['first'], 1, 'the target property was set');
       };
-  var argObj = {'first' : 1};
+  var argObj = {first : 1};
 
   bb.run(function() {
     bb.defer('one', argObj, deferMethod);
@@ -164,14 +163,14 @@ test('when passed same function twice with same arguments and same target', func
   expect(7);
 
   var bb = new Backburner(['one']);
-  var i=0;
+  var i = 0;
   var deferMethod = function(a, b){
     i++;
     equal(a, 1, 'First argument is set twice');
     equal(b, 2, 'Second argument is set twice');
     equal(this['first'], 1, 'the target property was set');
   };
-  var argObj = {'first': 1};
+  var argObj = {first: 1};
 
   bb.run(function() {
     bb.defer('one', argObj, deferMethod, 1, 2);
@@ -184,19 +183,19 @@ test('when passed same function twice with same arguments and same target', func
 test('when passed same function twice with same target and different arguments', function() {
   expect(7);
 
-  var bb = new Backburner(['one']),
-      i=0,
-      deferMethod = function(a, b){
-        i++;
-        if(i === 1){
-          equal(a, 1, 'First argument set during first call');
-        } else {
-          equal(a, 3, 'First argument set during second call');
-        }
-        equal(b, 2, 'Second argument remains same');
-        equal(this['first'], 1, 'the target property was set');
-      },
-      argObj = {'first': 1};
+  var bb = new Backburner(['one']);
+  var i = 0;
+  var deferMethod = function(a, b){
+    i++;
+    if (i === 1) {
+      equal(a, 1, 'First argument set during first call');
+    } else {
+      equal(a, 3, 'First argument set during second call');
+    }
+    equal(b, 2, 'Second argument remains same');
+    equal(this['first'], 1, 'the target property was set');
+  };
+  var argObj = {first: 1};
 
   bb.run(function() {
     bb.defer('one', argObj, deferMethod, 1, 2);
@@ -213,7 +212,7 @@ test('when passed same function twice with different target and different argume
   var i = 0;
   var deferMethod = function(a, b){
     i++;
-    if(i === 1){
+    if (i === 1) {
       equal(a, 1, 'First argument set during first call');
     } else {
       equal(a, 3, 'First argument set during second call');
@@ -221,11 +220,11 @@ test('when passed same function twice with different target and different argume
     equal(b, 2, 'Second argument remains same');
     equal(this['first'], 1, 'the target property was set');
   };
-  var argObj = {'first': 1};
+  var argObj = {first: 1};
 
   bb.run(function() {
-    bb.defer('one', {'first': 1}, deferMethod, 1, 2);
-    bb.defer('one', {'first': 1}, deferMethod, 3, 2);
+    bb.defer('one', {first: 1}, deferMethod, 1, 2);
+    bb.defer('one', {first: 1}, deferMethod, 3, 2);
   });
 
   equal(i, 2, 'function was called twice');

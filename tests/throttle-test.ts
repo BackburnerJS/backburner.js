@@ -60,8 +60,6 @@ test('throttle', function() {
   // great, we've made it this far, there's one more thing
   // we need to test. we want to make sure we can call `throttle`
   // again with the same target/method after it has executed
-
-
   // at the 60ms mark, let's schedule another call to `throttle`
   stop();
   setTimeout(function() {
@@ -115,7 +113,7 @@ test('throttle with cancelTimers', function() {
 
   try {
     bb.cancelTimers();
-  } catch(e) {
+  } catch (e) {
     count++;
   }
 
@@ -181,7 +179,7 @@ test('throttle returns timer information usable for cancelling', function() {
 
   ok(bb.cancel(timer), 'the timer is cancelled');
 
-  //should return false second time around
+  // should return false second time around
   ok(!bb.cancel(timer), 'the timer no longer exists in the list');
 
   stop();

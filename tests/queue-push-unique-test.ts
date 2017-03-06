@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-var Queue = Backburner["Queue"];
+var Queue = (<any> Backburner).Queue;
 
 QUnit.module('Queue.prototpye.pushUnique');
 var slice = [].slice;

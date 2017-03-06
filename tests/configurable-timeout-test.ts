@@ -43,7 +43,6 @@ test('We can use a custom setTimeout', function() {
   });
 });
 
-
 test('We can use a custom clearTimeout', function() {
   expect(2);
 

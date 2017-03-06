@@ -25,8 +25,7 @@ test('Prevent Safari double finally in run', function() {
         throw 'from defer';
       });
     });
-  }
-  catch(e) { }
+  } catch (e) { }
 
   Backburner.prototype.end = realEnd;
 });
@@ -53,6 +52,5 @@ test('Prevent Safari double finally in end', function() {
     bb.run(function() {
       // No-op
     });
-  }
-  catch(e) { }
+  } catch (e) { }
 });

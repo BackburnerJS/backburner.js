@@ -1,7 +1,8 @@
 export default function binarySearch(time, timers) {
   var start = 0;
   var end = timers.length - 2;
-  var middle, l;
+  var middle;
+  var l;
 
   while (start < end) {
     // since timers is an array of pairs 'l' will always

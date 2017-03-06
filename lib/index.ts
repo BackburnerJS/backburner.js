@@ -1,9 +1,9 @@
 import {
   each,
-  isString,
+  isCoercableNumber,
   isFunction,
   isNumber,
-  isCoercableNumber,
+  isString,
   now
 } from './backburner/utils';
 
@@ -26,9 +26,9 @@ function Backburner(queueNames: string[], options?: any) {
     begin: []
   };
 
-  var _this = this;
+  var ref = this;
   this._boundClearItems = function() {
-    clearItems.apply(_this, arguments);
+    clearItems.apply(ref, arguments);
   };
 
   this._timerTimeoutId = undefined;
@@ -44,11 +44,11 @@ function Backburner(queueNames: string[], options?: any) {
   };
 
   this._boundRunExpiredTimers = function () {
-    _this._runExpiredTimers();
+    ref._runExpiredTimers();
   };
 }
 
-Backburner['Queue'] = Queue;
+(<any> Backburner).Queue = Queue;
 
 Backburner.prototype = {
   begin: function() {
@@ -133,7 +133,9 @@ Backburner.prototype = {
     if (eventName) {
       var callbacks = this._eventCallbacks[eventName];
       var callbackFound = false;
-      if (!callbacks) return;
+      if (!callbacks) {
+        return;
+      }
       if (callback) {
         for (var i = 0; i < callbacks.length; i++) {
           if (callbacks[i] === callback) {
@@ -153,7 +155,9 @@ Backburner.prototype = {
 
   run: function(/* target, method, args */) {
     var length = arguments.length;
-    var method, target, args;
+    var method;
+    var target;
+    var args;
 
     if (length === 1) {
       method = arguments[0];
@@ -186,7 +190,7 @@ Backburner.prototype = {
     if (onError) {
       try {
         return method.apply(target, args);
-      } catch(error) {
+      } catch (error) {
         onError(error);
       } finally {
         if (!didFinally) {
@@ -226,7 +230,8 @@ Backburner.prototype = {
     }
 
     var length = arguments.length;
-    var method, target;
+    var method;
+    var target;
 
     if (length === 1) {
       method = arguments[0];
@@ -253,7 +258,6 @@ Backburner.prototype = {
     }
   },
 
-
   /*
     Defer the passed function to run inside the specified queue.
 
@@ -266,7 +270,9 @@ Backburner.prototype = {
   */
   defer: function(queueName /* , target, method, args */) {
     var length = arguments.length;
-    var method, target, args;
+    var method;
+    var target;
+    var args;
 
     if (length === 2) {
       method = arguments[1];
@@ -285,7 +291,7 @@ Backburner.prototype = {
     if (length > 3) {
       args = new Array(length - 3);
       for (var i = 3; i < length; i++) {
-        args[i-3] = arguments[i];
+        args[i - 3] = arguments[i];
       }
     } else {
       args = undefined;
@@ -297,7 +303,9 @@ Backburner.prototype = {
 
   deferOnce: function(queueName /* , target, method, args */) {
     var length = arguments.length;
-    var method, target, args;
+    var method;
+    var target;
+    var args;
 
     if (length === 2) {
       method = arguments[1];
@@ -316,7 +324,7 @@ Backburner.prototype = {
     if (length > 3) {
       args = new Array(length - 3);
       for (var i = 3; i < length; i++) {
-        args[i-3] = arguments[i];
+        args[i - 3] = arguments[i];
       }
     } else {
       args = undefined;
@@ -336,9 +344,13 @@ Backburner.prototype = {
       args[x] = arguments[x];
     }
 
-    var length = args.length,
-        method, wait, target,
-        methodOrTarget, methodOrWait, methodOrArgs;
+    var length = args.length;
+    var method;
+    var wait;
+    var target;
+    var methodOrTarget;
+    var methodOrWait;
+    var methodOrArgs;
 
     if (length === 0) {
       return;
@@ -432,7 +444,10 @@ Backburner.prototype = {
       args[i] = arguments[i];
     }
     var immediate = args.pop();
-    var wait, throttler, index, timer;
+    var wait;
+    var throttler;
+    var index;
+    var timer;
 
     if (isNumber(immediate) || isString(immediate)) {
       wait = immediate;
@@ -450,7 +465,7 @@ Backburner.prototype = {
       if (!immediate) {
         backburner.run.apply(backburner, args);
       }
-      var index = findThrottler(target, method, backburner._throttlers);
+      index = findThrottler(target, method, backburner._throttlers);
       if (index > -1) {
         backburner._throttlers.splice(index, 1);
       }
@@ -475,7 +490,10 @@ Backburner.prototype = {
     }
 
     var immediate = args.pop();
-    var wait, index, debouncee, timer;
+    var wait;
+    var index;
+    var debouncee;
+    var timer;
 
     if (isNumber(immediate) || isString(immediate)) {
       wait = immediate;
@@ -498,7 +516,7 @@ Backburner.prototype = {
       if (!immediate) {
         backburner.run.apply(backburner, args);
       }
-      var index = findDebouncee(target, method, backburner._debouncees);
+      index = findDebouncee(target, method, backburner._debouncees);
       if (index > -1) {
         backburner._debouncees.splice(index, 1);
       }
@@ -554,7 +572,7 @@ Backburner.prototype = {
           return true;
         }
       }
-    } else if (Object.prototype.toString.call(timer) === '[object Array]'){ // we're cancelling a throttle or debounce
+    } else if (Object.prototype.toString.call(timer) === '[object Array]') { // we're cancelling a throttle or debounce
       return this._cancelItem(findThrottler, this._throttlers, timer) ||
                this._cancelItem(findDebouncee, this._debouncees, timer);
     } else {
@@ -563,7 +581,8 @@ Backburner.prototype = {
   },
 
   _cancelItem: function(findMethod, array, timer){
-    var item, index;
+    var item;
+    var index;
 
     if (timer.length < 3) { return false; }
 
@@ -595,7 +614,7 @@ Backburner.prototype = {
     var l = timers.length;
     for (; i < l; i += 2) {
       var executeAt = timers[i];
-      var fn = timers[i+1];
+      var fn = timers[i + 1];
       if (executeAt <= n) {
         this.schedule(this.options.defaultQueue, null, fn);
       } else {
