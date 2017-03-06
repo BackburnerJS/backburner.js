@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('cancel');
+QUnit.module('cancel');
 
 test('null', function() {
   // mimic browser behavior: window.clearTimeout(null) -> undefined

@@ -6,7 +6,6 @@ cache:
   directories:
     - node_modules
 script:
-  - npm run lint
   - npm test
 after_success:
   - npm build
@@ -17,4 +16,4 @@ env:
     - secure: Lo7dEbRFHNrQL29iUs88zFQyRNWcK7lnLIoPlBIUDiLOXamsUilxykAPmifIK34yFS4GqN+zv9mkcVEkieRQV5LlZgNd1RLJ5nDM6bkMSRM1K14K36EUy3ldU9Ld1d/sa5yx4cxJXqNRjfF/d+i7OTDQduLYmrFLhLPPu2HetbA=
     - secure: cAsSmFA77dBTgo7JHT3kcXlwAfilDoOwrVo3b77SHj64rWVUjB3xyaCWY+3gCoULTDD/fuEO80TWwzfV2sQGASvJyrSNLw3P7//Ym/dkHcTdQ3CfCagCf689/PfFTMM1+v6gZHSYcryJzRWkLolEgFlkU+lw4rwVlRjrKSwnRgQ=
     - secure: bNBRMlxWFRbAR04OI1SfwfYJis9KTm0C6O/xkAuMiardqJ6z+EpTXKSplAu6MlUM5VsiOON2ZNwo3bwmtshWhGiUhOVnjZCBtuVcJXyj/RQk9ug8A8pFKYn4o3Yn57H6o4tj/Gw3/NV5ocbw5MzRbgCSFkLbHl9lPDRTYyX2SwM=
-    
+

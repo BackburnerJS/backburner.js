@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('Events');
+QUnit.module('Events');
 
 test('end event should fire after runloop completes', function() {
   expect(3);

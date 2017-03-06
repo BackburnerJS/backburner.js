@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('hasTimers');
+QUnit.module('hasTimers');
 
 test('hasTimers', function () {
   var bb = new Backburner(['ohai']);

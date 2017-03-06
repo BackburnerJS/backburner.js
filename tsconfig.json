@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es2015",
+    "noEmit": true,
+    "baseUrl": ".",
+    "module": "amd",
+    "paths": {
+      "backburner": ["lib/index.ts"]
+    }
+  },
+  "files": [
+    "lib/index.ts",
+    "tests/index.ts"
+  ]
+}

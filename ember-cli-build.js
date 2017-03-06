@@ -4,47 +4,59 @@ const MergeTrees = require('broccoli-merge-trees');
 const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
 const path = require('path');
-const typescript = require('broccoli-typescript-compiler');
+const typescript = require('broccoli-typescript-compiler').typescript;
 
+module.exports = function () {
+  const src = new MergeTrees([
+    new Funnel(path.dirname(require.resolve('@types/qunit/package')), {
+      include: [ 'index.d.ts' ],
+      destDir: 'qunit'
+    }),
+    new Funnel(path.join(__dirname, '/lib'), {
+      include: [ '**/*.ts' ],
+      destDir: 'lib'
+    }),
+    new Funnel('tests', {
+      include: [ '**/*.ts' ],
+      destDir: 'tests'
+    })
+  ]);
 
-module.exports = function () {  
-  const lib = typescript(path.join(__dirname, '/lib'), {
+  const compiled = typescript(src, {
     tsconfig: {
       compilerOptions: {
-        module: 'es6',
-        target: 'es6',
+        module: 'es2015',
+        target: 'es2015',
         removeComments: true,
-        moduleResolution: 'node'
-      }
+        moduleResolution: 'node',
+        baseUrl: '.',
+        paths: {
+          backburner: ['lib/index.ts']
+        }
+      },
+      files: ['qunit/index.d.ts', 'lib/index.ts', 'tests/index.ts']
     }
   });
+
   return new MergeTrees([
-    new Rollup(lib, {
+    new Rollup(compiled, {
       rollup: {
-        entry: 'index.js',
+        entry: 'lib/index.js',
         targets: [{
-          dest: 'backburner.js',
-          format: 'es',
-          exports: 'named'
-        },{
           dest: 'es6/backburner.js',
           format: 'es',
-          exports: 'named'
-        }]
-      }
-    }),
-    new Rollup(lib, {
-      rollup: {
-        entry: 'index.js',
-        targets: [{
-          dest: 'tests/backburner.js',
+        }, {
+          dest: 'named-amd/backburner.js',
           format: 'amd',
           moduleId: 'backburner',
           exports: 'named'
+        }, {
+          dest: 'backburner.js',
+          format: 'cjs'
         }]
       }
     }),
-    new Rollup(new Funnel('tests', { include: ['**/*.js'], destDir: 'tests' }), {
+    new Rollup(compiled, {
       rollup: {
         entry: 'tests/index.js',
         external: ['backburner'],

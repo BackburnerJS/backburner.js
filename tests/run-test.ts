@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('run');
+QUnit.module('run');
 
 test('when passed a function', function() {
   expect(1);
@@ -170,7 +170,7 @@ test('onError with target and action', function() {
     ok(true);
   });
 
-  target.onerror = function(error) {
+  target['onerror'] = function(error) {
     equal('test error', error.message);
   };
 

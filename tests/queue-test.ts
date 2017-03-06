@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('Queue');
+QUnit.module('Queue');
 
 test('actions scheduled on previous queue, start over from beginning', function() {
   expect(5);

@@ -10,9 +10,9 @@ import {
 import searchTimer from './backburner/binary-search';
 import DeferredActionQueues from './backburner/deferred-action-queues';
 
-export { default as Queue } from './backburner/queue';
+import Queue from './backburner/queue';
 
-export default function Backburner(queueNames, options) {
+function Backburner(queueNames: string[], options?: any) {
   this.queueNames = queueNames;
   this.options = options || {};
   if (!this.options.defaultQueue) {
@@ -47,6 +47,8 @@ export default function Backburner(queueNames, options) {
     _this._runExpiredTimers();
   };
 }
+
+Backburner['Queue'] = Queue;
 
 Backburner.prototype = {
   begin: function() {
@@ -671,3 +673,5 @@ function findItem(target, method, collection) {
 function clearItems(item) {
   this._platform.clearTimeout(item[2]);
 }
+
+export default Backburner;

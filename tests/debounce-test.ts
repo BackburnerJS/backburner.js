@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('debounce');
+QUnit.module('debounce');
 
 test('debounce', function() {
   expect(14);
