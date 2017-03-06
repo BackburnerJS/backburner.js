@@ -3,7 +3,7 @@ import Backburner from 'backburner';
 var originalDateNow = Date.now;
 var originalDateValueOf = Date.prototype.valueOf;
 
-module('setTimeout',{
+QUnit.module('setTimeout',{
   teardown: function(){
     Date.now = originalDateNow;
     Date.prototype.valueOf = originalDateValueOf;
@@ -70,7 +70,7 @@ test('setTimeout can continue when `Date.now` is monkey-patched', function() {
 });
 
 var bb;
-module('setTimeout arguments / arity', {
+QUnit.module('setTimeout arguments / arity', {
   setup: function(){
     bb = new Backburner(['one']);
   },

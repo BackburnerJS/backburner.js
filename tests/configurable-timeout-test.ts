@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('configurable platform.setTimeout');
+QUnit.module('configurable platform.setTimeout');
 
 test('We can configure a custom platform', function() {
   expect(1);

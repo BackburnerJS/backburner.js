@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('debug');
+QUnit.module('debug');
 
 test('DEBUG flag enables stack tagging', function() {
   var bb = new Backburner(['one']);

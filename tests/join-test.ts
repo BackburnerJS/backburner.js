@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('join');
+QUnit.module('join');
 
 function depth(bb) {
   return bb.instanceStack.length + (bb.currentInstance ? 1 : 0);

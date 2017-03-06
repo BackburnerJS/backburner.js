@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('safari bug');
+QUnit.module('safari bug');
 
 test('Prevent Safari double finally in run', function() {
   expect(1);

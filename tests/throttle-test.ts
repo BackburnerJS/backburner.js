@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('throttle');
+QUnit.module('throttle');
 
 test('throttle', function() {
   expect(18);

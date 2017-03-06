@@ -1,6 +1,8 @@
-import { Queue } from 'backburner';
+import Backburner from 'backburner';
 
-module('Queue.prototpye.pushUnique');
+var Queue = Backburner["Queue"];
+
+QUnit.module('Queue.prototpye.pushUnique');
 var slice = [].slice;
 
 test('pushUnique: 2 different targets', function() {

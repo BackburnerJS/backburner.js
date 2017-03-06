@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-module('autorun');
+QUnit.module('autorun');
 
 test('autorun', function() {
   var bb = new Backburner(['zomg']);
