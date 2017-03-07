@@ -80,7 +80,7 @@ test('queue execution order', function() {
   expect(1);
 
   var bb = new Backburner(['one']);
-  var items = [];
+  var items: number[] = [];
 
   bb.run(function() {
     items.push(0);

@@ -27,8 +27,8 @@ module.exports = function () {
       compilerOptions: {
         module: 'es2015',
         target: 'es2015',
-        removeComments: true,
         moduleResolution: 'node',
+        strictNullChecks: true,
         baseUrl: '.',
         paths: {
           backburner: ['lib/index.ts']

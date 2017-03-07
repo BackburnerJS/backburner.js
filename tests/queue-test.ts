@@ -70,12 +70,12 @@ test('Default queue can be manually configured', function() {
 test('onBegin and onEnd are called and passed the correct parameters', function() {
   expect(2);
 
-  var befores = [];
-  var afters = [];
-  var expectedBefores = [];
-  var expectedAfters = [];
-  var outer;
-  var inner;
+  var befores: Array<any | null | undefined> = [];
+  var afters: Array<any | null | undefined> = [];
+  var expectedBefores: Array<any | null | undefined> = [];
+  var expectedAfters: Array<any | null | undefined> = [];
+  var outer: any;
+  var inner: any;
 
   var bb = new Backburner(['one'], {
     onBegin: function(current, previous) {

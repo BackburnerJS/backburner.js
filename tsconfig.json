@@ -5,6 +5,7 @@
     "noEmit": true,
     "baseUrl": ".",
     "module": "amd",
+    "strictNullChecks": true,
     "paths": {
       "backburner": ["lib/index.ts"]
     }

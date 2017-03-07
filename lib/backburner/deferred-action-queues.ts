@@ -3,7 +3,7 @@ import {
   each
 } from './utils';
 
-export default function DeferredActionQueues(queueNames, options) {
+export default function DeferredActionQueues(queueNames: string[], options) {
   var queues = this.queues = {};
   this.queueNames = queueNames = queueNames || [];
 
