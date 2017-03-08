@@ -98,8 +98,8 @@ test('onBegin and onEnd are called and passed the correct parameters', function(
     });
   });
 
-  expectedBefores = [outer, undefined, inner, outer];
-  expectedAfters = [inner, outer, outer, undefined];
+  expectedBefores = [outer, null, inner, outer];
+  expectedAfters = [inner, outer, outer, null];
 
   deepEqual(befores, expectedBefores, 'before callbacks successful');
   deepEqual(afters, expectedAfters, 'after callback successful');
