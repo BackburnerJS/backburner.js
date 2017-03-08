@@ -39,23 +39,30 @@ module.exports = function () {
     }
   });
 
+  const backburner = new Rollup(compiled, {
+    rollup: {
+      dest: 'es6/backburner.js',
+      entry: 'lib/index.js',
+      format: 'es'
+    }
+  });
+
   return new MergeTrees([
-    new Rollup(compiled, {
+    backburner,
+    new Rollup(backburner, {
       rollup: {
-        entry: 'lib/index.js',
+        entry: 'es6/backburner.js',
+        plugins: [
+          buble()
+        ],
         targets: [{
-          dest: 'es6/backburner.js',
-          format: 'es',
-        }, {
           dest: 'named-amd/backburner.js',
           exports: 'named',
           format: 'amd',
-          moduleId: 'backburner',
-          plugins: [buble()]
+          moduleId: 'backburner'
         }, {
           dest: 'backburner.js',
-          format: 'cjs',
-          plugins: [buble()]
+          format: 'cjs'
         }]
       }
     }),
@@ -67,7 +74,10 @@ module.exports = function () {
         targets: [{
           dest: 'tests/tests.js',
           format: 'amd',
-          moduleId: 'backburner-tests'
+          moduleId: 'backburner-tests',
+          plugins: [
+            buble()
+          ]
         }]
       }
     }),

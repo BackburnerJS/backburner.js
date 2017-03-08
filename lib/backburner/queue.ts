@@ -2,17 +2,24 @@ import {
   isString
 } from './utils';
 
-export default function Queue(name, options, globalOptions) {
-  this.name = name;
-  this.globalOptions = globalOptions || {};
-  this.options = options;
-  this._queue = [];
-  this.targetQueues = {};
-  this._queueBeingFlushed = undefined;
-}
+export default class Queue {
+  private _queue: any;
+  private name: string;
+  private globalOptions: any;
+  private options: any;
+  private targetQueues: any;
+  private _queueBeingFlushed: any | undefined;
 
-Queue.prototype = {
-  push: function(target, method, args, stack) {
+  constructor(name: string, options: any, globalOptions: any) {
+    this.name = name;
+    this.globalOptions = globalOptions || {};
+    this.options = options;
+    this._queue = [];
+    this.targetQueues = {};
+    this._queueBeingFlushed = undefined;
+  }
+
+  public push(target, method, args, stack) {
     var queue = this._queue;
     queue.push(target, method, args, stack);
 
@@ -21,65 +28,9 @@ Queue.prototype = {
       target: target,
       method: method
     };
-  },
+  }
 
-  pushUniqueWithoutGuid: function(target, method, args, stack) {
-    var queue = this._queue;
-
-    for (var i = 0, l = queue.length; i < l; i += 4) {
-      var currentTarget = queue[i];
-      var currentMethod = queue[i + 1];
-
-      if (currentTarget === target && currentMethod === method) {
-        queue[i + 2] = args;  // replace args
-        queue[i + 3] = stack; // replace stack
-        return;
-      }
-    }
-
-    queue.push(target, method, args, stack);
-  },
-
-  targetQueue: function(targetQueue, target, method, args, stack) {
-    var queue = this._queue;
-
-    for (var i = 0, l = targetQueue.length; i < l; i += 2) {
-      var currentMethod = targetQueue[i];
-      var currentIndex  = targetQueue[i + 1];
-
-      if (currentMethod === method) {
-        queue[currentIndex + 2] = args;  // replace args
-        queue[currentIndex + 3] = stack; // replace stack
-        return;
-      }
-    }
-
-    targetQueue.push(
-      method,
-      queue.push(target, method, args, stack) - 4
-    );
-  },
-
-  pushUniqueWithGuid: function(guid, target, method, args, stack) {
-    var hasLocalQueue = this.targetQueues[guid];
-
-    if (hasLocalQueue) {
-      this.targetQueue(hasLocalQueue, target, method, args, stack);
-    } else {
-      this.targetQueues[guid] = [
-        method,
-        this._queue.push(target, method, args, stack) - 4
-      ];
-    }
-
-    return {
-      queue: this,
-      target: target,
-      method: method
-    };
-  },
-
-  pushUnique: function(target, method, args, stack) {
+  public pushUnique(target, method, args, stack) {
     var KEY = this.globalOptions.GUID_KEY;
 
     if (target && KEY) {
@@ -96,29 +47,9 @@ Queue.prototype = {
       target: target,
       method: method
     };
-  },
+  }
 
-  invoke: function(target, method, args /*, onError, errorRecordedForStack */) {
-    if (args && args.length > 0) {
-      method.apply(target, args);
-    } else {
-      method.call(target);
-    }
-  },
-
-  invokeWithOnError: function(target, method, args, onError, errorRecordedForStack) {
-    try {
-      if (args && args.length > 0) {
-        method.apply(target, args);
-      } else {
-        method.call(target);
-      }
-    } catch (error) {
-      onError(error, errorRecordedForStack);
-    }
-  },
-
-  flush: function(sync) {
+  public flush(sync) {
     var queue = this._queue;
     var length = queue.length;
 
@@ -188,9 +119,9 @@ Queue.prototype = {
       // check if new items have been added
       this.flush(true);
     }
-  },
+  }
 
-  cancel: function(actionToCancel) {
+  public cancel(actionToCancel) {
     var queue = this._queue;
     var currentTarget;
     var currentMethod;
@@ -244,4 +175,80 @@ Queue.prototype = {
       }
     }
   }
-};
+
+    private pushUniqueWithoutGuid(target, method, args, stack) {
+    var queue = this._queue;
+
+    for (var i = 0, l = queue.length; i < l; i += 4) {
+      var currentTarget = queue[i];
+      var currentMethod = queue[i + 1];
+
+      if (currentTarget === target && currentMethod === method) {
+        queue[i + 2] = args;  // replace args
+        queue[i + 3] = stack; // replace stack
+        return;
+      }
+    }
+
+    queue.push(target, method, args, stack);
+  }
+
+  private targetQueue(targetQueue, target, method, args, stack) {
+    var queue = this._queue;
+
+    for (var i = 0, l = targetQueue.length; i < l; i += 2) {
+      var currentMethod = targetQueue[i];
+      var currentIndex  = targetQueue[i + 1];
+
+      if (currentMethod === method) {
+        queue[currentIndex + 2] = args;  // replace args
+        queue[currentIndex + 3] = stack; // replace stack
+        return;
+      }
+    }
+
+    targetQueue.push(
+      method,
+      queue.push(target, method, args, stack) - 4
+    );
+  }
+
+  private pushUniqueWithGuid(guid, target, method, args, stack) {
+    var hasLocalQueue = this.targetQueues[guid];
+
+    if (hasLocalQueue) {
+      this.targetQueue(hasLocalQueue, target, method, args, stack);
+    } else {
+      this.targetQueues[guid] = [
+        method,
+        this._queue.push(target, method, args, stack) - 4
+      ];
+    }
+
+    return {
+      queue: this,
+      target: target,
+      method: method
+    };
+  }
+
+  private invoke(target, method, args /*, onError, errorRecordedForStack */) {
+    if (args && args.length > 0) {
+      method.apply(target, args);
+    } else {
+      method.call(target);
+    }
+  }
+
+  private invokeWithOnError(target, method, args, onError, errorRecordedForStack) {
+    try {
+      if (args && args.length > 0) {
+        method.apply(target, args);
+      } else {
+        method.call(target);
+      }
+    } catch (error) {
+      onError(error, errorRecordedForStack);
+    }
+  }
+}
