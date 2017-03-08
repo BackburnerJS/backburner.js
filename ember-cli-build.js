@@ -5,6 +5,7 @@ const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
 const path = require('path');
 const typescript = require('broccoli-typescript-compiler').typescript;
+const buble = require('rollup-plugin-buble');
 
 module.exports = function () {
   const src = new MergeTrees([
@@ -49,10 +50,12 @@ module.exports = function () {
           dest: 'named-amd/backburner.js',
           exports: 'named',
           format: 'amd',
-          moduleId: 'backburner'
+          moduleId: 'backburner',
+          plugins: [buble()]
         }, {
           dest: 'backburner.js',
-          format: 'cjs'
+          format: 'cjs',
+          plugins: [buble()]
         }]
       }
     }),
