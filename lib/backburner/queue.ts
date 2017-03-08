@@ -3,7 +3,7 @@ import {
 } from './utils';
 
 export default class Queue {
-  private _queue: any;
+  public _queue: any[];
   private name: string;
   private globalOptions: any;
   private options: any;
@@ -49,7 +49,7 @@ export default class Queue {
     };
   }
 
-  public flush(sync) {
+  public flush(sync?) {
     var queue = this._queue;
     var length = queue.length;
 

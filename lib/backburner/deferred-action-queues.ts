@@ -4,7 +4,7 @@ import {
 } from './utils';
 
 export default class DeferredActionQueues {
-  private queues: {
+  public queues: {
     [name: string]: Queue
   };
 
