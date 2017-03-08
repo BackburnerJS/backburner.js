@@ -3,27 +3,27 @@ import {
   each
 } from './utils';
 
-export default function DeferredActionQueues(queueNames: string[], options) {
-  var queues = this.queues = {};
-  this.queueNames = queueNames = queueNames || [];
+export default class DeferredActionQueues {
+  private queues: {
+    [name: string]: Queue
+  };
 
-  this.options = options;
+  private queueNames: string[];
 
-  each(queueNames, function(queueName) {
-    queues[queueName] = new Queue(queueName, options[queueName], options);
-  });
-}
+  private options: any;
 
-function noSuchQueue(name) {
-  throw new Error('You attempted to schedule an action in a queue (' + name + ') that doesn\'t exist');
-}
+  constructor(queueNames: string[], options: any) {
+    var queues = this.queues = {};
+    this.queueNames = queueNames = queueNames || [];
 
-function noSuchMethod(name) {
-  throw new Error('You attempted to schedule an action in a queue (' + name + ') for a method that doesn\'t exist');
-}
+    this.options = options;
 
-DeferredActionQueues.prototype = {
-  schedule: function(name, target, method, args, onceFlag, stack) {
+    each(queueNames, function(queueName) {
+      queues[queueName] = new Queue(queueName, options[queueName], options);
+    });
+  }
+
+  public schedule(name, target, method, args, onceFlag, stack) {
     var queues = this.queues;
     var queue = queues[name];
 
@@ -40,9 +40,9 @@ DeferredActionQueues.prototype = {
     } else {
       return queue.push(target, method, args, stack);
     }
-  },
+  }
 
-  flush: function() {
+  public flush() {
     var queues = this.queues;
     var queueNames = this.queueNames;
     var queueName;
@@ -64,4 +64,12 @@ DeferredActionQueues.prototype = {
       }
     }
   }
-};
+}
+
+function noSuchQueue(name) {
+  throw new Error('You attempted to schedule an action in a queue (' + name + ') that doesn\'t exist');
+}
+
+function noSuchMethod(name) {
+  throw new Error('You attempted to schedule an action in a queue (' + name + ') for a method that doesn\'t exist');
+}
