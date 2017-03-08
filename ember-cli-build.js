@@ -9,30 +9,30 @@ const typescript = require('broccoli-typescript-compiler').typescript;
 module.exports = function () {
   const src = new MergeTrees([
     new Funnel(path.dirname(require.resolve('@types/qunit/package')), {
-      include: [ 'index.d.ts' ],
-      destDir: 'qunit'
+      destDir: 'qunit',
+      include: [ 'index.d.ts' ]
     }),
     new Funnel(path.join(__dirname, '/lib'), {
-      include: [ '**/*.ts' ],
-      destDir: 'lib'
+      destDir: 'lib',
+      include: [ '**/*.ts' ]
     }),
     new Funnel('tests', {
-      include: [ '**/*.ts' ],
-      destDir: 'tests'
+      destDir: 'tests',
+      include: [ '**/*.ts' ]
     })
   ]);
 
   const compiled = typescript(src, {
     tsconfig: {
       compilerOptions: {
-        module: 'es2015',
-        target: 'es2015',
-        moduleResolution: 'node',
-        strictNullChecks: true,
         baseUrl: '.',
+        module: 'es2015',
+        moduleResolution: 'node',
         paths: {
           backburner: ['lib/index.ts']
-        }
+        },
+        strictNullChecks: true,
+        target: 'es2015'
       },
       files: ['qunit/index.d.ts', 'lib/index.ts', 'tests/index.ts']
     }
@@ -47,9 +47,9 @@ module.exports = function () {
           format: 'es',
         }, {
           dest: 'named-amd/backburner.js',
+          exports: 'named',
           format: 'amd',
-          moduleId: 'backburner',
-          exports: 'named'
+          moduleId: 'backburner'
         }, {
           dest: 'backburner.js',
           format: 'cjs'
@@ -57,6 +57,7 @@ module.exports = function () {
       }
     }),
     new Rollup(compiled, {
+      annotation: 'tests/tests.js',
       rollup: {
         entry: 'tests/index.js',
         external: ['backburner'],
@@ -65,22 +66,21 @@ module.exports = function () {
           format: 'amd',
           moduleId: 'backburner-tests'
         }]
-      },
-      annotation: 'tests/tests.js'
+      }
     }),
     new Funnel(path.dirname(require.resolve('qunitjs')), {
       annotation: 'tests/qunit.{js,css}',
-      files: ['qunit.css', 'qunit.js'],
-      destDir: 'tests'
+      destDir: 'tests',
+      files: ['qunit.css', 'qunit.js']
     }),
     new Funnel(path.dirname(require.resolve('loader.js')), {
       annotation: 'tests/loader.js',
-      files: ['loader.js'],
-      destDir: 'tests'
+      destDir: 'tests',
+      files: ['loader.js']
     }),
     new Funnel(path.join(__dirname, '/tests'), {
-      files: ['index.html'],
-      destDir: 'tests'
+      destDir: 'tests',
+      files: ['index.html']
     })
   ], {
     annotation: 'dist'

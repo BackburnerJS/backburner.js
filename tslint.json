@@ -12,5 +12,9 @@
         "no-empty": false,
         "no-string-literal": false,
         "max-line-length": []
+    },
+    "jsRules": {
+        "quotemark": ["single", "avoid-escape"],
+        "trailing-comma": []
     }
 }
