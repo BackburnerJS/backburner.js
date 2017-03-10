@@ -1,6 +1,8 @@
 import Queue from './queue';
 import {
-  each
+  each,
+  noSuchQueue,
+  noSuchMethod
 } from './utils';
 
 export default class DeferredActionQueues {
@@ -43,20 +45,16 @@ export default class DeferredActionQueues {
   }
 
   public flush() {
-    var queues = this.queues;
-    var queueNames = this.queueNames;
-    var queueName;
     var queue;
+    var queueName;
     var queueNameIndex = 0;
-    var numberOfQueues = queueNames.length;
+    var numberOfQueues = this.queueNames.length;
 
     while (queueNameIndex < numberOfQueues) {
-      queueName = queueNames[queueNameIndex];
-      queue = queues[queueName];
+      queueName = this.queueNames[queueNameIndex];
+      queue = this.queues[queueName];
 
-      var numberOfQueueItems = queue._queue.length;
-
-      if (numberOfQueueItems === 0) {
+      if (queue._queue.length === 0) {
         queueNameIndex++;
       } else {
         queue.flush(false /* async */);
@@ -64,12 +62,4 @@ export default class DeferredActionQueues {
       }
     }
   }
-}
-
-function noSuchQueue(name) {
-  throw new Error('You attempted to schedule an action in a queue (' + name + ') that doesn\'t exist');
-}
-
-function noSuchMethod(name) {
-  throw new Error('You attempted to schedule an action in a queue (' + name + ') for a method that doesn\'t exist');
 }

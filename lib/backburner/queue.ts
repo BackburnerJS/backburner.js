@@ -176,7 +176,7 @@ export default class Queue {
     }
   }
 
-    private pushUniqueWithoutGuid(target, method, args, stack) {
+  private pushUniqueWithoutGuid(target, method, args, stack) {
     var queue = this._queue;
 
     for (var i = 0, l = queue.length; i < l; i += 4) {

@@ -4,7 +4,11 @@ import {
   isFunction,
   isNumber,
   isString,
-  now
+  now,
+  getOnError,
+  findDebouncee,
+  findThrottler,
+  findItem
 } from './backburner/utils';
 
 import searchTimer from './backburner/binary-search';
@@ -63,7 +67,7 @@ export default class Backburner {
     };
 
     this._boundClearItems = (item) => {
-      clearItems.call(this, item);
+      this._platform.clearTimeout(item[2]);
     };
 
     this._timerTimeoutId = undefined;
@@ -698,34 +702,3 @@ export default class Backburner {
 Backburner.prototype.schedule = Backburner.prototype.defer;
 Backburner.prototype.scheduleOnce = Backburner.prototype.deferOnce;
 Backburner.prototype.later = Backburner.prototype.setTimeout;
-
-function getOnError(options) {
-  return options.onError || (options.onErrorTarget && options.onErrorTarget[options.onErrorMethod]);
-}
-
-function findDebouncee(target, method, debouncees) {
-  return findItem(target, method, debouncees);
-}
-
-function findThrottler(target, method, throttlers) {
-  return findItem(target, method, throttlers);
-}
-
-function findItem(target, method, collection) {
-  var item;
-  var index = -1;
-
-  for (var i = 0, l = collection.length; i < l; i++) {
-    item = collection[i];
-    if (item[0] === target && item[1] === method) {
-      index = i;
-      break;
-    }
-  }
-
-  return index;
-}
-
-function clearItems(item) {
-  this._platform.clearTimeout(item[2]);
-}
