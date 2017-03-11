@@ -1,31 +1,29 @@
 import Queue from './queue';
 import {
-  each,
-  noSuchQueue,
-  noSuchMethod
+  each
 } from './utils';
 
-export default class DeferredActionQueues {
-  public queues: {
-    [name: string]: Queue
-  };
+export default function DeferredActionQueues(queueNames: string[], options) {
+  var queues = this.queues = {};
+  this.queueNames = queueNames = queueNames || [];
 
-  private queueNames: string[];
+  this.options = options;
 
-  private options: any;
+  each(queueNames, function(queueName) {
+    queues[queueName] = new Queue(queueName, options[queueName], options);
+  });
+}
 
-  constructor(queueNames: string[], options: any) {
-    var queues = this.queues = {};
-    this.queueNames = queueNames = queueNames || [];
+function noSuchQueue(name) {
+  throw new Error('You attempted to schedule an action in a queue (' + name + ') that doesn\'t exist');
+}
 
-    this.options = options;
+function noSuchMethod(name) {
+  throw new Error('You attempted to schedule an action in a queue (' + name + ') for a method that doesn\'t exist');
+}
 
-    each(queueNames, function(queueName) {
-      queues[queueName] = new Queue(queueName, options[queueName], options);
-    });
-  }
-
-  public schedule(name, target, method, args, onceFlag, stack) {
+DeferredActionQueues.prototype = {
+  schedule: function(name, target, method, args, onceFlag, stack) {
     var queues = this.queues;
     var queue = queues[name];
 
@@ -42,19 +40,23 @@ export default class DeferredActionQueues {
     } else {
       return queue.push(target, method, args, stack);
     }
-  }
+  },
 
-  public flush() {
-    var queue;
+  flush: function() {
+    var queues = this.queues;
+    var queueNames = this.queueNames;
     var queueName;
+    var queue;
     var queueNameIndex = 0;
-    var numberOfQueues = this.queueNames.length;
+    var numberOfQueues = queueNames.length;
 
     while (queueNameIndex < numberOfQueues) {
-      queueName = this.queueNames[queueNameIndex];
-      queue = this.queues[queueName];
+      queueName = queueNames[queueNameIndex];
+      queue = queues[queueName];
 
-      if (queue._queue.length === 0) {
+      var numberOfQueueItems = queue._queue.length;
+
+      if (numberOfQueueItems === 0) {
         queueNameIndex++;
       } else {
         queue.flush(false /* async */);
@@ -62,4 +64,4 @@ export default class DeferredActionQueues {
       }
     }
   }
-}
+};

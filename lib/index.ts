@@ -4,11 +4,7 @@ import {
   isFunction,
   isNumber,
   isString,
-  now,
-  getOnError,
-  findDebouncee,
-  findThrottler,
-  findItem
+  now
 } from './backburner/utils';
 
 import searchTimer from './backburner/binary-search';
@@ -16,83 +12,46 @@ import DeferredActionQueues from './backburner/deferred-action-queues';
 
 import Queue from './backburner/queue';
 
-export default class Backburner {
-  public static Queue = Queue;
-
-  public DEBUG = false;
-
-  public currentInstance: DeferredActionQueues | null | undefined;
-
-  public schedule: Function;
-  public scheduleOnce: Function;
-  public later: Function;
-
-  public options: any;
-
-  private queueNames: string[];
-  private instanceStack: DeferredActionQueues[];
-  private _debouncees: any[];
-  private _throttlers: any[];
-  private _eventCallbacks: {
-    end: Function[];
-    begin: Function[];
-  };
-
-  private _boundClearItems: (item) => void;
-  private _timerTimeoutId: number | undefined;
-  private _timers: any[];
-  private _platform: {
-    setTimeout(fn: () => void, ms: number): number;
-    clearTimeout(id: number): void;
-  };
-
-  private _boundRunExpiredTimers: () => void;
-
-  private _autorun: number | null = null;
-  private _boundAutorunEnd: () => void;
-
-  constructor(queueNames: string[], options?: any) {
-    this.queueNames = queueNames;
-    this.options = options || {};
-    if (!this.options.defaultQueue) {
-      this.options.defaultQueue = queueNames[0];
-    }
-    this.currentInstance = null;
-    this.instanceStack = [];
-    this._debouncees = [];
-    this._throttlers = [];
-    this._eventCallbacks = {
-      end: [],
-      begin: []
-    };
-
-    this._boundClearItems = (item) => {
-      this._platform.clearTimeout(item[2]);
-    };
-
-    this._timerTimeoutId = undefined;
-    this._timers = [];
-
-    this._platform = this.options._platform || {
-      setTimeout(fn, ms) {
-        return setTimeout(fn, ms);
-      },
-      clearTimeout(id) {
-        clearTimeout(id);
-      }
-    };
-
-    this._boundRunExpiredTimers = () => {
-      this._runExpiredTimers();
-    };
-
-    this._boundAutorunEnd = () => {
-      this._autorun = null;
-      this.end();
-    };
+function Backburner(queueNames: string[], options?: any) {
+  this.queueNames = queueNames;
+  this.options = options || {};
+  if (!this.options.defaultQueue) {
+    this.options.defaultQueue = queueNames[0];
   }
+  this.instanceStack = [];
+  this._debouncees = [];
+  this._throttlers = [];
+  this._eventCallbacks = {
+    end: [],
+    begin: []
+  };
 
-  public begin(): DeferredActionQueues {
+  var ref = this;
+  this._boundClearItems = function() {
+    clearItems.apply(ref, arguments);
+  };
+
+  this._timerTimeoutId = undefined;
+  this._timers = [];
+
+  this._platform = this.options._platform || {
+    setTimeout: function (fn, ms) {
+      return setTimeout(fn, ms);
+    },
+    clearTimeout: function (id) {
+      clearTimeout(id);
+    }
+  };
+
+  this._boundRunExpiredTimers = function () {
+    ref._runExpiredTimers();
+  };
+}
+
+(<any> Backburner).Queue = Queue;
+
+Backburner.prototype = {
+  begin: function() {
     var options = this.options;
     var onBegin = options && options.onBegin;
     var previousInstance = this.currentInstance;
@@ -101,27 +60,22 @@ export default class Backburner {
       this.instanceStack.push(previousInstance);
     }
 
-    const current = this.currentInstance = new DeferredActionQueues(this.queueNames, options);
-    this._trigger('begin', current, previousInstance);
+    this.currentInstance = new DeferredActionQueues(this.queueNames, options);
+    this._trigger('begin', this.currentInstance, previousInstance);
     if (onBegin) {
-      onBegin(current, previousInstance);
+      onBegin(this.currentInstance, previousInstance);
     }
-    return current;
-  }
+  },
 
-  public end() {
-    let options = this.options;
-    let onEnd = options && options.onEnd;
-    let currentInstance = this.currentInstance;
-    let nextInstance: DeferredActionQueues | null | undefined = null;
-
-    if (!currentInstance) {
-      throw new Error('end called without begin');
-    }
+  end: function() {
+    var options = this.options;
+    var onEnd = options && options.onEnd;
+    var currentInstance = this.currentInstance;
+    var nextInstance = null;
 
     // Prevent double-finally bug in Safari 6.0.2 and iOS 6
     // This bug appears to be resolved in Safari 6.0.5 and iOS 7
-    let finallyAlreadyCalled = false;
+    var finallyAlreadyCalled = false;
     try {
       currentInstance.flush();
     } finally {
@@ -140,9 +94,30 @@ export default class Backburner {
         }
       }
     }
-  }
+  },
 
-  public on(eventName, callback) {
+  /**
+   Trigger an event. Supports up to two arguments. Designed around
+   triggering transition events from one run loop instance to the
+   next, which requires an argument for the first instance and then
+   an argument for the next instance.
+
+   @private
+   @method _trigger
+   @param {String} eventName
+   @param {any} arg1
+   @param {any} arg2
+   */
+  _trigger: function(eventName, arg1, arg2) {
+    var callbacks = this._eventCallbacks[eventName];
+    if (callbacks) {
+      for (var i = 0; i < callbacks.length; i++) {
+        callbacks[i](arg1, arg2);
+      }
+    }
+  },
+
+  on: function(eventName, callback) {
     if (typeof callback !== 'function') {
       throw new TypeError('Callback must be a function');
     }
@@ -152,9 +127,9 @@ export default class Backburner {
     } else {
       throw new TypeError('Cannot on() event "' + eventName + '" because it does not exist');
     }
-  }
+  },
 
-  public off(eventName, callback) {
+  off: function(eventName, callback) {
     if (eventName) {
       var callbacks = this._eventCallbacks[eventName];
       var callbackFound = false;
@@ -176,25 +151,33 @@ export default class Backburner {
     } else {
       throw new TypeError('Cannot off() event "' + eventName + '" because it does not exist');
     }
-  }
+  },
 
-  public run(method: Function);
-  public run(target: Function | any | null, method?: Function | string, ...args);
-  public run(target: any | null | undefined, method?: any, ...args: any[]) {
+  run: function(/* target, method, args */) {
     var length = arguments.length;
-    var _method: Function | string;
-    var _target: any | null | undefined;
+    var method;
+    var target;
+    var args;
 
     if (length === 1) {
-      _method = target;
-      _target = null;
+      method = arguments[0];
+      target = null;
     } else {
-      _target = target;
-      _method = method;
+      target = arguments[0];
+      method = arguments[1];
     }
 
-    if (isString(_method)) {
-      _method = <Function> _target[_method];
+    if (isString(method)) {
+      method = target[method];
+    }
+
+    if (length > 2) {
+      args = new Array(length - 2);
+      for (var i = 0, l = length - 2; i < l; i++) {
+        args[i] = arguments[i + 2];
+      }
+    } else {
+      args = [];
     }
 
     var onError = getOnError(this.options);
@@ -206,7 +189,7 @@ export default class Backburner {
 
     if (onError) {
       try {
-        return _method.apply(_target, args);
+        return method.apply(target, args);
       } catch (error) {
         onError(error);
       } finally {
@@ -217,7 +200,7 @@ export default class Backburner {
       }
     } else {
       try {
-        return _method.apply(_target, args);
+        return method.apply(target, args);
       } finally {
         if (!didFinally) {
           didFinally = true;
@@ -225,7 +208,7 @@ export default class Backburner {
         }
       }
     }
-  }
+  },
 
   /*
     Join the passed method with an existing queue and execute immediately,
@@ -241,8 +224,7 @@ export default class Backburner {
     @param {any} args The method arguments
     @return method result
   */
-  public join(...args);
-  public join() {
+  join: function(/* target, method, args */) {
     if (!this.currentInstance) {
       return this.run.apply(this, arguments);
     }
@@ -274,7 +256,7 @@ export default class Backburner {
       }
       return method.apply(target, args);
     }
-  }
+  },
 
   /*
     Defer the passed function to run inside the specified queue.
@@ -286,40 +268,7 @@ export default class Backburner {
     @param {any} args The method arguments
     @return method result
   */
-  public defer(queueName: string, ...args);
-  public defer(queueName /* , target, method, args */) {
-    var length = arguments.length;
-    var method;
-    var target;
-    var args;
-
-    if (length === 2) {
-      method = arguments[1];
-      target = null;
-    } else {
-      target = arguments[1];
-      method = arguments[2];
-    }
-
-    if (isString(method)) {
-      method = target[method];
-    }
-
-    var stack = this.DEBUG ? new Error() : undefined;
-
-    if (length > 3) {
-      args = new Array(length - 3);
-      for (var i = 3; i < length; i++) {
-        args[i - 3] = arguments[i];
-      }
-    } else {
-      args = undefined;
-    }
-    return this._ensureInstance().schedule(queueName, target, method, args, false, stack);
-  }
-
-  public deferOnce(queueName: string, ...args);
-  public deferOnce(queueName: string /* , target, method, args */) {
+  defer: function(queueName /* , target, method, args */) {
     var length = arguments.length;
     var method;
     var target;
@@ -348,12 +297,46 @@ export default class Backburner {
       args = undefined;
     }
 
-    let currentInstance = this._ensureInstance();
-    return currentInstance.schedule(queueName, target, method, args, true, stack);
-  }
+    if (!this.currentInstance) { createAutorun(this); }
+    return this.currentInstance.schedule(queueName, target, method, args, false, stack);
+  },
 
-  public setTimeout(...args);
-  public setTimeout() {
+  deferOnce: function(queueName /* , target, method, args */) {
+    var length = arguments.length;
+    var method;
+    var target;
+    var args;
+
+    if (length === 2) {
+      method = arguments[1];
+      target = null;
+    } else {
+      target = arguments[1];
+      method = arguments[2];
+    }
+
+    if (isString(method)) {
+      method = target[method];
+    }
+
+    var stack = this.DEBUG ? new Error() : undefined;
+
+    if (length > 3) {
+      args = new Array(length - 3);
+      for (var i = 3; i < length; i++) {
+        args[i - 3] = arguments[i];
+      }
+    } else {
+      args = undefined;
+    }
+
+    if (!this.currentInstance) {
+      createAutorun(this);
+    }
+    return this.currentInstance.schedule(queueName, target, method, args, true, stack);
+  },
+
+  setTimeout: function() {
     var l = arguments.length;
     var args = new Array(l);
 
@@ -432,10 +415,29 @@ export default class Backburner {
     }
 
     return this._setTimeout(fn, executeAt);
-  }
+  },
 
-  public throttle(...args);
-  public throttle(target, method /* , args, wait, [immediate] */) {
+  _setTimeout: function (fn, executeAt) {
+    if (this._timers.length === 0) {
+      this._timers.push(executeAt, fn);
+      this._installTimerTimeout();
+      return fn;
+    }
+
+    // find position to insert
+    var i = searchTimer(executeAt, this._timers);
+
+    this._timers.splice(i, 0, executeAt, fn);
+
+    // we should be the new earliest timer if i == 0
+    if (i === 0) {
+      this._reinstallTimerTimeout();
+    }
+
+    return fn;
+  },
+
+  throttle: function(target, method /* , args, wait, [immediate] */) {
     var backburner = this;
     var args = new Array(arguments.length);
     for (var i = 0; i < arguments.length; i++) {
@@ -478,10 +480,9 @@ export default class Backburner {
     this._throttlers.push(throttler);
 
     return throttler;
-  }
+  },
 
-  public debounce(...args);
-  public debounce(target, method /* , args, wait, [immediate] */) {
+  debounce: function(target, method /* , args, wait, [immediate] */) {
     var backburner = this;
     var args = new Array(arguments.length);
     for (var i = 0; i < arguments.length; i++) {
@@ -534,9 +535,9 @@ export default class Backburner {
     backburner._debouncees.push(debouncee);
 
     return debouncee;
-  }
+  },
 
-  public cancelTimers() {
+  cancelTimers: function() {
     each(this._throttlers, this._boundClearItems);
     this._throttlers = [];
 
@@ -550,13 +551,13 @@ export default class Backburner {
       this._platform.clearTimeout(this._autorun);
       this._autorun = null;
     }
-  }
+  },
 
-  public hasTimers() {
+  hasTimers: function() {
     return !!this._timers.length || !!this._debouncees.length || !!this._throttlers.length || this._autorun;
-  }
+  },
 
-  public cancel(timer?) {
+  cancel: function (timer) {
     var timerType = typeof timer;
 
     if (timer && timerType === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
@@ -577,29 +578,9 @@ export default class Backburner {
     } else {
       return; // timer was null or not a timer
     }
-  }
+  },
 
-  private _setTimeout(fn, executeAt) {
-    if (this._timers.length === 0) {
-      this._timers.push(executeAt, fn);
-      this._installTimerTimeout();
-      return fn;
-    }
-
-    // find position to insert
-    var i = searchTimer(executeAt, this._timers);
-
-    this._timers.splice(i, 0, executeAt, fn);
-
-    // we should be the new earliest timer if i == 0
-    if (i === 0) {
-      this._reinstallTimerTimeout();
-    }
-
-    return fn;
-  }
-
-  private _cancelItem(findMethod, array, timer) {
+  _cancelItem: function(findMethod, array, timer){
     var item;
     var index;
 
@@ -619,35 +600,14 @@ export default class Backburner {
     }
 
     return false;
-  }
+  },
 
-  /**
-   Trigger an event. Supports up to two arguments. Designed around
-   triggering transition events from one run loop instance to the
-   next, which requires an argument for the first instance and then
-   an argument for the next instance.
-
-   @private
-   @method _trigger
-   @param {String} eventName
-   @param {any} arg1
-   @param {any} arg2
-   */
-  private _trigger(eventName, arg1, arg2) {
-    var callbacks = this._eventCallbacks[eventName];
-    if (callbacks) {
-      for (var i = 0; i < callbacks.length; i++) {
-        callbacks[i](arg1, arg2);
-      }
-    }
-  }
-
-  private _runExpiredTimers() {
+  _runExpiredTimers: function () {
     this._timerTimeoutId = undefined;
     this.run(this, this._scheduleExpiredTimers);
-  }
+  },
 
-  private _scheduleExpiredTimers() {
+  _scheduleExpiredTimers: function () {
     var n = now();
     var timers = this._timers;
     var i = 0;
@@ -656,29 +616,29 @@ export default class Backburner {
       var executeAt = timers[i];
       var fn = timers[i + 1];
       if (executeAt <= n) {
-        this.defer(this.options.defaultQueue, null, fn);
+        this.schedule(this.options.defaultQueue, null, fn);
       } else {
         break;
       }
     }
     timers.splice(0, i);
     this._installTimerTimeout();
-  }
+  },
 
-  private _reinstallTimerTimeout() {
+  _reinstallTimerTimeout: function () {
     this._clearTimerTimeout();
     this._installTimerTimeout();
-  }
+  },
 
-  private _clearTimerTimeout() {
+  _clearTimerTimeout: function () {
     if (!this._timerTimeoutId) {
       return;
     }
     this._platform.clearTimeout(this._timerTimeoutId);
     this._timerTimeoutId = undefined;
-  }
+  },
 
-  private _installTimerTimeout() {
+  _installTimerTimeout: function () {
     if (!this._timers.length) {
       return;
     }
@@ -687,18 +647,50 @@ export default class Backburner {
     var wait = Math.max(0, minExpiresAt - n);
     this._timerTimeoutId = this._platform.setTimeout(this._boundRunExpiredTimers, wait);
   }
-
-  private _ensureInstance(): DeferredActionQueues {
-    let currentInstance = this.currentInstance;
-    if (!currentInstance) {
-      const setTimeout = this._platform.setTimeout;
-      currentInstance = this.begin();
-      this._autorun = setTimeout(this._boundAutorunEnd, 0);
-    }
-    return currentInstance;
-  }
-}
+};
 
 Backburner.prototype.schedule = Backburner.prototype.defer;
 Backburner.prototype.scheduleOnce = Backburner.prototype.deferOnce;
 Backburner.prototype.later = Backburner.prototype.setTimeout;
+
+function getOnError(options) {
+  return options.onError || (options.onErrorTarget && options.onErrorTarget[options.onErrorMethod]);
+}
+
+function createAutorun(backburner) {
+  var setTimeout = backburner._platform.setTimeout;
+  backburner.begin();
+  backburner._autorun = setTimeout(function() {
+    backburner._autorun = null;
+    backburner.end();
+  }, 0);
+}
+
+function findDebouncee(target, method, debouncees) {
+  return findItem(target, method, debouncees);
+}
+
+function findThrottler(target, method, throttlers) {
+  return findItem(target, method, throttlers);
+}
+
+function findItem(target, method, collection) {
+  var item;
+  var index = -1;
+
+  for (var i = 0, l = collection.length; i < l; i++) {
+    item = collection[i];
+    if (item[0] === target && item[1] === method) {
+      index = i;
+      break;
+    }
+  }
+
+  return index;
+}
+
+function clearItems(item) {
+  this._platform.clearTimeout(item[2]);
+}
+
+export default Backburner;

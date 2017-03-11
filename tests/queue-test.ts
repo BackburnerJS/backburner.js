@@ -48,10 +48,7 @@ test('Queue#flush should be recursive if new items are added', function() {
     increment();
     equal(count, 1, 'should not have run yet');
 
-    var currentInstance = bb.currentInstance;
-    if (currentInstance) {
-      currentInstance.queues.one.flush();
-    }
+    bb.currentInstance.queues.one.flush();
     equal(count, 4, 'should have run all scheduled methods, even ones added during flush');
   });
 
@@ -98,7 +95,7 @@ test('onBegin and onEnd are called and passed the correct parameters', function(
     });
   });
 
-  expectedBefores = [outer, null, inner, outer];
+  expectedBefores = [outer, undefined, inner, outer];
   expectedAfters = [inner, outer, outer, null];
 
   deepEqual(befores, expectedBefores, 'before callbacks successful');

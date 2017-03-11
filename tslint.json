@@ -1,21 +1,16 @@
 {
     "extends": "tslint:recommended",
     "rules": {
-        "quotemark": [true, "single", "avoid-escape"],
-        "trailing-comma": [false],
+        "quotemark": ["single", "avoid-escape"],
+        "trailing-comma": [],
         "no-var-keyword": false,
         "object-literal-shorthand": false,
         "object-literal-sort-keys": false,
-        "only-arrow-functions": [false],
+        "only-arrow-functions": [],
         "jsdoc-format": false,
         "prefer-for-of": false,
         "no-empty": false,
         "no-string-literal": false,
-        "max-line-length": [false],
-        "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"]
-    },
-    "jsRules": {
-        "quotemark": [true, "single", "avoid-escape"],
-        "trailing-comma": [false]
+        "max-line-length": []
     }
 }
