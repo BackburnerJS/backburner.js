@@ -12,12 +12,10 @@ module.exports = function () {
       include: [ 'index.d.ts' ],
       destDir: 'qunit'
     }),
-    new Funnel(path.join(__dirname, '/lib'), {
-      include: [ '**/*.ts' ],
+    new Funnel(__dirname + '/lib', {
       destDir: 'lib'
     }),
-    new Funnel('tests', {
-      include: [ '**/*.ts' ],
+    new Funnel(__dirname + '/tests', {
       destDir: 'tests'
     })
   ]);
@@ -78,7 +76,7 @@ module.exports = function () {
       files: ['loader.js'],
       destDir: 'tests'
     }),
-    new Funnel(path.join(__dirname, '/tests'), {
+    new Funnel(__dirname + '/tests', {
       files: ['index.html'],
       destDir: 'tests'
     })
