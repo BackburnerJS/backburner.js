@@ -21,7 +21,7 @@ test('debounce', function() {
 
   // let's schedule `debouncee` to run in 10ms
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 1);
     ok(!wasCalled);
@@ -30,7 +30,7 @@ test('debounce', function() {
 
   // let's schedule `debouncee` to run again in 30ms
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 2);
     ok(!wasCalled);
@@ -39,7 +39,7 @@ test('debounce', function() {
 
   // let's schedule `debouncee` to run yet again in 60ms
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 3);
     ok(!wasCalled);
@@ -49,7 +49,7 @@ test('debounce', function() {
   // now, let's schedule an assertion to occur at 110ms,
   // 10ms after `debouncee` has been called the last time
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 4);
     ok(wasCalled);
@@ -61,7 +61,7 @@ test('debounce', function() {
 
   // at the 120ms mark, let's schedule another call to `debounce`
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     wasCalled = false; // reset the flag
 
     // assert call order
@@ -73,7 +73,7 @@ test('debounce', function() {
 
     // assert that it is called in the future and not blackholed
     stop();
-    setTimeout(function() {
+    setTimeout(() => {
       start();
       equal(step++, 6);
       ok(wasCalled, 'Another debounce call with the same function can be executed later');
@@ -103,7 +103,7 @@ test('debounce - immediate', function() {
 
   // let's schedule `debouncee` to run in 10ms
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 1);
     ok(!wasCalled);
@@ -112,7 +112,7 @@ test('debounce - immediate', function() {
 
   // let's schedule `debouncee` to run again in 30ms
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 2);
     ok(!wasCalled);
@@ -121,7 +121,7 @@ test('debounce - immediate', function() {
 
   // let's schedule `debouncee` to run yet again in 60ms
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 3);
     ok(!wasCalled);
@@ -131,7 +131,7 @@ test('debounce - immediate', function() {
   // now, let's schedule an assertion to occur at 110ms,
   // 10ms after `debouncee` has been called the last time
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 4);
     ok(!wasCalled);
@@ -143,7 +143,7 @@ test('debounce - immediate', function() {
 
   // at the 120ms mark, let's schedule another call to `debounce`
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     wasCalled = false; // reset the flag
 
     // assert call order
@@ -157,7 +157,7 @@ test('debounce - immediate', function() {
 
     // assert that it is called in the future and not blackholed
     stop();
-    setTimeout(function() {
+    setTimeout(() => {
       start();
       equal(step++, 6);
       ok(!wasCalled);
@@ -180,7 +180,7 @@ test('debounce accept time interval like string numbers', function() {
   equal(step++, 0);
 
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 1);
     ok(!wasCalled);
@@ -188,7 +188,7 @@ test('debounce accept time interval like string numbers', function() {
   }, 10);
 
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 2);
     ok(wasCalled);
@@ -216,7 +216,7 @@ test('debounce returns timer information usable for cancelling', function() {
   ok(!bb.cancel(timer), 'the timer no longer exists in the list');
 
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     ok(!wasCalled, 'the timer wasn\'t called after waiting');
   }, 60);
@@ -238,7 +238,7 @@ test('debounce cancelled after it\'s executed returns false', function() {
   timer = bb.debounce(null, debouncee, 1);
 
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     ok(!bb.cancel(timer), 'no timer existed to cancel');
     ok(wasCalled, 'the timer was actually called');
@@ -262,7 +262,7 @@ test('debounce cancelled doesn\'t cancel older items', function() {
   timer = bb.debounce(null, debouncee, 1);
 
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     bb.debounce(null, debouncee, 1);
     ok(!bb.cancel(timer), 'the second timer isn\'t removed, despite appearing to be the same');
@@ -286,14 +286,14 @@ test('debounce that is immediate, and cancelled and called again happens immedia
   timer = bb.debounce(null, debouncee, 1000, true);
 
   stop();
-  setTimeout(function() { // 10 millisecond delay
+  setTimeout(() => { // 10 millisecond delay
     start();
     equal(1, calledCount, 'debounced method was called');
     ok(bb.cancel(timer), 'debounced delay was cancelled');
     bb.debounce(null, debouncee, 1000, true);
 
     stop();
-    setTimeout(function(){ // 10 millisecond delay
+    setTimeout(() => { // 10 millisecond delay
       start();
       equal(2, calledCount, 'debounced method was called again immediately');
     }, 10);
@@ -313,7 +313,7 @@ test('onError', function() {
     onError: onError
   });
 
-  bb.debounce(null, function() { throw new Error('test error'); }, 20);
+  bb.debounce(null,() => { throw new Error('test error'); }, 20);
 
   stop();
 });

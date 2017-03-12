@@ -9,11 +9,11 @@ test('autorun', function() {
   ok(!bb.currentInstance, 'The DeferredActionQueues object is lazily instaniated');
   equal(step++, 0);
 
-  bb.schedule('zomg', null, function() {
+  bb.schedule('zomg', null, () => {
     start();
     equal(step, 2);
     stop();
-    setTimeout(function() {
+    setTimeout(() => {
       start();
       ok(!bb.hasTimers(), 'The all timers are cleared');
     });

@@ -8,19 +8,17 @@ test('end event should fire after runloop completes', function() {
 
   let bb = new Backburner(['one', 'two']);
 
-  bb.on('end', function() {
-    callNumber++;
-  });
+  bb.on('end', () => callNumber++);
 
-  let funcOne = function() {
+  function funcOne() {
     equal(callNumber, 0);
-  };
+  }
 
-  let funcTwo = function() {
+  function funcTwo() {
     equal(callNumber, 0);
-  };
+  }
 
-  bb.run(function() {
+  bb.run(() => {
     bb.schedule('one', null, funcOne);
     bb.schedule('two', null, funcTwo);
   });
@@ -33,24 +31,22 @@ test('end event should fire before onEnd', function() {
   let callNumber = 0;
 
   let bb = new Backburner(['one', 'two'], {
-    onEnd: function() {
+    onEnd() {
       equal(callNumber, 1);
     }
   });
 
-  bb.on('end', function() {
-    callNumber++;
-  });
+  bb.on('end', () => callNumber++);
 
-  let funcOne = function() {
+  function funcOne() {
     equal(callNumber, 0);
-  };
+  }
 
-  let funcTwo = function() {
+   function funcTwo() {
     equal(callNumber, 0);
-  };
+  }
 
-  bb.run(function() {
+  bb.run(() => {
     bb.schedule('one', null, funcOne);
     bb.schedule('two', null, funcTwo);
   });
@@ -64,23 +60,23 @@ test('end event should be passed the current and next instance', function() {
   let secondArgument = null;
 
   let bb = new Backburner(['one'], {
-    onEnd: function(first, second) {
+    onEnd(first, second) {
       equal(firstArgument, first);
       equal(secondArgument, second);
     }
   });
 
-  bb.on('end', function(first, second) {
+  bb.on('end', (first, second) => {
     firstArgument = first;
     secondArgument = second;
   });
 
-  bb.run(function() {
-    bb.schedule('one', null, function() {});
+  bb.run(() => {
+    bb.schedule('one', null, () => {});
   });
 
-  bb.run(function() {
-    bb.schedule('one', null, function() {});
+  bb.run(() => {
+    bb.schedule('one', null, () => {});
   });
 });
 // blah
@@ -91,20 +87,18 @@ test('begin event should fire before runloop begins', function() {
 
   let bb = new Backburner(['one', 'two']);
 
-  bb.on('begin', function() {
-    callNumber++;
-  });
+  bb.on('begin', () => callNumber++);
 
-  let funcOne = function() {
+  function funcOne() {
     equal(callNumber, 1);
-  };
+  }
 
-  let funcTwo = function() {
+  function funcTwo() {
     equal(callNumber, 1);
-  };
+  }
 
   equal(callNumber, 0);
-  bb.run(function() {
+  bb.run(() => {
     bb.schedule('one', null, funcOne);
     bb.schedule('two', null, funcTwo);
   });
@@ -117,18 +111,16 @@ test('begin event should fire before onBegin', function() {
   let callNumber = 0;
 
   let bb = new Backburner(['one', 'two'], {
-    onBegin: function() {
+    onBegin() {
       equal(callNumber, 1);
     }
   });
 
-  bb.on('begin', function() {
-    callNumber++;
-  });
+  bb.on('begin', () => callNumber++);
 
-  bb.run(function() {
-    bb.schedule('one', null, function() {});
-    bb.schedule('two', null, function() {});
+  bb.run(() => {
+    bb.schedule('one', null, () => {});
+    bb.schedule('two', null, () => {});
   });
 });
 
@@ -140,23 +132,23 @@ test('begin event should be passed the current and previous instance', function(
   let secondArgument = null;
 
   let bb = new Backburner(['one'], {
-    onBegin: function(first, second) {
+    onBegin(first, second) {
       equal(firstArgument, first);
       equal(secondArgument, second);
     }
   });
 
-  bb.on('begin', function(first, second) {
+  bb.on('begin', (first, second) => {
     firstArgument = first;
     secondArgument = second;
   });
 
-  bb.run(function() {
-    bb.schedule('one', null, function() {});
+  bb.run(() => {
+    bb.schedule('one', null, () => {});
   });
 
-  bb.run(function() {
-    bb.schedule('one', null, function() {});
+  bb.run(() => {
+    bb.schedule('one', null, () => {});
   });
 });
 
@@ -168,19 +160,19 @@ test('events should work with multiple callbacks', function() {
 
   let bb = new Backburner(['one']);
 
-  let first = function() {
+  function first() {
     firstCalled = true;
-  };
+  }
 
-  let second = function() {
+  function second() {
     secondCalled = true;
-  };
+  }
 
   bb.on('end', first);
   bb.on('end', second);
 
-  bb.run(function() {
-    bb.schedule('one', null, function() {});
+  bb.run(() => {
+    bb.schedule('one', null, () => {});
   });
 
   equal(secondCalled, true);
@@ -194,21 +186,21 @@ test('off should unregister specific callback', function() {
 
   let bb = new Backburner(['one']);
 
-  let first = function() {
+  function first() {
     firstCalled = true;
-  };
+  }
 
-  let second = function() {
+  function second() {
     secondCalled = true;
-  };
+  }
 
   bb.on('end', first);
   bb.on('end', second);
 
   bb.off('end', first);
 
-  bb.run(function() {
-    bb.schedule('one', null, function() {});
+  bb.run(() => {
+    bb.schedule('one', null, () => {});
   });
 
   equal(secondCalled, true);

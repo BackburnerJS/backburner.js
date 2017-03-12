@@ -6,8 +6,8 @@ test('We can configure a custom platform', function() {
   expect(1);
 
   let fakePlatform = {
-    setTimeout: function() {},
-    clearTimeout: function() {},
+    setTimeout() {},
+    clearTimeout() {},
     isFakePlatform: true
   };
 
@@ -24,11 +24,11 @@ test('We can use a custom setTimeout', function() {
   let customTimeoutWasUsed = false;
   let bb = new Backburner(['one'], {
     _platform: {
-      setTimeout: function customSetTimeout(method, wait) {
+      setTimeout(method, wait) {
         customTimeoutWasUsed = true;
         return setTimeout(method, wait);
       },
-      clearTimeout: function customClearTimeout(timer) {
+      clearTimeout(timer) {
         return clearTimeout(timer);
       },
       isFakePlatform: true
@@ -36,7 +36,7 @@ test('We can use a custom setTimeout', function() {
   });
 
   stop();
-  bb.deferOnce('one', function() {
+  bb.deferOnce('one', () => {
     start();
     ok(bb.options._platform.isFakePlatform, 'we are using the fake platform');
     ok(customTimeoutWasUsed , 'custom setTimeout was used');
@@ -50,23 +50,21 @@ test('We can use a custom clearTimeout', function() {
   let customClearTimeoutWasUsed = false;
   let bb = new Backburner(['one'], {
     _platform: {
-      setTimeout: function customSetTimeout(method, wait) {
+      setTimeout(method, wait) {
         return setTimeout(method, wait);
       },
-      clearTimeout: function customClearTimeout(timer) {
+      clearTimeout(timer) {
         customClearTimeoutWasUsed = true;
         return clearTimeout(timer);
       }
     }
   });
 
-  bb.deferOnce('one', function() {
-    functionWasCalled = true;
-  });
+  bb.deferOnce('one', () => functionWasCalled = true);
   bb.cancelTimers();
 
-  bb.run(function() {
-    bb.deferOnce('one', function() {
+  bb.run(() => {
+    bb.deferOnce('one', () => {
       ok(!functionWasCalled, 'function was not called');
       ok(customClearTimeoutWasUsed, 'custom clearTimeout was used');
     });

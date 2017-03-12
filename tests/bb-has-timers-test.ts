@@ -6,14 +6,14 @@ test('hasTimers', function () {
   let bb = new Backburner(['ohai']);
   let timer;
   let target = {
-    fn: function () {}
+    fn() { }
   };
 
-  bb.schedule('ohai', null, function () {
+  bb.schedule('ohai', null, () => {
     ok(!bb.hasTimers(), 'Initially there are no timers');
     start();
 
-    timer = bb.later('ohai', function() {});
+    timer = bb.later('ohai', () => {});
     ok(bb.hasTimers(), 'hasTimers checks timers');
 
     bb.cancel(timer);
