@@ -27,7 +27,7 @@
     "broccoli-stew": "^1.4.0",
     "broccoli-typescript-compiler": "^1.0.1",
     "do-you-even-bench": "^1.0.2",
-    "ember-cli": "2.11.1",
+    "ember-cli": "^2.12.0-beta.2",
     "ember-cli-inject-live-reload": "1.6.1",
     "glob": "^7.1.1",
     "loader.js": "^4.2.3",
