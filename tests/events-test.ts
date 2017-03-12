@@ -42,7 +42,7 @@ test('end event should fire before onEnd', function() {
     equal(callNumber, 0);
   }
 
-   function funcTwo() {
+  function funcTwo() {
     equal(callNumber, 0);
   }
 

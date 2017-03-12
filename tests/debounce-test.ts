@@ -313,7 +313,7 @@ test('onError', function() {
     onError: onError
   });
 
-  bb.debounce(null,() => { throw new Error('test error'); }, 20);
+  bb.debounce(null, () => { throw new Error('test error'); }, 20);
 
   stop();
 });

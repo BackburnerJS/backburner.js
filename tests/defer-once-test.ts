@@ -140,12 +140,12 @@ test('when passed same function twice with same target', function() {
   let i = 0;
   let functionWasCalled = false;
 
-  function deferMethod(){
+  function deferMethod() {
     i++;
     equal(i, 1, 'Function should be called only once');
     equal(this['first'], 1, 'the target property was set');
     functionWasCalled = true;
-  };
+  }
 
   let argObj = {first: 1};
 
@@ -163,7 +163,7 @@ test('when passed same function twice with different targets', function() {
   let bb = new Backburner(['one']);
   let i = 0;
 
-  function deferMethod(){
+  function deferMethod() {
     i++;
     equal(this['first'], 1, 'the target property was set');
   }
@@ -228,7 +228,7 @@ test('when passed same function twice with different target and different argume
   let bb = new Backburner(['one']);
   let i = 0;
 
-  function deferMethod(a, b){
+  function deferMethod(a, b) {
     i++;
     if (i === 1) {
       equal(a, 1, 'First argument set during first call');
@@ -255,7 +255,7 @@ test('when passed same function with same target after already triggering in cur
   let bb = new Backburner(['one', 'two'], { GUID_KEY: 'GUID_KEY' });
   let i = 0;
 
-  function deferMethod(a){
+  function deferMethod(a) {
     i++;
     equal(a, i, 'Correct argument is set');
     equal(this['first'], 1, 'the target property was set');

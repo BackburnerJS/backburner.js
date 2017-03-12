@@ -13,7 +13,7 @@ test('when passed a function', function() {
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
-  bb.run(function() {
+  bb.run(() => {
     bb.defer('one', function() {
       functionWasCalled = true;
     });
@@ -158,7 +158,7 @@ test('when passed same function twice with same arguments and same target', func
   let bb = new Backburner(['one']);
   let i = 0;
 
-  function deferMethod(a, b){
+  function deferMethod(a, b) {
     i++;
     equal(a, 1, 'First argument is set twice');
     equal(b, 2, 'Second argument is set twice');
@@ -181,7 +181,7 @@ test('when passed same function twice with same target and different arguments',
   let bb = new Backburner(['one']);
   let i = 0;
 
-  function deferMethod(a, b){
+  function deferMethod(a, b) {
     i++;
     if (i === 1) {
       equal(a, 1, 'First argument set during first call');
