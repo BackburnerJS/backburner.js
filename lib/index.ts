@@ -13,6 +13,7 @@ import {
 
 import searchTimer from './backburner/binary-search';
 import DeferredActionQueues from './backburner/deferred-action-queues';
+import iteratorDrain from './backburner/iterator-drain';
 
 import Queue from './backburner/queue';
 
@@ -24,6 +25,7 @@ export default class Backburner {
   public currentInstance: DeferredActionQueues | null | undefined;
 
   public schedule: Function;
+  public scheduleIterable: Function;
   public scheduleOnce: Function;
   public later: Function;
 
@@ -316,6 +318,19 @@ export default class Backburner {
       args = undefined;
     }
     return this._ensureInstance().schedule(queueName, target, method, args, false, stack);
+  }
+
+  /*
+    Defer the passed iterable of functions to run inside the specified queue.
+
+    @method deferIterable
+    @param {String} queueName
+    @param {Iterable} an iterable of functions to execute
+    @return method result
+  */
+  public deferIterable(queueName: string, iterable: any) {
+    let stack = this.DEBUG ? new Error() : undefined;
+    return this._ensureInstance().schedule(queueName, null, iteratorDrain, [iterable], false, stack);
   }
 
   public deferOnce(queueName: string, ...args);
@@ -701,4 +716,5 @@ export default class Backburner {
 
 Backburner.prototype.schedule = Backburner.prototype.defer;
 Backburner.prototype.scheduleOnce = Backburner.prototype.deferOnce;
+Backburner.prototype.scheduleIterable = Backburner.prototype.deferIterable;
 Backburner.prototype.later = Backburner.prototype.setTimeout;

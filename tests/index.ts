@@ -4,6 +4,7 @@ import './cancel-test';
 import './configurable-timeout-test';
 import './debounce-test';
 import './debug-test';
+import './defer-iterable-test';
 import './defer-once-test';
 import './defer-test';
 import './events-test';
