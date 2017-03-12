@@ -63,7 +63,7 @@ test('throws when passed a null method', function() {
     equal('You attempted to schedule an action in a queue (deferErrors) for a method that doesn\'t exist', error.message);
   }
 
-  var bb = new Backburner(['deferErrors'], {
+  let bb = new Backburner(['deferErrors'], {
     onError
   });
 
