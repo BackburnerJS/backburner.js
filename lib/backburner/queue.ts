@@ -70,7 +70,7 @@ export default class Queue {
     let invoke = onError ? this.invokeWithOnError : this.invoke;
 
     this.targetQueues = Object.create(null);
-    let queueItems = this._queueBeingFlushed = this._queue.slice();
+    let queueItems = this._queueBeingFlushed = this._queue;
     this._queue = [];
 
     if (before) {
