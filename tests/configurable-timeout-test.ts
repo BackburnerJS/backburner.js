@@ -1,9 +1,9 @@
 import Backburner from 'backburner';
 
-QUnit.module('configurable platform.setTimeout');
+QUnit.module('tests/configurable-timeout');
 
-test('We can configure a custom platform', function() {
-  expect(1);
+QUnit.test('We can configure a custom platform', function(assert) {
+  assert.expect(1);
 
   let fakePlatform = {
     setTimeout() {},
@@ -15,11 +15,12 @@ test('We can configure a custom platform', function() {
     _platform: fakePlatform
   });
 
-  ok(bb.options._platform.isFakePlatform, 'We can pass in a custom platform');
+  assert.ok(bb.options._platform.isFakePlatform, 'We can pass in a custom platform');
 });
 
-test('We can use a custom setTimeout', function() {
-  expect(2);
+QUnit.test('We can use a custom setTimeout', function(assert) {
+  assert.expect(2);
+  let done = assert.async();
 
   let customTimeoutWasUsed = false;
   let bb = new Backburner(['one'], {
@@ -35,16 +36,15 @@ test('We can use a custom setTimeout', function() {
     }
   });
 
-  stop();
   bb.deferOnce('one', () => {
-    start();
-    ok(bb.options._platform.isFakePlatform, 'we are using the fake platform');
-    ok(customTimeoutWasUsed , 'custom setTimeout was used');
+    assert.ok(bb.options._platform.isFakePlatform, 'we are using the fake platform');
+    assert.ok(customTimeoutWasUsed , 'custom setTimeout was used');
+    done();
   });
 });
 
-test('We can use a custom clearTimeout', function() {
-  expect(2);
+QUnit.test('We can use a custom clearTimeout', function(assert) {
+  assert.expect(2);
 
   let functionWasCalled = false;
   let customClearTimeoutWasUsed = false;
@@ -65,8 +65,8 @@ test('We can use a custom clearTimeout', function() {
 
   bb.run(() => {
     bb.deferOnce('one', () => {
-      ok(!functionWasCalled, 'function was not called');
-      ok(customClearTimeoutWasUsed, 'custom clearTimeout was used');
+      assert.ok(!functionWasCalled, 'function was not called');
+      assert.ok(customClearTimeoutWasUsed, 'custom clearTimeout was used');
     });
   });
 });

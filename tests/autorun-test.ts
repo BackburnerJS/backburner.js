@@ -1,25 +1,23 @@
 import Backburner from 'backburner';
 
-QUnit.module('autorun');
+QUnit.module('tests/autorun');
 
-test('autorun', function() {
+QUnit.test('autorun', function(assert) {
+  let done = assert.async();
   let bb = new Backburner(['zomg']);
   let step = 0;
 
-  ok(!bb.currentInstance, 'The DeferredActionQueues object is lazily instaniated');
-  equal(step++, 0);
+  assert.ok(!bb.currentInstance, 'The DeferredActionQueues object is lazily instaniated');
+  assert.equal(step++, 0);
 
   bb.schedule('zomg', null, () => {
-    start();
-    equal(step, 2);
-    stop();
+    assert.equal(step, 2);
     setTimeout(() => {
-      start();
-      ok(!bb.hasTimers(), 'The all timers are cleared');
+      assert.ok(!bb.hasTimers(), 'The all timers are cleared');
+      done();
     });
   });
 
-  ok(bb.currentInstance, 'The DeferredActionQueues object exists');
-  equal(step++, 1);
-  stop();
+  assert.ok(bb.currentInstance, 'The DeferredActionQueues object exists');
+  assert.equal(step++, 1);
 });

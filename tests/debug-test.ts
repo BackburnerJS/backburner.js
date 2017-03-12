@@ -1,26 +1,26 @@
 import Backburner from 'backburner';
 
-QUnit.module('debug');
+QUnit.module('tests/debug');
 
-test('DEBUG flag enables stack tagging', function() {
+QUnit.test('DEBUG flag enables stack tagging', function(assert) {
   let bb = new Backburner(['one']);
 
   bb.defer('one', () => {});
 
-  ok(bb.currentInstance && !bb.currentInstance.queues.one._queue[3], 'No stack is recorded');
+  assert.ok(bb.currentInstance && !bb.currentInstance.queues.one._queue[3], 'No stack is recorded');
 
   bb.DEBUG = true;
 
   bb.defer('one', () => {});
 
   if (new Error().stack) { // workaround for CLI runner :(
-    expect(4);
+    assert.expect(4);
     let stack = bb.currentInstance && bb.currentInstance.queues.one._queue[7].stack;
-    ok(typeof stack === 'string', 'A stack is recorded');
+    assert.ok(typeof stack === 'string', 'A stack is recorded');
 
     let onError = function(error, errorRecordedForStack){
-      ok(errorRecordedForStack, 'errorRecordedForStack passed to error function');
-      ok(errorRecordedForStack.stack, 'stack is recorded');
+      assert.ok(errorRecordedForStack, 'errorRecordedForStack passed to error function');
+      assert.ok(errorRecordedForStack.stack, 'stack is recorded');
     };
 
     bb = new Backburner(['errors'], {onError: onError});

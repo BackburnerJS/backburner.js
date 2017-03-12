@@ -1,34 +1,34 @@
 import Backburner from 'backburner';
 
-QUnit.module('Queue');
+QUnit.module('tests/queue');
 
-test('actions scheduled on previous queue, start over from beginning', function() {
-  expect(5);
+QUnit.test('actions scheduled on previous queue, start over from beginning', function(assert) {
+  assert.expect(5);
 
   let bb = new Backburner(['one', 'two']);
   let step = 0;
 
   bb.run(function() {
-    equal(step++, 0, '0');
+    assert.equal(step++, 0, '0');
 
     bb.schedule('two', null, function() {
-      equal(step++, 1, '1');
+      assert.equal(step++, 1, '1');
 
       bb.schedule('one', null, function() {
-        equal(step++, 3, '3');
+        assert.equal(step++, 3, '3');
       });
     });
 
     bb.schedule('two', null, function() {
-      equal(step++, 2, '2');
+      assert.equal(step++, 2, '2');
     });
   });
 
-  equal(step, 4, '4');
+  assert.equal(step, 4, '4');
 });
 
-test('Queue#flush should be recursive if new items are added', function() {
-  expect(2);
+QUnit.test('Queue#flush should be recursive if new items are added', function(assert) {
+  assert.expect(2);
 
   let bb = new Backburner(['one']);
   let count = 0;
@@ -46,32 +46,32 @@ test('Queue#flush should be recursive if new items are added', function() {
     }
 
     increment();
-    equal(count, 1, 'should not have run yet');
+    assert.equal(count, 1, 'should not have run yet');
 
     let currentInstance = bb.currentInstance;
     if (currentInstance) {
       currentInstance.queues.one.flush();
     }
-    equal(count, 4, 'should have run all scheduled methods, even ones added during flush');
+    assert.equal(count, 4, 'should have run all scheduled methods, even ones added during flush');
   });
 
 });
 
-test('Default queue is automatically set to first queue if none is provided', function() {
+QUnit.test('Default queue is automatically set to first queue if none is provided', function(assert) {
   let bb = new Backburner(['one', 'two']);
-  equal(bb.options.defaultQueue, 'one');
+  assert.equal(bb.options.defaultQueue, 'one');
 });
 
-test('Default queue can be manually configured', function() {
+QUnit.test('Default queue can be manually configured', function(assert) {
   let bb = new Backburner(['one', 'two'], {
     defaultQueue: 'two'
   });
 
-  equal(bb.options.defaultQueue, 'two');
+  assert.equal(bb.options.defaultQueue, 'two');
 });
 
-test('onBegin and onEnd are called and passed the correct parameters', function() {
-  expect(2);
+QUnit.test('onBegin and onEnd are called and passed the correct parameters', function(assert) {
+  assert.expect(2);
 
   let befores: Array<any | null | undefined> = [];
   let afters: Array<any | null | undefined> = [];
@@ -101,6 +101,6 @@ test('onBegin and onEnd are called and passed the correct parameters', function(
   expectedBefores = [outer, null, inner, outer];
   expectedAfters = [inner, outer, outer, null];
 
-  deepEqual(befores, expectedBefores, 'before callbacks successful');
-  deepEqual(afters, expectedAfters, 'after callback successful');
+  assert.deepEqual(befores, expectedBefores, 'before callbacks successful');
+  assert.deepEqual(afters, expectedAfters, 'after callback successful');
 });

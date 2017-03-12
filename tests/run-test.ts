@@ -1,53 +1,51 @@
 import Backburner from 'backburner';
 
-QUnit.module('run');
+QUnit.module('tests/run');
 
-test('when passed a function', function() {
-  expect(1);
+QUnit.test('when passed a function', function(assert) {
+  assert.expect(1);
 
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
-  bb.run(() => {
-    functionWasCalled = true;
-  });
+  bb.run(() => functionWasCalled = true);
 
-  ok(functionWasCalled, 'function was called');
+  assert.ok(functionWasCalled, 'function was called');
 });
 
-test('when passed a target and method', function() {
-  expect(2);
+QUnit.test('when passed a target and method', function(assert) {
+  assert.expect(2);
 
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
   bb.run({zomg: 'hi'}, function() {
-    equal(this.zomg, 'hi', 'the target was properly set');
+    assert.equal(this.zomg, 'hi', 'the target was properly set');
     functionWasCalled = true;
   });
 
-  ok(functionWasCalled, 'function was called');
+  assert.ok(functionWasCalled, 'function was called');
 });
 
-test('when passed a target, method, and arguments', function() {
-  expect(5);
+QUnit.test('when passed a target, method, and arguments', function(assert) {
+  assert.expect(5);
 
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
   bb.run({zomg: 'hi'}, function(a, b, c) {
-    equal(this.zomg, 'hi', 'the target was properly set');
-    equal(a, 1, 'the first arguments was passed in');
-    equal(b, 2, 'the second arguments was passed in');
-    equal(c, 3, 'the third arguments was passed in');
+    assert.equal(this.zomg, 'hi', 'the target was properly set');
+    assert.equal(a, 1, 'the first arguments was passed in');
+    assert.equal(b, 2, 'the second arguments was passed in');
+    assert.equal(c, 3, 'the third arguments was passed in');
     functionWasCalled = true;
   }, 1, 2, 3);
 
-  ok(functionWasCalled, 'function was called');
+  assert.ok(functionWasCalled, 'function was called');
 });
 
-test('nesting run loops preserves the stack', function() {
-  expect(10);
+QUnit.test('nesting run loops preserves the stack', function(assert) {
+  assert.expect(10);
 
   let bb = new Backburner(['one']);
   let outerBeforeFunctionWasCalled = false;
@@ -70,63 +68,63 @@ test('nesting run loops preserves the stack', function() {
         bb.defer('one', function () {
           innerFunctionWasCalled = true;
         });
-        ok(!innerFunctionWasCalled, 'function is deferred');
+        assert.ok(!innerFunctionWasCalled, 'function is deferred');
       });
-      ok(innerFunctionWasCalled, 'function is called');
+      assert.ok(innerFunctionWasCalled, 'function is called');
 
       bb.defer('one', function () {
         middleAfterFunctionWasCalled = true;
       });
 
-      ok(!middleBeforeFunctionWasCalled, 'function is deferred');
-      ok(!middleAfterFunctionWasCalled, 'function is deferred');
+      assert.ok(!middleBeforeFunctionWasCalled, 'function is deferred');
+      assert.ok(!middleAfterFunctionWasCalled, 'function is deferred');
     });
 
-    ok(middleBeforeFunctionWasCalled, 'function is called');
-    ok(middleAfterFunctionWasCalled, 'function is called');
+    assert.ok(middleBeforeFunctionWasCalled, 'function is called');
+    assert.ok(middleAfterFunctionWasCalled, 'function is called');
 
     bb.defer('one', function () {
       outerAfterFunctionWasCalled = true;
     });
 
-    ok(!outerBeforeFunctionWasCalled, 'function is deferred');
-    ok(!outerAfterFunctionWasCalled, 'function is deferred');
+    assert.ok(!outerBeforeFunctionWasCalled, 'function is deferred');
+    assert.ok(!outerAfterFunctionWasCalled, 'function is deferred');
   });
 
-  ok(outerBeforeFunctionWasCalled, 'function is called');
-  ok(outerAfterFunctionWasCalled, 'function is called');
+  assert.ok(outerBeforeFunctionWasCalled, 'function is called');
+  assert.ok(outerAfterFunctionWasCalled, 'function is called');
 });
 
-test('runs can be nested', function() {
-  expect(2);
+QUnit.test('runs can be nested', function(assert) {
+  assert.expect(2);
 
   let bb = new Backburner(['one']);
   let step = 0;
 
   bb.run(function() {
-    equal(step++, 0);
+    assert.equal(step++, 0);
 
     bb.run(function() {
-      equal(step++, 1);
+      assert.equal(step++, 1);
     });
   });
 });
 
-test('run returns value', function() {
+QUnit.test('run returns value', function(assert) {
   let bb = new Backburner(['one']);
 
   let value = bb.run(function() {
     return 'hi';
   });
 
-  equal(value, 'hi');
+  assert.equal(value, 'hi');
 });
 
-test('onError', function() {
-  expect(1);
+QUnit.test('onError', function(assert) {
+  assert.expect(1);
 
   function onError(error) {
-    equal('test error', error.message);
+    assert.equal('QUnit.test error', error.message);
   }
 
   let bb = new Backburner(['errors'], {
@@ -134,30 +132,26 @@ test('onError', function() {
   });
 
   bb.run(function() {
-    throw new Error('test error');
+    throw new Error('QUnit.test error');
   });
 });
 
-test('onError set after start', function() {
-  expect(2);
+QUnit.test('onError set after start', function(assert) {
+  assert.expect(2);
 
   let bb = new Backburner(['errors']);
 
-  bb.run(function() {
-    ok(true);
-  });
+  bb.run(() => assert.ok(true));
 
   bb.options.onError = function(error) {
-    equal('test error', error.message);
+    assert.equal('QUnit.test error', error.message);
   };
 
-  bb.run(function() {
-    throw new Error('test error');
-  });
+  bb.run(() => { throw new Error('QUnit.test error'); });
 });
 
-test('onError with target and action', function() {
-  expect(2);
+QUnit.test('onError with target and action', function(assert) {
+  assert.expect(2);
 
   let target = {};
 
@@ -166,15 +160,11 @@ test('onError with target and action', function() {
     onErrorMethod: 'onerror'
   });
 
-  bb.run(function() {
-    ok(true);
-  });
+  bb.run(() => assert.ok(true));
 
   target['onerror'] = function(error) {
-    equal('test error', error.message);
+    assert.equal('QUnit.test error', error.message);
   };
 
-  bb.run(function() {
-    throw new Error('test error');
-  });
+  bb.run(() => { throw new Error('QUnit.test error'); });
 });
