@@ -1,9 +1,9 @@
 import Backburner from 'backburner';
 
-QUnit.module('Events');
+QUnit.module('tests/events');
 
-test('end event should fire after runloop completes', function() {
-  expect(3);
+QUnit.test('end event should fire after runloop completes', function(assert) {
+  assert.expect(3);
   let callNumber = 0;
 
   let bb = new Backburner(['one', 'two']);
@@ -11,11 +11,11 @@ test('end event should fire after runloop completes', function() {
   bb.on('end', () => callNumber++);
 
   function funcOne() {
-    equal(callNumber, 0);
+    assert.equal(callNumber, 0);
   }
 
   function funcTwo() {
-    equal(callNumber, 0);
+    assert.equal(callNumber, 0);
   }
 
   bb.run(() => {
@@ -23,27 +23,27 @@ test('end event should fire after runloop completes', function() {
     bb.schedule('two', null, funcTwo);
   });
 
-  equal(callNumber, 1);
+  assert.equal(callNumber, 1);
 });
 
-test('end event should fire before onEnd', function() {
-  expect(3);
+QUnit.test('end event should fire before onEnd', function(assert) {
+  assert.expect(3);
   let callNumber = 0;
 
   let bb = new Backburner(['one', 'two'], {
     onEnd() {
-      equal(callNumber, 1);
+      assert.equal(callNumber, 1);
     }
   });
 
   bb.on('end', () => callNumber++);
 
   function funcOne() {
-    equal(callNumber, 0);
+    assert.equal(callNumber, 0);
   }
 
   function funcTwo() {
-    equal(callNumber, 0);
+    assert.equal(callNumber, 0);
   }
 
   bb.run(() => {
@@ -52,8 +52,8 @@ test('end event should fire before onEnd', function() {
   });
 });
 
-test('end event should be passed the current and next instance', function() {
-  expect(4);
+QUnit.test('end event should be passed the current and next instance', function(assert) {
+  assert.expect(4);
   let callNumber = 0;
 
   let firstArgument = null;
@@ -61,8 +61,8 @@ test('end event should be passed the current and next instance', function() {
 
   let bb = new Backburner(['one'], {
     onEnd(first, second) {
-      equal(firstArgument, first);
-      equal(secondArgument, second);
+      assert.equal(firstArgument, first);
+      assert.equal(secondArgument, second);
     }
   });
 
@@ -71,18 +71,13 @@ test('end event should be passed the current and next instance', function() {
     secondArgument = second;
   });
 
-  bb.run(() => {
-    bb.schedule('one', null, () => {});
-  });
-
-  bb.run(() => {
-    bb.schedule('one', null, () => {});
-  });
+  bb.run(() => bb.schedule('one', null, () => {}));
+  bb.run(() => bb.schedule('one', null, () => {}));
 });
 // blah
 
-test('begin event should fire before runloop begins', function() {
-  expect(4);
+QUnit.test('begin event should fire before runloop begins', function(assert) {
+  assert.expect(4);
   let callNumber = 0;
 
   let bb = new Backburner(['one', 'two']);
@@ -90,29 +85,29 @@ test('begin event should fire before runloop begins', function() {
   bb.on('begin', () => callNumber++);
 
   function funcOne() {
-    equal(callNumber, 1);
+    assert.equal(callNumber, 1);
   }
 
   function funcTwo() {
-    equal(callNumber, 1);
+    assert.equal(callNumber, 1);
   }
 
-  equal(callNumber, 0);
+  assert.equal(callNumber, 0);
   bb.run(() => {
     bb.schedule('one', null, funcOne);
     bb.schedule('two', null, funcTwo);
   });
 
-  equal(callNumber, 1);
+  assert.equal(callNumber, 1);
 });
 
-test('begin event should fire before onBegin', function() {
-  expect(1);
+QUnit.test('begin event should fire before onBegin', function(assert) {
+  assert.expect(1);
   let callNumber = 0;
 
   let bb = new Backburner(['one', 'two'], {
     onBegin() {
-      equal(callNumber, 1);
+      assert.equal(callNumber, 1);
     }
   });
 
@@ -124,8 +119,8 @@ test('begin event should fire before onBegin', function() {
   });
 });
 
-test('begin event should be passed the current and previous instance', function() {
-  expect(4);
+QUnit.test('begin event should be passed the current and previous instance', function(assert) {
+  assert.expect(4);
   let callNumber = 0;
 
   let firstArgument = null;
@@ -133,8 +128,8 @@ test('begin event should be passed the current and previous instance', function(
 
   let bb = new Backburner(['one'], {
     onBegin(first, second) {
-      equal(firstArgument, first);
-      equal(secondArgument, second);
+      assert.equal(firstArgument, first);
+      assert.equal(secondArgument, second);
     }
   });
 
@@ -143,18 +138,13 @@ test('begin event should be passed the current and previous instance', function(
     secondArgument = second;
   });
 
-  bb.run(() => {
-    bb.schedule('one', null, () => {});
-  });
-
-  bb.run(() => {
-    bb.schedule('one', null, () => {});
-  });
+  bb.run(() => bb.schedule('one', null, () => {}));
+  bb.run(() => bb.schedule('one', null, () => {}));
 });
 
 // blah
-test('events should work with multiple callbacks', function() {
-  expect(2);
+QUnit.test('events should work with multiple callbacks', function(assert) {
+  assert.expect(2);
   let firstCalled = false;
   let secondCalled = false;
 
@@ -171,16 +161,14 @@ test('events should work with multiple callbacks', function() {
   bb.on('end', first);
   bb.on('end', second);
 
-  bb.run(() => {
-    bb.schedule('one', null, () => {});
-  });
+  bb.run(() => bb.schedule('one', null, () => {}));
 
-  equal(secondCalled, true);
-  equal(firstCalled, true);
+  assert.equal(secondCalled, true);
+  assert.equal(firstCalled, true);
 });
 
-test('off should unregister specific callback', function() {
-  expect(2);
+QUnit.test('off should unregister specific callback', function(assert) {
+  assert.expect(2);
   let firstCalled = false;
   let secondCalled = false;
 
@@ -199,10 +187,8 @@ test('off should unregister specific callback', function() {
 
   bb.off('end', first);
 
-  bb.run(() => {
-    bb.schedule('one', null, () => {});
-  });
+  bb.run(() => bb.schedule('one', null, () => {}));
 
-  equal(secondCalled, true);
-  equal(firstCalled, false);
+  assert.equal(secondCalled, true);
+  assert.equal(firstCalled, false);
 });

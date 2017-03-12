@@ -1,8 +1,9 @@
 import Backburner from 'backburner';
 
-QUnit.module('hasTimers');
+QUnit.module('tests/bb-has-timers');
 
-test('hasTimers', function () {
+QUnit.test('hasTimers', function (assert) {
+  let done = assert.async();
   let bb = new Backburner(['ohai']);
   let timer;
   let target = {
@@ -10,27 +11,26 @@ test('hasTimers', function () {
   };
 
   bb.schedule('ohai', null, () => {
-    ok(!bb.hasTimers(), 'Initially there are no timers');
-    start();
+    assert.ok(!bb.hasTimers(), 'Initially there are no timers');
 
     timer = bb.later('ohai', () => {});
-    ok(bb.hasTimers(), 'hasTimers checks timers');
+    assert.ok(bb.hasTimers(), 'hasTimers checks timers');
 
     bb.cancel(timer);
-    ok(!bb.hasTimers(), 'Timers are cleared');
+    assert.ok(!bb.hasTimers(), 'Timers are cleared');
 
     timer = bb.debounce(target, 'fn', 200);
-    ok(bb.hasTimers(), 'hasTimers checks debouncees');
+    assert.ok(bb.hasTimers(), 'hasTimers checks debouncees');
 
     bb.cancel(timer);
-    ok(!bb.hasTimers(), 'Timers are cleared');
+    assert.ok(!bb.hasTimers(), 'Timers are cleared');
 
     timer = bb.throttle(target, 'fn', 200);
-    ok(bb.hasTimers(), 'hasTimers checks throttlers');
+    assert.ok(bb.hasTimers(), 'hasTimers checks throttlers');
 
     bb.cancel(timer);
-    ok(!bb.hasTimers(), 'Timers are cleared');
-  });
+    assert.ok(!bb.hasTimers(), 'Timers are cleared');
 
-  stop();
+    done();
+  });
 });

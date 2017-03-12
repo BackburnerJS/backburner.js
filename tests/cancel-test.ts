@@ -1,35 +1,35 @@
+
 import Backburner from 'backburner';
 
-QUnit.module('cancel');
+QUnit.module('tests/cancel');
 
-test('null', function() {
+QUnit.test('null', function(assert) {
   // mimic browser behavior: window.clearTimeout(null) -> undefined
-  expect(3);
+  assert.expect(3);
   let bb = new Backburner(['cancel']);
-  equal(bb.cancel(), undefined, 'cancel with no arguments should return undefined');
-  equal(bb.cancel(null), undefined, 'cancel a null timer should return undefined');
-  equal(bb.cancel(undefined), undefined, 'cancel an undefined timer should return undefined');
+  assert.equal(bb.cancel(), undefined, 'cancel with no arguments should return undefined');
+  assert.equal(bb.cancel(null), undefined, 'cancel a null timer should return undefined');
+  assert.equal(bb.cancel(undefined), undefined, 'cancel an undefined timer should return undefined');
 });
 
-test('deferOnce', function() {
-  expect(3);
+QUnit.test('deferOnce', function(assert) {
+  assert.expect(3);
 
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
   bb.run(() => {
-    let timer = bb.deferOnce('one', function() {
-      functionWasCalled = true;
-    });
+    let timer = bb.deferOnce('one', () => functionWasCalled = true);
 
-    ok(timer, 'Timer object was returned');
-    ok(bb.cancel(timer), 'Cancel returned true');
-    ok(!functionWasCalled, 'function was not called');
+    assert.ok(timer, 'Timer object was returned');
+    assert.ok(bb.cancel(timer), 'Cancel returned true');
+    assert.ok(!functionWasCalled, 'function was not called');
   });
 });
 
-test('setTimeout', function() {
-  expect(5);
+QUnit.test('setTimeout', function(assert) {
+  assert.expect(5);
+  let done = assert.async();
 
   let called = false;
   let bb = new Backburner(['one'], {
@@ -37,27 +37,25 @@ test('setTimeout', function() {
       called = true;
     }
   });
+
   let functionWasCalled = false;
+  let timer = bb.setTimeout(() => functionWasCalled = true);
 
-  let timer = bb.setTimeout(() => {
-    functionWasCalled = true;
-  }, 0);
+  assert.ok(timer, 'Timer object was returned');
+  assert.ok(bb.cancel(timer), 'Cancel returned true');
+  assert.ok(!called, 'onBegin was not called');
 
-  ok(timer, 'Timer object was returned');
-  ok(bb.cancel(timer), 'Cancel returned true');
-  ok(!called, 'onBegin was not called');
-
-  stop();
   setTimeout(() => {
-    start();
-    ok(!functionWasCalled, 'function was not called');
-    ok(!called, 'onBegin was not called');
+    assert.ok(!functionWasCalled, 'function was not called');
+    assert.ok(!called, 'onBegin was not called');
+    done();
   }, 0);
 });
 
-test('setTimeout with multiple pending', function() {
-  expect(7);
+QUnit.test('setTimeout with multiple pending', function(assert) {
+  assert.expect(7);
 
+  let done = assert.async();
   let called = false;
   let bb = new Backburner(['one'], {
     onBegin() {
@@ -70,24 +68,23 @@ test('setTimeout with multiple pending', function() {
   let timer1 = bb.setTimeout(() => function1WasCalled = true);
   let timer2 = bb.setTimeout(() => function2WasCalled = true);
 
-  ok(timer1, 'Timer object 2 was returned');
-  ok(bb.cancel(timer1), 'Cancel for timer 1 returned true');
-  ok(timer2, 'Timer object 2 was returned');
-  ok(!called, 'onBegin was not called');
+  assert.ok(timer1, 'Timer object 2 was returned');
+  assert.ok(bb.cancel(timer1), 'Cancel for timer 1 returned true');
+  assert.ok(timer2, 'Timer object 2 was returned');
+  assert.ok(!called, 'onBegin was not called');
 
-  stop();
   setTimeout(() => {
-    start();
+    assert.ok(!function1WasCalled, 'function 1 was not called');
+    assert.ok(function2WasCalled, 'function 2 was called');
+    assert.ok(called, 'onBegin was called');
 
-    ok(!function1WasCalled, 'function 1 was not called');
-    ok(function2WasCalled, 'function 2 was called');
-    ok(called, 'onBegin was called');
+    done();
   }, 10);
 });
 
-test('setTimeout and creating a new setTimeout', function() {
-  expect(7);
-
+QUnit.test('setTimeout and creating a new setTimeout', function(assert) {
+  assert.expect(7);
+  let done = assert.async();
   let called = false;
   let bb = new Backburner(['one'], {
     onBegin() {
@@ -99,55 +96,53 @@ test('setTimeout and creating a new setTimeout', function() {
 
   let timer1 = bb.setTimeout(() => function1WasCalled = true, 0);
 
-  ok(timer1, 'Timer object 2 was returned');
-  ok(bb.cancel(timer1), 'Cancel for timer 1 returned true');
+  assert.ok(timer1, 'Timer object 2 was returned');
+  assert.ok(bb.cancel(timer1), 'Cancel for timer 1 returned true');
 
   let timer2 = bb.setTimeout(() => function2WasCalled = true, 1);
 
-  ok(timer2, 'Timer object 2 was returned');
-  ok(!called, 'onBegin was not called');
+  assert.ok(timer2, 'Timer object 2 was returned');
+  assert.ok(!called, 'onBegin was not called');
 
-  stop();
   setTimeout(() => {
-    start();
-
-    ok(!function1WasCalled, 'function 1 was not called');
-    ok(function2WasCalled, 'function 2 was called');
-    ok(called, 'onBegin was called');
+    assert.ok(!function1WasCalled, 'function 1 was not called');
+    assert.ok(function2WasCalled, 'function 2 was called');
+    assert.ok(called, 'onBegin was called');
+    done();
   }, 50);
 });
 
-test('cancelTimers', function() {
+QUnit.test('cancelTimers', function(assert) {
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
   let timer = bb.setTimeout(() => functionWasCalled = true);
 
-  ok(timer, 'Timer object was returned');
-  ok(bb.hasTimers(), 'bb has scheduled timer');
+  assert.ok(timer, 'Timer object was returned');
+  assert.ok(bb.hasTimers(), 'bb has scheduled timer');
 
   bb.cancelTimers();
 
-  ok(!bb.hasTimers(), 'bb has no scheduled timer');
-  ok(!functionWasCalled, 'function was not called');
+  assert.ok(!bb.hasTimers(), 'bb has no scheduled timer');
+  assert.ok(!functionWasCalled, 'function was not called');
 });
 
-test('cancel during flush', function() {
-  expect(1);
+QUnit.test('cancel during flush', function(assert) {
+  assert.expect(1);
 
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
   bb.run(() => {
-    let  timer1 = bb.deferOnce('one', () => bb.cancel(timer2));
-    let  timer2 = bb.deferOnce('one', () => functionWasCalled = true);
+    let timer1 = bb.deferOnce('one', () => bb.cancel(timer2));
+    let timer2 = bb.deferOnce('one', () => functionWasCalled = true);
   });
 
-  ok(!functionWasCalled, 'function was not called');
+  assert.ok(!functionWasCalled, 'function was not called');
 });
 
-test('with GUID_KEY and target', function() {
-  expect(3);
+QUnit.test('with GUID_KEY and target', function(assert) {
+  assert.expect(3);
 
   let obj = {
     ___FOO___: 1
@@ -166,19 +161,19 @@ test('with GUID_KEY and target', function() {
   bb.run(() => {
     let timer = bb.scheduleOnce('action', obj, fn);
 
-    equal(wasCalled, 0);
+    assert.equal(wasCalled, 0);
 
     bb.cancel(timer);
     bb.scheduleOnce('action', obj, fn);
 
-    equal(wasCalled, 0);
+    assert.equal(wasCalled, 0);
   });
 
-  equal(wasCalled, 1);
+  assert.equal(wasCalled, 1);
 });
 
-test('with GUID_KEY and a target without meta', function() {
-  expect(3);
+QUnit.test('with GUID_KEY and a target without meta', function(assert) {
+  assert.expect(3);
 
   let obj = { };
 
@@ -195,19 +190,19 @@ test('with GUID_KEY and a target without meta', function() {
   bb.run(() => {
     let timer = bb.scheduleOnce('action', obj, fn);
 
-    equal(wasCalled, 0);
+    assert.equal(wasCalled, 0);
 
     bb.cancel(timer);
     bb.scheduleOnce('action', obj, fn);
 
-    equal(wasCalled, 0);
+    assert.equal(wasCalled, 0);
   });
 
-  equal(wasCalled, 1);
+  assert.equal(wasCalled, 1);
 });
 
-test('with GUID_KEY no target', function() {
-  expect(3);
+QUnit.test('with GUID_KEY no target', function(assert) {
+  assert.expect(3);
 
   let bb = new Backburner(['action'], {
     GUID_KEY: '___FOO___'
@@ -222,13 +217,13 @@ test('with GUID_KEY no target', function() {
   bb.run(() => {
     let timer = bb.scheduleOnce('action', fn);
 
-    equal(wasCalled, 0);
+    assert.equal(wasCalled, 0);
 
     bb.cancel(timer);
     bb.scheduleOnce('action', fn);
 
-    equal(wasCalled, 0);
+    assert.equal(wasCalled, 0);
   });
 
-  equal(wasCalled, 1);
+  assert.equal(wasCalled, 1);
 });

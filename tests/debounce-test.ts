@@ -1,95 +1,86 @@
 import Backburner from 'backburner';
 
-QUnit.module('debounce');
+QUnit.module('tests/debounce');
 
-test('debounce', function() {
-  expect(14);
+QUnit.test('debounce', function(assert) {
+  assert.expect(14);
 
   let bb = new Backburner(['zomg']);
   let step = 0;
+  let done = assert.async();
 
   let wasCalled = false;
   function debouncee() {
-    ok(!wasCalled);
+    assert.ok(!wasCalled);
     wasCalled = true;
   }
 
   // let's debounce the function `debouncee` for 40ms
   // it will be executed 40ms after
   bb.debounce(null, debouncee, 40);
-  equal(step++, 0);
+  assert.equal(step++, 0);
 
   // let's schedule `debouncee` to run in 10ms
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 1);
-    ok(!wasCalled);
+    assert.equal(step++, 1);
+    assert.ok(!wasCalled);
     bb.debounce(null, debouncee, 40);
   }, 10);
 
   // let's schedule `debouncee` to run again in 30ms
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 2);
-    ok(!wasCalled);
+    assert.equal(step++, 2);
+    assert.ok(!wasCalled);
     bb.debounce(null, debouncee, 40);
   }, 30);
 
   // let's schedule `debouncee` to run yet again in 60ms
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 3);
-    ok(!wasCalled);
+    assert.equal(step++, 3);
+    assert.ok(!wasCalled);
     bb.debounce(null, debouncee, 40);
   }, 60);
 
   // now, let's schedule an assertion to occur at 110ms,
   // 10ms after `debouncee` has been called the last time
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 4);
-    ok(wasCalled);
+    assert.equal(step++, 4);
+    assert.ok(wasCalled);
   }, 110);
 
   // great, we've made it this far, there's one more thing
-  // we need to test. we want to make sure we can call `debounce`
+  // we need to QUnit.test. we want to make sure we can call `debounce`
   // again with the same target/method after it has executed
 
   // at the 120ms mark, let's schedule another call to `debounce`
-  stop();
   setTimeout(() => {
     wasCalled = false; // reset the flag
 
     // assert call order
-    start();
-    equal(step++, 5);
+    assert.equal(step++, 5);
 
     // call debounce for the second time
     bb.debounce(null, debouncee, 100);
 
     // assert that it is called in the future and not blackholed
-    stop();
     setTimeout(() => {
-      start();
-      equal(step++, 6);
-      ok(wasCalled, 'Another debounce call with the same function can be executed later');
+      assert.equal(step++, 6);
+      assert.ok(wasCalled, 'Another debounce call with the same function can be executed later');
+      done();
     }, 230);
   }, 120);
 });
 
-test('debounce - immediate', function() {
-  expect(16);
+QUnit.test('debounce - immediate', function(assert) {
+  assert.expect(16);
 
+  let done = assert.async();
   let bb = new Backburner(['zomg']);
   let step = 0;
 
   let wasCalled = false;
   function debouncee() {
-    ok(!wasCalled);
+    assert.ok(!wasCalled);
     wasCalled = true;
   }
 
@@ -97,223 +88,200 @@ test('debounce - immediate', function() {
   // it will be executed immediately, and prevent
   // any actions for 40ms after
   bb.debounce(null, debouncee, 40, true);
-  equal(step++, 0);
-  ok(wasCalled);
+  assert.equal(step++, 0);
+  assert.ok(wasCalled);
   wasCalled = false;
 
   // let's schedule `debouncee` to run in 10ms
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 1);
-    ok(!wasCalled);
+    assert.equal(step++, 1);
+    assert.ok(!wasCalled);
     bb.debounce(null, debouncee, 40, true);
   }, 10);
 
   // let's schedule `debouncee` to run again in 30ms
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 2);
-    ok(!wasCalled);
+    assert.equal(step++, 2);
+    assert.ok(!wasCalled);
     bb.debounce(null, debouncee, 40, true);
   }, 30);
 
   // let's schedule `debouncee` to run yet again in 60ms
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 3);
-    ok(!wasCalled);
+    assert.equal(step++, 3);
+    assert.ok(!wasCalled);
     bb.debounce(null, debouncee, 40, true);
   }, 60);
 
   // now, let's schedule an assertion to occur at 110ms,
   // 10ms after `debouncee` has been called the last time
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 4);
-    ok(!wasCalled);
+    assert.equal(step++, 4);
+    assert.ok(!wasCalled);
   }, 110);
 
   // great, we've made it this far, there's one more thing
-  // we need to test. we want to make sure we can call `debounce`
+  // we need to QUnit.test. we want to make sure we can call `debounce`
   // again with the same target/method after it has executed
 
   // at the 120ms mark, let's schedule another call to `debounce`
-  stop();
   setTimeout(() => {
     wasCalled = false; // reset the flag
 
     // assert call order
-    start();
-    equal(step++, 5);
+    assert.equal(step++, 5);
 
     // call debounce for the second time
     bb.debounce(null, debouncee, 100, true);
-    ok(wasCalled, 'Another debounce call with the same function can be executed later');
+    assert.ok(wasCalled, 'Another debounce call with the same function can be executed later');
     wasCalled = false;
 
     // assert that it is called in the future and not blackholed
-    stop();
     setTimeout(() => {
-      start();
-      equal(step++, 6);
-      ok(!wasCalled);
+      assert.equal(step++, 6);
+      assert.ok(!wasCalled);
+      done();
     }, 230);
   }, 120);
 });
 
-test('debounce accept time interval like string numbers', function() {
-
+QUnit.test('debounce accept time interval like string numbers', function(assert) {
+  let done = assert.async();
   let bb = new Backburner(['zomg']);
   let step = 0;
-
   let wasCalled = false;
+
   function debouncee() {
-    ok(!wasCalled);
+    assert.ok(!wasCalled);
     wasCalled = true;
   }
 
   bb.debounce(null, debouncee, '40');
-  equal(step++, 0);
+  assert.equal(step++, 0);
 
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 1);
-    ok(!wasCalled);
+    assert.equal(step++, 1);
+    assert.ok(!wasCalled);
     bb.debounce(null, debouncee, '40');
   }, 10);
 
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 2);
-    ok(wasCalled);
+    assert.equal(step++, 2);
+    assert.ok(wasCalled);
+    done();
   }, 60);
-
 });
 
-test('debounce returns timer information usable for cancelling', function() {
-  expect(3);
+QUnit.test('debounce returns timer information usable for cancelling', function(assert) {
+  assert.expect(3);
 
+  let done = assert.async();
   let bb = new Backburner(['batman']);
-  let timer;
   let wasCalled = false;
 
   function debouncee() {
-    ok(false, 'this method shouldn\'t be called');
+    assert.ok(false, 'this method shouldn\'t be called');
     wasCalled = true;
   }
 
-  timer = bb.debounce(null, debouncee, 1);
+  let timer = bb.debounce(null, debouncee, 1);
 
-  ok(bb.cancel(timer), 'the timer is cancelled');
+  assert.ok(bb.cancel(timer), 'the timer is cancelled');
 
   // should return false second time around
-  ok(!bb.cancel(timer), 'the timer no longer exists in the list');
+  assert.ok(!bb.cancel(timer), 'the timer no longer exists in the list');
 
-  stop();
   setTimeout(() => {
-    start();
-    ok(!wasCalled, 'the timer wasn\'t called after waiting');
+    assert.ok(!wasCalled, 'the timer wasn\'t called after waiting');
+    done();
   }, 60);
-
 });
 
-test('debounce cancelled after it\'s executed returns false', function() {
-  expect(3);
+QUnit.test('debounce cancelled after it\'s executed returns false', function(assert) {
+  assert.expect(3);
 
+  let done = assert.async();
   let bb = new Backburner(['darkknight']);
-  let timer;
   let wasCalled = false;
 
   function debouncee() {
-    ok(true, 'the debounced method was called');
+    assert.ok(true, 'the debounced method was called');
     wasCalled = true;
   }
 
-  timer = bb.debounce(null, debouncee, 1);
+  let timer = bb.debounce(null, debouncee, 1);
 
-  stop();
   setTimeout(() => {
-    start();
-    ok(!bb.cancel(timer), 'no timer existed to cancel');
-    ok(wasCalled, 'the timer was actually called');
+    assert.ok(!bb.cancel(timer), 'no timer existed to cancel');
+    assert.ok(wasCalled, 'the timer was actually called');
+    done();
   }, 10);
 
 });
 
-test('debounce cancelled doesn\'t cancel older items', function() {
-  expect(4);
+QUnit.test('debounce cancelled doesn\'t cancel older items', function(assert) {
+  assert.expect(4);
 
   let bb = new Backburner(['robin']);
-  let timer;
-
   let wasCalled = false;
+  let done = assert.async();
 
   function debouncee() {
-    ok(true, 'the debounced method was called');
+    assert.ok(true, 'the debounced method was called');
+    if (wasCalled) {
+      done();
+    }
     wasCalled = true;
   }
 
-  timer = bb.debounce(null, debouncee, 1);
+  let timer = bb.debounce(null, debouncee, 1);
 
-  stop();
   setTimeout(() => {
-    start();
     bb.debounce(null, debouncee, 1);
-    ok(!bb.cancel(timer), 'the second timer isn\'t removed, despite appearing to be the same');
-    ok(wasCalled, 'the timer was actually called');
+    assert.ok(!bb.cancel(timer), 'the second timer isn\'t removed, despite appearing to be the same');
+    assert.ok(wasCalled, 'the timer was actually called');
   }, 10);
-
 });
 
-test('debounce that is immediate, and cancelled and called again happens immediately', function() {
-  expect(3);
+QUnit.test('debounce that is immediate, and cancelled and called again happens immediately', function(assert) {
+  assert.expect(3);
 
+  let done = assert.async();
   let bb = new Backburner(['robin']);
-  let timer;
-
   let calledCount = 0;
 
   function debouncee() {
     calledCount++;
   }
 
-  timer = bb.debounce(null, debouncee, 1000, true);
+  let timer = bb.debounce(null, debouncee, 1000, true);
 
-  stop();
   setTimeout(() => { // 10 millisecond delay
-    start();
-    equal(1, calledCount, 'debounced method was called');
-    ok(bb.cancel(timer), 'debounced delay was cancelled');
+    assert.equal(1, calledCount, 'debounced method was called');
+    assert.ok(bb.cancel(timer), 'debounced delay was cancelled');
     bb.debounce(null, debouncee, 1000, true);
 
-    stop();
     setTimeout(() => { // 10 millisecond delay
-      start();
-      equal(2, calledCount, 'debounced method was called again immediately');
+      assert.equal(2, calledCount, 'debounced method was called again immediately');
+      done();
     }, 10);
   }, 10);
 
 });
 
-test('onError', function() {
-  expect(1);
+QUnit.test('onError', function(assert) {
+  assert.expect(1);
+
+  let done = assert.async();
 
   function onError(error) {
-    equal('test error', error.message);
-    start();
+    assert.equal('QUnit.test error', error.message);
+    done();
   }
 
   let bb = new Backburner(['errors'], {
-    onError: onError
+    onError
   });
 
-  bb.debounce(null, () => { throw new Error('test error'); }, 20);
-
-  stop();
+  bb.debounce(null, () => { throw new Error('QUnit.test error'); }, 20);
 });

@@ -1,48 +1,43 @@
 import Backburner from 'backburner';
 
-QUnit.module('throttle');
+QUnit.module('tests/throttle');
 
-test('throttle', function() {
-  expect(18);
+QUnit.test('throttle', function(assert) {
+  assert.expect(18);
 
   let bb = new Backburner(['zomg']);
   let step = 0;
+  let done = assert.async();
 
   let wasCalled = false;
   function throttler() {
-    ok(!wasCalled);
+    assert.ok(!wasCalled);
     wasCalled = true;
   }
 
   // let's throttle the function `throttler` for 40ms
   // it will be executed in 40ms
   bb.throttle(null, throttler, 40, false);
-  equal(step++, 0);
+  assert.equal(step++, 0);
 
   // let's schedule `throttler` to run in 10ms
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 1);
-    ok(!wasCalled);
+    assert.equal(step++, 1);
+    assert.ok(!wasCalled);
     bb.throttle(null, throttler, false);
   }, 10);
 
   // let's schedule `throttler` to run again in 20ms
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 2);
-    ok(!wasCalled);
+    assert.equal(step++, 2);
+    assert.ok(!wasCalled);
     bb.throttle(null, throttler, false);
   }, 20);
 
   // let's schedule `throttler` to run yet again in 30ms
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 3);
-    ok(!wasCalled);
+    assert.equal(step++, 3);
+    assert.ok(!wasCalled);
     bb.throttle(null, throttler, false);
   }, 30);
 
@@ -50,60 +45,51 @@ test('throttle', function() {
 
   // now, let's schedule an assertion to occur at 50ms,
   // 10ms after `throttler` has been called
-  stop();
   setTimeout(() => {
-    start();
-    equal(step++, 4);
-    ok(wasCalled);
+    assert.equal(step++, 4);
+    assert.ok(wasCalled);
   }, 50);
 
   // great, we've made it this far, there's one more thing
   // we need to test. we want to make sure we can call `throttle`
   // again with the same target/method after it has executed
   // at the 60ms mark, let's schedule another call to `throttle`
-  stop();
   setTimeout(() => {
     wasCalled = false; // reset the flag
 
     // assert call order
-    start();
-    equal(step++, 5);
+    assert.equal(step++, 5);
 
     // call throttle for the second time
     bb.throttle(null, throttler, 100, false);
 
     // assert that it is called in the future and not blackholed
-    stop();
     setTimeout(() => {
-      start();
-      equal(step++, 6);
-      ok(wasCalled, 'Another throttle call with the same function can be executed later');
+      assert.equal(step++, 6);
+      assert.ok(wasCalled, 'Another throttle call with the same function can be executed later');
     }, 110);
   }, 60);
 
-  stop();
   setTimeout(() => {
     wasCalled = false; // reset the flag
 
     // assert call order
-    start();
-    equal(step++, 7);
+    assert.equal(step++, 7);
 
     // call throttle again that time using a string number like time interval
     bb.throttle(null, throttler, '100', false);
 
     // assert that it is called in the future and not blackholed
-    stop();
     setTimeout(() => {
-      start();
-      equal(step++, 8);
-      ok(wasCalled, 'Throttle accept a string number like time interval');
+      assert.equal(step++, 8);
+      assert.ok(wasCalled, 'Throttle accept a string number like time interval');
+      done();
     }, 110);
   }, 180);
 });
 
-test('throttle with cancelTimers', function() {
-  expect(1);
+QUnit.test('throttle with cancelTimers', function(assert) {
+  assert.expect(1);
 
   let count = 0;
   let bb = new Backburner(['zomg']);
@@ -117,19 +103,20 @@ test('throttle with cancelTimers', function() {
     count++;
   }
 
-  equal(count, 0, 'calling cancelTimers while something is being throttled does not throw an error');
+  assert.equal(count, 0, 'calling cancelTimers while something is being throttled does not throw an error');
 });
 
-test('throttle leading edge', function() {
-  expect(10);
+QUnit.test('throttle leading edge', function(assert) {
+  assert.expect(10);
 
   let bb = new Backburner(['zerg']);
   let throttle;
   let throttle2;
   let wasCalled = false;
+  let done = assert.async();
 
   function throttler() {
-    ok(!wasCalled, 'throttler hasn\'t been called yet');
+    assert.ok(!wasCalled, 'throttler hasn\'t been called yet');
     wasCalled = true;
   }
 
@@ -137,116 +124,108 @@ test('throttle leading edge', function() {
   // it will be executed immediately, but throttled for the future hits
   throttle = bb.throttle(null, throttler, 40);
 
-  ok(wasCalled, 'function was executed immediately');
+  assert.ok(wasCalled, 'function was executed immediately');
 
   wasCalled = false;
   // let's schedule `throttler` to run again, it shouldn't be allowed to queue for another 40 msec
   throttle2 = bb.throttle(null, throttler, 40);
 
-  equal(throttle, throttle2, 'No new throttle was inserted, returns old throttle');
+  assert.equal(throttle, throttle2, 'No new throttle was inserted, returns old throttle');
 
-  stop();
   setTimeout(() => {
-    start();
-    ok(!wasCalled, 'attempt to call throttle again didn\'t happen');
+    assert.ok(!wasCalled, 'attempt to call throttle again didn\'t happen');
 
     throttle = bb.throttle(null, throttler, 40);
-    ok(wasCalled, 'newly inserted throttle after timeout functioned');
+    assert.ok(wasCalled, 'newly inserted throttle after timeout functioned');
 
-    ok(bb.cancel(throttle), 'wait time of throttle was cancelled');
+    assert.ok(bb.cancel(throttle), 'wait time of throttle was cancelled');
 
     wasCalled = false;
     throttle2 = bb.throttle(null, throttler, 40);
-    notEqual(throttle, throttle2, 'the throttle is different');
-    ok(wasCalled, 'throttle was inserted and run immediately after cancel');
+    assert.notEqual(throttle, throttle2, 'the throttle is different');
+    assert.ok(wasCalled, 'throttle was inserted and run immediately after cancel');
+    done();
   }, 60);
-
 });
 
-test('throttle returns timer information usable for cancelling', function() {
-  expect(3);
+QUnit.test('throttle returns timer information usable for cancelling', function(assert) {
+  assert.expect(3);
 
+  let done = assert.async();
   let bb = new Backburner(['batman']);
-  let timer;
   let wasCalled = false;
 
   function throttler() {
-    ok(false, 'this method shouldn\'t be called');
+    assert.ok(false, 'this method shouldn\'t be called');
     wasCalled = true;
   }
 
-  timer = bb.throttle(null, throttler, 1, false);
+  let timer = bb.throttle(null, throttler, 1, false);
 
-  ok(bb.cancel(timer), 'the timer is cancelled');
+  assert.ok(bb.cancel(timer), 'the timer is cancelled');
 
   // should return false second time around
-  ok(!bb.cancel(timer), 'the timer no longer exists in the list');
+  assert.ok(!bb.cancel(timer), 'the timer no longer exists in the list');
 
-  stop();
   setTimeout(() => {
-    start();
-    ok(!wasCalled, 'the timer wasn\'t called after waiting');
+    assert.ok(!wasCalled, 'the timer wasn\'t called after waiting');
+    done();
   }, 60);
-
 });
 
-test('throttler cancel after it\'s executed returns false', function() {
-  expect(3);
+QUnit.test('throttler cancel after it\'s executed returns false', function(assert) {
+  assert.expect(3);
 
   let bb = new Backburner(['darkknight']);
-  let timer;
+  let done = assert.async();
 
   let wasCalled = false;
 
   function throttler() {
-    ok(true, 'the throttled method was called');
+    assert.ok(true, 'the throttled method was called');
     wasCalled = true;
   }
 
-  timer = bb.throttle(null, throttler, 1);
+  let timer = bb.throttle(null, throttler, 1);
 
-  stop();
   setTimeout(() => {
-    start();
-    ok(!bb.cancel(timer), 'no timer existed to cancel');
-    ok(wasCalled, 'the timer was actually called');
+    assert.ok(!bb.cancel(timer), 'no timer existed to cancel');
+    assert.ok(wasCalled, 'the timer was actually called');
+    done();
   }, 10);
-
 });
 
-test('throttler returns the appropriate timer to cancel if the old item still exists', function() {
-  expect(5);
+QUnit.test('throttler returns the appropriate timer to cancel if the old item still exists', function(assert) {
+  assert.expect(5);
 
   let bb = new Backburner(['robin']);
-  let timer;
-  let timer2;
-
   let wasCalled = false;
+  let done = assert.async();
 
   function throttler() {
-    ok(true, 'the throttled method was called');
+    assert.ok(true, 'the throttled method was called');
     wasCalled = true;
   }
 
-  timer = bb.throttle(null, throttler, 1);
-  timer2 = bb.throttle(null, throttler, 1);
-  deepEqual(timer, timer2, 'the same timer was returned');
+  let timer = bb.throttle(null, throttler, 1);
+  let timer2 = bb.throttle(null, throttler, 1);
 
-  stop();
+  assert.deepEqual(timer, timer2, 'the same timer was returned');
+
   setTimeout(() => {
-    start();
     bb.throttle(null, throttler, 1);
-    ok(!bb.cancel(timer), 'the second timer isn\'t removed, despite appearing to be the same item');
-    ok(wasCalled, 'the timer was actually called');
+    assert.ok(!bb.cancel(timer), 'the second timer isn\'t removed, despite appearing to be the same item');
+    assert.ok(wasCalled, 'the timer was actually called');
+    done();
   }, 10);
 
 });
 
-test('onError', function() {
-  expect(1);
+QUnit.test('onError', function(assert) {
+  assert.expect(1);
 
   function onError(error) {
-    equal('test error', error.message);
+    assert.equal('test error', error.message);
   }
 
   let bb = new Backburner(['errors'], {

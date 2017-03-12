@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@types/qunit@1":
-  version "1.16.31"
-  resolved "https://registry.npmjs.org/@types/qunit/-/qunit-1.16.31.tgz#169ba79df56f25f40556c39c544e018bb6390792"
+"@types/qunit@^2.0.31":
+  version "2.0.31"
+  resolved "https://registry.npmjs.org/@types/qunit/-/qunit-2.0.31.tgz#a53e2cf635262c8bf46a71a137d8c7970dde9562"
 
 abbrev@1:
   version "1.1.0"
@@ -1278,7 +1278,7 @@ ember-cli-version-checker@^1.0.2, ember-cli-version-checker@^1.1.6, ember-cli-ve
   dependencies:
     semver "^5.3.0"
 
-ember-cli@2.12.0-beta.2:
+ember-cli@^2.12.0-beta.2:
   version "2.12.0-beta.2"
   resolved "https://registry.npmjs.org/ember-cli/-/ember-cli-2.12.0-beta.2.tgz#607bfe02eaddde67fbd54d4e01757dd8101f184e"
   dependencies:
@@ -3134,9 +3134,9 @@ quick-temp@^0.1.2, quick-temp@^0.1.3, quick-temp@^0.1.5:
     rimraf "^2.5.4"
     underscore.string "~3.3.4"
 
-qunitjs@^1.19.0:
-  version "1.23.1"
-  resolved "https://registry.npmjs.org/qunitjs/-/qunitjs-1.23.1.tgz#1971cf97ac9be01a64d2315508d2e48e6fd4e719"
+qunitjs@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.npmjs.org/qunitjs/-/qunitjs-2.2.0.tgz#507db368305b6f45839b079195bca251ba76d50a"
 
 randomatic@^1.1.3:
   version "1.1.6"
