@@ -5,10 +5,10 @@ QUnit.module('run');
 test('when passed a function', function() {
   expect(1);
 
-  var bb = new Backburner(['one']);
-  var functionWasCalled = false;
+  let bb = new Backburner(['one']);
+  let functionWasCalled = false;
 
-  bb.run(function() {
+  bb.run(() => {
     functionWasCalled = true;
   });
 
@@ -18,8 +18,8 @@ test('when passed a function', function() {
 test('when passed a target and method', function() {
   expect(2);
 
-  var bb = new Backburner(['one']);
-  var functionWasCalled = false;
+  let bb = new Backburner(['one']);
+  let functionWasCalled = false;
 
   bb.run({zomg: 'hi'}, function() {
     equal(this.zomg, 'hi', 'the target was properly set');
@@ -32,8 +32,8 @@ test('when passed a target and method', function() {
 test('when passed a target, method, and arguments', function() {
   expect(5);
 
-  var bb = new Backburner(['one']);
-  var functionWasCalled = false;
+  let bb = new Backburner(['one']);
+  let functionWasCalled = false;
 
   bb.run({zomg: 'hi'}, function(a, b, c) {
     equal(this.zomg, 'hi', 'the target was properly set');
@@ -49,20 +49,20 @@ test('when passed a target, method, and arguments', function() {
 test('nesting run loops preserves the stack', function() {
   expect(10);
 
-  var bb = new Backburner(['one']);
-  var outerBeforeFunctionWasCalled = false;
-  var middleBeforeFunctionWasCalled = false;
-  var innerFunctionWasCalled = false;
-  var middleAfterFunctionWasCalled = false;
-  var outerAfterFunctionWasCalled = false;
+  let bb = new Backburner(['one']);
+  let outerBeforeFunctionWasCalled = false;
+  let middleBeforeFunctionWasCalled = false;
+  let innerFunctionWasCalled = false;
+  let middleAfterFunctionWasCalled = false;
+  let outerAfterFunctionWasCalled = false;
 
   bb.run(function () {
-    bb.defer('one', function () {
+    bb.defer('one', () => {
       outerBeforeFunctionWasCalled = true;
     });
 
     bb.run(function () {
-      bb.defer('one', function () {
+      bb.defer('one', () => {
         middleBeforeFunctionWasCalled = true;
       });
 
@@ -100,8 +100,8 @@ test('nesting run loops preserves the stack', function() {
 test('runs can be nested', function() {
   expect(2);
 
-  var bb = new Backburner(['one']);
-  var step = 0;
+  let bb = new Backburner(['one']);
+  let step = 0;
 
   bb.run(function() {
     equal(step++, 0);
@@ -113,9 +113,9 @@ test('runs can be nested', function() {
 });
 
 test('run returns value', function() {
-  var bb = new Backburner(['one']);
+  let bb = new Backburner(['one']);
 
-  var value = bb.run(function() {
+  let value = bb.run(function() {
     return 'hi';
   });
 
@@ -129,7 +129,7 @@ test('onError', function() {
     equal('test error', error.message);
   }
 
-  var bb = new Backburner(['errors'], {
+  let bb = new Backburner(['errors'], {
     onError: onError
   });
 
@@ -141,7 +141,7 @@ test('onError', function() {
 test('onError set after start', function() {
   expect(2);
 
-  var bb = new Backburner(['errors']);
+  let bb = new Backburner(['errors']);
 
   bb.run(function() {
     ok(true);
@@ -159,9 +159,9 @@ test('onError set after start', function() {
 test('onError with target and action', function() {
   expect(2);
 
-  var target = {};
+  let target = {};
 
-  var bb = new Backburner(['errors'], {
+  let bb = new Backburner(['errors'], {
     onErrorTarget: target,
     onErrorMethod: 'onerror'
   });

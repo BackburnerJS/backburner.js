@@ -69,13 +69,13 @@ module.exports = function () {
       rollup: {
         entry: 'tests/index.js',
         external: ['backburner'],
+        plugins: [
+          buble()
+        ],
         targets: [{
           dest: 'tests/tests.js',
           format: 'amd',
-          moduleId: 'backburner-tests',
-          plugins: [
-            buble()
-          ]
+          moduleId: 'backburner-tests'
         }]
       }
     }),

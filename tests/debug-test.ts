@@ -3,7 +3,7 @@ import Backburner from 'backburner';
 QUnit.module('debug');
 
 test('DEBUG flag enables stack tagging', function() {
-  var bb = new Backburner(['one']);
+  let bb = new Backburner(['one']);
 
   bb.defer('one', function() {});
 
@@ -15,10 +15,10 @@ test('DEBUG flag enables stack tagging', function() {
 
   if (new Error().stack) { // workaround for CLI runner :(
     expect(4);
-    var stack = bb.currentInstance && bb.currentInstance.queues.one._queue[7].stack;
+    let stack = bb.currentInstance && bb.currentInstance.queues.one._queue[7].stack;
     ok(typeof stack === 'string', 'A stack is recorded');
 
-    var onError = function(error, errorRecordedForStack){
+    let onError = function(error, errorRecordedForStack){
       ok(errorRecordedForStack, 'errorRecordedForStack passed to error function');
       ok(errorRecordedForStack.stack, 'stack is recorded');
     };

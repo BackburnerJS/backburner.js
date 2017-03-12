@@ -3,9 +3,9 @@ import Backburner from 'backburner';
 QUnit.module('hasTimers');
 
 test('hasTimers', function () {
-  var bb = new Backburner(['ohai']);
-  var timer;
-  var target = {
+  let bb = new Backburner(['ohai']);
+  let timer;
+  let target = {
     fn: function () {}
   };
 

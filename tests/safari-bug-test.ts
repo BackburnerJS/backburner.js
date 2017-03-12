@@ -5,9 +5,9 @@ QUnit.module('safari bug');
 test('Prevent Safari double finally in run', function() {
   expect(1);
 
-  var bb = new Backburner(['one']);
-  var count = 0;
-  var realEnd = Backburner.prototype.end;
+  let bb = new Backburner(['one']);
+  let count = 0;
+  let realEnd = Backburner.prototype.end;
 
   Backburner.prototype.end = function() {
     count++;
@@ -17,7 +17,7 @@ test('Prevent Safari double finally in run', function() {
 
   try {
     bb.run(function() {
-      bb.defer('one', function() {
+      bb.defer('one', () => {
         // If we throw from here, it'll be a throw from
         // the `finally` in `.run()`, thus invoking Safari's
         // bizarre double-finally bug. Without the proper guards,
@@ -33,9 +33,9 @@ test('Prevent Safari double finally in run', function() {
 test('Prevent Safari double finally in end', function() {
   expect(1);
 
-  var count = 0;
-  var bb = new Backburner(['one'], {
-        onEnd: function() {
+  let count = 0;
+  let bb = new Backburner(['one'], {
+        onEnd() {
           count++;
           equal(count, 1, 'onEnd is called only once');
 
@@ -49,7 +49,7 @@ test('Prevent Safari double finally in end', function() {
       });
 
   try {
-    bb.run(function() {
+    bb.run(() => {
       // No-op
     });
   } catch (e) { }

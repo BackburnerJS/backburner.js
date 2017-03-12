@@ -9,10 +9,10 @@ function depth(bb) {
 test('outside of a run loop', function() {
   expect(4);
 
-  var bb = new Backburner(['one']);
+  let bb = new Backburner(['one']);
 
   equal(depth(bb), 0);
-  var result = bb.join(function() {
+  let result = bb.join(function() {
     equal(depth(bb), 1);
     return 'result';
   });
@@ -23,11 +23,11 @@ test('outside of a run loop', function() {
 test('inside of a run loop', function() {
   expect(4);
 
-  var bb = new Backburner(['one']);
+  let bb = new Backburner(['one']);
 
   equal(depth(bb), 0);
   bb.run(function() {
-    var result = bb.join(function() {
+    let result = bb.join(function() {
       equal(depth(bb), 1);
       return 'result';
     });
@@ -39,7 +39,7 @@ test('inside of a run loop', function() {
 test('nested join calls', function() {
   expect(7);
 
-  var bb = new Backburner(['one']);
+  let bb = new Backburner(['one']);
 
   equal(depth(bb), 0);
   bb.join(function() {
@@ -59,7 +59,7 @@ test('nested join calls', function() {
 test('nested run loops', function() {
   expect(7);
 
-  var bb = new Backburner(['one']);
+  let bb = new Backburner(['one']);
 
   equal(depth(bb), 0);
   bb.join(function() {
@@ -79,8 +79,8 @@ test('nested run loops', function() {
 test('queue execution order', function() {
   expect(1);
 
-  var bb = new Backburner(['one']);
-  var items: number[] = [];
+  let bb = new Backburner(['one']);
+  let items: number[] = [];
 
   bb.run(function() {
     items.push(0);

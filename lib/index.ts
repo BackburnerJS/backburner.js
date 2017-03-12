@@ -1,14 +1,14 @@
 import {
   each,
+  findDebouncee,
+  findItem,
+  findThrottler,
+  getOnError,
   isCoercableNumber,
   isFunction,
   isNumber,
   isString,
-  now,
-  getOnError,
-  findDebouncee,
-  findThrottler,
-  findItem
+  now
 } from './backburner/utils';
 
 import searchTimer from './backburner/binary-search';
@@ -93,9 +93,9 @@ export default class Backburner {
   }
 
   public begin(): DeferredActionQueues {
-    var options = this.options;
-    var onBegin = options && options.onBegin;
-    var previousInstance = this.currentInstance;
+    let options = this.options;
+    let onBegin = options && options.onBegin;
+    let previousInstance = this.currentInstance;
 
     if (previousInstance) {
       this.instanceStack.push(previousInstance);
@@ -116,7 +116,7 @@ export default class Backburner {
     let nextInstance: DeferredActionQueues | null | undefined = null;
 
     if (!currentInstance) {
-      throw new Error('end called without begin');
+      throw new Error(`end called without begin`);
     }
 
     // Prevent double-finally bug in Safari 6.0.2 and iOS 6
@@ -144,25 +144,25 @@ export default class Backburner {
 
   public on(eventName, callback) {
     if (typeof callback !== 'function') {
-      throw new TypeError('Callback must be a function');
+      throw new TypeError(`Callback must be a function`);
     }
-    var callbacks = this._eventCallbacks[eventName];
+    let callbacks = this._eventCallbacks[eventName];
     if (callbacks) {
       callbacks.push(callback);
     } else {
-      throw new TypeError('Cannot on() event "' + eventName + '" because it does not exist');
+      throw new TypeError(`Cannot on() event ${eventName} because it does not exist`);
     }
   }
 
   public off(eventName, callback) {
     if (eventName) {
-      var callbacks = this._eventCallbacks[eventName];
-      var callbackFound = false;
+      let callbacks = this._eventCallbacks[eventName];
+      let callbackFound = false;
       if (!callbacks) {
         return;
       }
       if (callback) {
-        for (var i = 0; i < callbacks.length; i++) {
+        for (let i = 0; i < callbacks.length; i++) {
           if (callbacks[i] === callback) {
             callbackFound = true;
             callbacks.splice(i, 1);
@@ -171,19 +171,19 @@ export default class Backburner {
         }
       }
       if (!callbackFound) {
-        throw new TypeError('Cannot off() callback that does not exist');
+        throw new TypeError(`Cannot off() callback that does not exist`);
       }
     } else {
-      throw new TypeError('Cannot off() event "' + eventName + '" because it does not exist');
+      throw new TypeError(`Cannot off() event ${eventName} because it does not exist`);
     }
   }
 
   public run(method: Function);
   public run(target: Function | any | null, method?: Function | string, ...args);
   public run(target: any | null | undefined, method?: any, ...args: any[]) {
-    var length = arguments.length;
-    var _method: Function | string;
-    var _target: any | null | undefined;
+    let length = arguments.length;
+    let _method: Function | string;
+    let _target: any | null | undefined;
 
     if (length === 1) {
       _method = target;
@@ -197,12 +197,12 @@ export default class Backburner {
       _method = <Function> _target[_method];
     }
 
-    var onError = getOnError(this.options);
+    let onError = getOnError(this.options);
 
     this.begin();
 
     // guard against Safari 6's double-finally bug
-    var didFinally = false;
+    let didFinally = false;
 
     if (onError) {
       try {
@@ -247,9 +247,9 @@ export default class Backburner {
       return this.run.apply(this, arguments);
     }
 
-    var length = arguments.length;
-    var method;
-    var target;
+    let length = arguments.length;
+    let method;
+    let target;
 
     if (length === 1) {
       method = arguments[0];
@@ -268,8 +268,8 @@ export default class Backburner {
     } else if (length === 2) {
       return method.call(target);
     } else {
-      var args = new Array(length - 2);
-      for (var i = 0, l = length - 2; i < l; i++) {
+      let args = new Array(length - 2);
+      for (let i = 0, l = length - 2; i < l; i++) {
         args[i] = arguments[i + 2];
       }
       return method.apply(target, args);
@@ -288,10 +288,10 @@ export default class Backburner {
   */
   public defer(queueName: string, ...args);
   public defer(queueName /* , target, method, args */) {
-    var length = arguments.length;
-    var method;
-    var target;
-    var args;
+    let length = arguments.length;
+    let method;
+    let target;
+    let args;
 
     if (length === 2) {
       method = arguments[1];
@@ -305,11 +305,11 @@ export default class Backburner {
       method = target[method];
     }
 
-    var stack = this.DEBUG ? new Error() : undefined;
+    let stack = this.DEBUG ? new Error() : undefined;
 
     if (length > 3) {
       args = new Array(length - 3);
-      for (var i = 3; i < length; i++) {
+      for (let i = 3; i < length; i++) {
         args[i - 3] = arguments[i];
       }
     } else {
@@ -320,10 +320,10 @@ export default class Backburner {
 
   public deferOnce(queueName: string, ...args);
   public deferOnce(queueName: string /* , target, method, args */) {
-    var length = arguments.length;
-    var method;
-    var target;
-    var args;
+    let length = arguments.length;
+    let method;
+    let target;
+    let args;
 
     if (length === 2) {
       method = arguments[1];
@@ -337,11 +337,11 @@ export default class Backburner {
       method = target[method];
     }
 
-    var stack = this.DEBUG ? new Error() : undefined;
+    let stack = this.DEBUG ? new Error() : undefined;
 
     if (length > 3) {
       args = new Array(length - 3);
-      for (var i = 3; i < length; i++) {
+      for (let i = 3; i < length; i++) {
         args[i - 3] = arguments[i];
       }
     } else {
@@ -354,20 +354,20 @@ export default class Backburner {
 
   public setTimeout(...args);
   public setTimeout() {
-    var l = arguments.length;
-    var args = new Array(l);
+    let l = arguments.length;
+    let args = new Array(l);
 
-    for (var x = 0; x < l; x++) {
+    for (let x = 0; x < l; x++) {
       args[x] = arguments[x];
     }
 
-    var length = args.length;
-    var method;
-    var wait;
-    var target;
-    var methodOrTarget;
-    var methodOrWait;
-    var methodOrArgs;
+    let length = args.length;
+    let method;
+    let wait;
+    let target;
+    let methodOrTarget;
+    let methodOrWait;
+    let methodOrArgs;
 
     if (length === 0) {
       return;
@@ -390,7 +390,7 @@ export default class Backburner {
         wait =  0;
       }
     } else {
-      var last = args[args.length - 1];
+      let last = args[args.length - 1];
 
       if (isCoercableNumber(last)) {
         wait = args.pop();
@@ -411,13 +411,13 @@ export default class Backburner {
       }
     }
 
-    var executeAt = now() + parseInt(wait !== wait ? 0 : wait, 10);
+    let executeAt = now() + parseInt(wait !== wait ? 0 : wait, 10);
 
     if (isString(method)) {
       method = target[method];
     }
 
-    var onError = getOnError(this.options);
+    let onError = getOnError(this.options);
 
     function fn() {
       if (onError) {
@@ -436,16 +436,16 @@ export default class Backburner {
 
   public throttle(...args);
   public throttle(target, method /* , args, wait, [immediate] */) {
-    var backburner = this;
-    var args = new Array(arguments.length);
-    for (var i = 0; i < arguments.length; i++) {
+    let backburner = this;
+    let args = new Array(arguments.length);
+    for (let i = 0; i < arguments.length; i++) {
       args[i] = arguments[i];
     }
-    var immediate = args.pop();
-    var wait;
-    var throttler;
-    var index;
-    var timer;
+    let immediate = args.pop();
+    let wait;
+    let throttler;
+    let index;
+    let timer;
 
     if (isNumber(immediate) || isString(immediate)) {
       wait = immediate;
@@ -482,17 +482,17 @@ export default class Backburner {
 
   public debounce(...args);
   public debounce(target, method /* , args, wait, [immediate] */) {
-    var backburner = this;
-    var args = new Array(arguments.length);
-    for (var i = 0; i < arguments.length; i++) {
+    let backburner = this;
+    let args = new Array(arguments.length);
+    for (let i = 0; i < arguments.length; i++) {
       args[i] = arguments[i];
     }
 
-    var immediate = args.pop();
-    var wait;
-    var index;
-    var debouncee;
-    var timer;
+    let immediate = args.pop();
+    let wait;
+    let index;
+    let debouncee;
+    let timer;
 
     if (isNumber(immediate) || isString(immediate)) {
       wait = immediate;
@@ -557,12 +557,12 @@ export default class Backburner {
   }
 
   public cancel(timer?) {
-    var timerType = typeof timer;
+    let timerType = typeof timer;
 
     if (timer && timerType === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
       return timer.queue.cancel(timer);
     } else if (timerType === 'function') { // we're cancelling a setTimeout
-      for (var i = 0, l = this._timers.length; i < l; i += 2) {
+      for (let i = 0, l = this._timers.length; i < l; i += 2) {
         if (this._timers[i + 1] === timer) {
           this._timers.splice(i, 2); // remove the two elements
           if (i === 0) {
@@ -587,7 +587,7 @@ export default class Backburner {
     }
 
     // find position to insert
-    var i = searchTimer(executeAt, this._timers);
+    let i = searchTimer(executeAt, this._timers);
 
     this._timers.splice(i, 0, executeAt, fn);
 
@@ -600,8 +600,8 @@ export default class Backburner {
   }
 
   private _cancelItem(findMethod, array, timer) {
-    var item;
-    var index;
+    let item;
+    let index;
 
     if (timer.length < 3) { return false; }
 
@@ -634,9 +634,9 @@ export default class Backburner {
    @param {any} arg2
    */
   private _trigger(eventName, arg1, arg2) {
-    var callbacks = this._eventCallbacks[eventName];
+    let callbacks = this._eventCallbacks[eventName];
     if (callbacks) {
-      for (var i = 0; i < callbacks.length; i++) {
+      for (let i = 0; i < callbacks.length; i++) {
         callbacks[i](arg1, arg2);
       }
     }
@@ -648,13 +648,13 @@ export default class Backburner {
   }
 
   private _scheduleExpiredTimers() {
-    var n = now();
-    var timers = this._timers;
-    var i = 0;
-    var l = timers.length;
+    let n = now();
+    let timers = this._timers;
+    let i = 0;
+    let l = timers.length;
     for (; i < l; i += 2) {
-      var executeAt = timers[i];
-      var fn = timers[i + 1];
+      let executeAt = timers[i];
+      let fn = timers[i + 1];
       if (executeAt <= n) {
         this.defer(this.options.defaultQueue, null, fn);
       } else {
@@ -682,9 +682,9 @@ export default class Backburner {
     if (!this._timers.length) {
       return;
     }
-    var minExpiresAt = this._timers[0];
-    var n = now();
-    var wait = Math.max(0, minExpiresAt - n);
+    let minExpiresAt = this._timers[0];
+    let n = now();
+    let wait = Math.max(0, minExpiresAt - n);
     this._timerTimeoutId = this._platform.setTimeout(this._boundRunExpiredTimers, wait);
   }
 

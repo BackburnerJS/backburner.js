@@ -20,7 +20,7 @@ export default class Queue {
   }
 
   public push(target, method, args, stack) {
-    var queue = this._queue;
+    let queue = this._queue;
     queue.push(target, method, args, stack);
 
     return {
@@ -31,10 +31,10 @@ export default class Queue {
   }
 
   public pushUnique(target, method, args, stack) {
-    var KEY = this.globalOptions.GUID_KEY;
+    let KEY = this.globalOptions.GUID_KEY;
 
     if (target && KEY) {
-      var guid = target[KEY];
+      let guid = target[KEY];
       if (guid) {
         return this.pushUniqueWithGuid(guid, target, method, args, stack);
       }
@@ -50,34 +50,34 @@ export default class Queue {
   }
 
   public flush(sync?) {
-    var queue = this._queue;
-    var length = queue.length;
+    let queue = this._queue;
+    let length = queue.length;
 
     if (length === 0) {
       return;
     }
 
-    var globalOptions = this.globalOptions;
-    var options = this.options;
-    var before = options && options.before;
-    var after = options && options.after;
-    var onError = globalOptions.onError || (globalOptions.onErrorTarget &&
+    let globalOptions = this.globalOptions;
+    let options = this.options;
+    let before = options && options.before;
+    let after = options && options.after;
+    let onError = globalOptions.onError || (globalOptions.onErrorTarget &&
                                             globalOptions.onErrorTarget[globalOptions.onErrorMethod]);
-    var target;
-    var method;
-    var args;
-    var errorRecordedForStack;
-    var invoke = onError ? this.invokeWithOnError : this.invoke;
+    let target;
+    let method;
+    let args;
+    let errorRecordedForStack;
+    let invoke = onError ? this.invokeWithOnError : this.invoke;
 
     this.targetQueues = Object.create(null);
-    var queueItems = this._queueBeingFlushed = this._queue.slice();
+    let queueItems = this._queueBeingFlushed = this._queue.slice();
     this._queue = [];
 
     if (before) {
       before();
     }
 
-    for (var i = 0; i < length; i += 4) {
+    for (let i = 0; i < length; i += 4) {
       target                = queueItems[i];
       method                = queueItems[i + 1];
       args                  = queueItems[i + 2];
@@ -122,17 +122,17 @@ export default class Queue {
   }
 
   public cancel(actionToCancel) {
-    var queue = this._queue;
-    var currentTarget;
-    var currentMethod;
-    var i;
-    var l;
-    var target = actionToCancel.target;
-    var method = actionToCancel.method;
-    var GUID_KEY = this.globalOptions.GUID_KEY;
+    let queue = this._queue;
+    let currentTarget;
+    let currentMethod;
+    let i;
+    let l;
+    let target = actionToCancel.target;
+    let method = actionToCancel.method;
+    let GUID_KEY = this.globalOptions.GUID_KEY;
 
     if (GUID_KEY && this.targetQueues && target) {
-      var targetQueue = this.targetQueues[target[GUID_KEY]];
+      let targetQueue = this.targetQueues[target[GUID_KEY]];
 
       if (targetQueue) {
         for (i = 0, l = targetQueue.length; i < l; i++) {
@@ -177,11 +177,11 @@ export default class Queue {
   }
 
   private pushUniqueWithoutGuid(target, method, args, stack) {
-    var queue = this._queue;
+    let queue = this._queue;
 
-    for (var i = 0, l = queue.length; i < l; i += 4) {
-      var currentTarget = queue[i];
-      var currentMethod = queue[i + 1];
+    for (let i = 0, l = queue.length; i < l; i += 4) {
+      let currentTarget = queue[i];
+      let currentMethod = queue[i + 1];
 
       if (currentTarget === target && currentMethod === method) {
         queue[i + 2] = args;  // replace args
@@ -194,11 +194,11 @@ export default class Queue {
   }
 
   private targetQueue(targetQueue, target, method, args, stack) {
-    var queue = this._queue;
+    let queue = this._queue;
 
-    for (var i = 0, l = targetQueue.length; i < l; i += 2) {
-      var currentMethod = targetQueue[i];
-      var currentIndex  = targetQueue[i + 1];
+    for (let i = 0, l = targetQueue.length; i < l; i += 2) {
+      let currentMethod = targetQueue[i];
+      let currentIndex  = targetQueue[i + 1];
 
       if (currentMethod === method) {
         queue[currentIndex + 2] = args;  // replace args
@@ -214,7 +214,7 @@ export default class Queue {
   }
 
   private pushUniqueWithGuid(guid, target, method, args, stack) {
-    var hasLocalQueue = this.targetQueues[guid];
+    let hasLocalQueue = this.targetQueues[guid];
 
     if (hasLocalQueue) {
       this.targetQueue(hasLocalQueue, target, method, args, stack);
