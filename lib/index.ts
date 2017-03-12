@@ -96,16 +96,23 @@ export default class Backburner {
     let options = this.options;
     let onBegin = options && options.onBegin;
     let previousInstance = this.currentInstance;
+    let current;
 
-    if (previousInstance) {
-      this.instanceStack.push(previousInstance);
+    if (this._autorun) {
+      current = previousInstance;
+      this._cancelAutorun();
+    } else {
+      if (previousInstance) {
+        this.instanceStack.push(previousInstance);
+      }
+      current = this.currentInstance = new DeferredActionQueues(this.queueNames, options);
+      this._trigger('begin', current, previousInstance);
     }
 
-    const current = this.currentInstance = new DeferredActionQueues(this.queueNames, options);
-    this._trigger('begin', current, previousInstance);
     if (onBegin) {
       onBegin(current, previousInstance);
     }
+
     return current;
   }
 
@@ -537,6 +544,10 @@ export default class Backburner {
     this._clearTimerTimeout();
     this._timers = [];
 
+    this._cancelAutorun();
+  }
+
+  private _cancelAutorun() {
     if (this._autorun) {
       this._platform.clearTimeout(this._autorun);
       this._autorun = null;
