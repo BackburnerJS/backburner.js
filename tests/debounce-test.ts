@@ -5,10 +5,10 @@ QUnit.module('debounce');
 test('debounce', function() {
   expect(14);
 
-  var bb = new Backburner(['zomg']);
-  var step = 0;
+  let bb = new Backburner(['zomg']);
+  let step = 0;
 
-  var wasCalled = false;
+  let wasCalled = false;
   function debouncee() {
     ok(!wasCalled);
     wasCalled = true;
@@ -84,10 +84,10 @@ test('debounce', function() {
 test('debounce - immediate', function() {
   expect(16);
 
-  var bb = new Backburner(['zomg']);
-  var step = 0;
+  let bb = new Backburner(['zomg']);
+  let step = 0;
 
-  var wasCalled = false;
+  let wasCalled = false;
   function debouncee() {
     ok(!wasCalled);
     wasCalled = true;
@@ -167,10 +167,10 @@ test('debounce - immediate', function() {
 
 test('debounce accept time interval like string numbers', function() {
 
-  var bb = new Backburner(['zomg']);
-  var step = 0;
+  let bb = new Backburner(['zomg']);
+  let step = 0;
 
-  var wasCalled = false;
+  let wasCalled = false;
   function debouncee() {
     ok(!wasCalled);
     wasCalled = true;
@@ -199,9 +199,9 @@ test('debounce accept time interval like string numbers', function() {
 test('debounce returns timer information usable for cancelling', function() {
   expect(3);
 
-  var bb = new Backburner(['batman']);
-  var timer;
-  var wasCalled = false;
+  let bb = new Backburner(['batman']);
+  let timer;
+  let wasCalled = false;
 
   function debouncee() {
     ok(false, 'this method shouldn\'t be called');
@@ -226,9 +226,9 @@ test('debounce returns timer information usable for cancelling', function() {
 test('debounce cancelled after it\'s executed returns false', function() {
   expect(3);
 
-  var bb = new Backburner(['darkknight']);
-  var timer;
-  var wasCalled = false;
+  let bb = new Backburner(['darkknight']);
+  let timer;
+  let wasCalled = false;
 
   function debouncee() {
     ok(true, 'the debounced method was called');
@@ -249,10 +249,10 @@ test('debounce cancelled after it\'s executed returns false', function() {
 test('debounce cancelled doesn\'t cancel older items', function() {
   expect(4);
 
-  var bb = new Backburner(['robin']);
-  var timer;
+  let bb = new Backburner(['robin']);
+  let timer;
 
-  var wasCalled = false;
+  let wasCalled = false;
 
   function debouncee() {
     ok(true, 'the debounced method was called');
@@ -274,10 +274,10 @@ test('debounce cancelled doesn\'t cancel older items', function() {
 test('debounce that is immediate, and cancelled and called again happens immediately', function() {
   expect(3);
 
-  var bb = new Backburner(['robin']);
-  var timer;
+  let bb = new Backburner(['robin']);
+  let timer;
 
-  var calledCount = 0;
+  let calledCount = 0;
 
   function debouncee() {
     calledCount++;
@@ -309,7 +309,7 @@ test('onError', function() {
     start();
   }
 
-  var bb = new Backburner(['errors'], {
+  let bb = new Backburner(['errors'], {
     onError: onError
   });
 

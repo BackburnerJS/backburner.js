@@ -5,10 +5,10 @@ QUnit.module('throttle');
 test('throttle', function() {
   expect(18);
 
-  var bb = new Backburner(['zomg']);
-  var step = 0;
+  let bb = new Backburner(['zomg']);
+  let step = 0;
 
-  var wasCalled = false;
+  let wasCalled = false;
   function throttler() {
     ok(!wasCalled);
     wasCalled = true;
@@ -21,7 +21,7 @@ test('throttle', function() {
 
   // let's schedule `throttler` to run in 10ms
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 1);
     ok(!wasCalled);
@@ -30,7 +30,7 @@ test('throttle', function() {
 
   // let's schedule `throttler` to run again in 20ms
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 2);
     ok(!wasCalled);
@@ -39,7 +39,7 @@ test('throttle', function() {
 
   // let's schedule `throttler` to run yet again in 30ms
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 3);
     ok(!wasCalled);
@@ -51,7 +51,7 @@ test('throttle', function() {
   // now, let's schedule an assertion to occur at 50ms,
   // 10ms after `throttler` has been called
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     equal(step++, 4);
     ok(wasCalled);
@@ -62,7 +62,7 @@ test('throttle', function() {
   // again with the same target/method after it has executed
   // at the 60ms mark, let's schedule another call to `throttle`
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     wasCalled = false; // reset the flag
 
     // assert call order
@@ -74,7 +74,7 @@ test('throttle', function() {
 
     // assert that it is called in the future and not blackholed
     stop();
-    setTimeout(function() {
+    setTimeout(() => {
       start();
       equal(step++, 6);
       ok(wasCalled, 'Another throttle call with the same function can be executed later');
@@ -82,7 +82,7 @@ test('throttle', function() {
   }, 60);
 
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     wasCalled = false; // reset the flag
 
     // assert call order
@@ -94,7 +94,7 @@ test('throttle', function() {
 
     // assert that it is called in the future and not blackholed
     stop();
-    setTimeout(function() {
+    setTimeout(() => {
       start();
       equal(step++, 8);
       ok(wasCalled, 'Throttle accept a string number like time interval');
@@ -105,11 +105,11 @@ test('throttle', function() {
 test('throttle with cancelTimers', function() {
   expect(1);
 
-  var count = 0;
-  var bb = new Backburner(['zomg']);
+  let count = 0;
+  let bb = new Backburner(['zomg']);
 
   // Throttle a no-op 10ms
-  bb.throttle(null, function(){ /* no-op */ }, 10, false);
+  bb.throttle(null, () => { /* no-op */ }, 10, false);
 
   try {
     bb.cancelTimers();
@@ -123,10 +123,10 @@ test('throttle with cancelTimers', function() {
 test('throttle leading edge', function() {
   expect(10);
 
-  var bb = new Backburner(['zerg']);
-  var throttle;
-  var throttle2;
-  var wasCalled = false;
+  let bb = new Backburner(['zerg']);
+  let throttle;
+  let throttle2;
+  let wasCalled = false;
 
   function throttler() {
     ok(!wasCalled, 'throttler hasn\'t been called yet');
@@ -146,7 +146,7 @@ test('throttle leading edge', function() {
   equal(throttle, throttle2, 'No new throttle was inserted, returns old throttle');
 
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     ok(!wasCalled, 'attempt to call throttle again didn\'t happen');
 
@@ -166,9 +166,9 @@ test('throttle leading edge', function() {
 test('throttle returns timer information usable for cancelling', function() {
   expect(3);
 
-  var bb = new Backburner(['batman']);
-  var timer;
-  var wasCalled = false;
+  let bb = new Backburner(['batman']);
+  let timer;
+  let wasCalled = false;
 
   function throttler() {
     ok(false, 'this method shouldn\'t be called');
@@ -183,7 +183,7 @@ test('throttle returns timer information usable for cancelling', function() {
   ok(!bb.cancel(timer), 'the timer no longer exists in the list');
 
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     ok(!wasCalled, 'the timer wasn\'t called after waiting');
   }, 60);
@@ -193,10 +193,10 @@ test('throttle returns timer information usable for cancelling', function() {
 test('throttler cancel after it\'s executed returns false', function() {
   expect(3);
 
-  var bb = new Backburner(['darkknight']);
-  var timer;
+  let bb = new Backburner(['darkknight']);
+  let timer;
 
-  var wasCalled = false;
+  let wasCalled = false;
 
   function throttler() {
     ok(true, 'the throttled method was called');
@@ -206,7 +206,7 @@ test('throttler cancel after it\'s executed returns false', function() {
   timer = bb.throttle(null, throttler, 1);
 
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     ok(!bb.cancel(timer), 'no timer existed to cancel');
     ok(wasCalled, 'the timer was actually called');
@@ -217,11 +217,11 @@ test('throttler cancel after it\'s executed returns false', function() {
 test('throttler returns the appropriate timer to cancel if the old item still exists', function() {
   expect(5);
 
-  var bb = new Backburner(['robin']);
-  var timer;
-  var timer2;
+  let bb = new Backburner(['robin']);
+  let timer;
+  let timer2;
 
-  var wasCalled = false;
+  let wasCalled = false;
 
   function throttler() {
     ok(true, 'the throttled method was called');
@@ -233,7 +233,7 @@ test('throttler returns the appropriate timer to cancel if the old item still ex
   deepEqual(timer, timer2, 'the same timer was returned');
 
   stop();
-  setTimeout(function() {
+  setTimeout(() => {
     start();
     bb.throttle(null, throttler, 1);
     ok(!bb.cancel(timer), 'the second timer isn\'t removed, despite appearing to be the same item');
@@ -249,11 +249,11 @@ test('onError', function() {
     equal('test error', error.message);
   }
 
-  var bb = new Backburner(['errors'], {
+  let bb = new Backburner(['errors'], {
     onError: onError
   });
 
-  bb.throttle(null, function() {
+  bb.throttle(null, () => {
     throw new Error('test error');
   }, 20);
 });

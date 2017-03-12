@@ -15,7 +15,7 @@ export default class DeferredActionQueues {
   private options: any;
 
   constructor(queueNames: string[], options: any) {
-    var queues = this.queues = {};
+    let queues = this.queues = {};
     this.queueNames = queueNames = queueNames || [];
 
     this.options = options;
@@ -26,8 +26,8 @@ export default class DeferredActionQueues {
   }
 
   public schedule(name, target, method, args, onceFlag, stack) {
-    var queues = this.queues;
-    var queue = queues[name];
+    let queues = this.queues;
+    let queue = queues[name];
 
     if (!queue) {
       noSuchQueue(name);
@@ -45,10 +45,10 @@ export default class DeferredActionQueues {
   }
 
   public flush() {
-    var queue;
-    var queueName;
-    var queueNameIndex = 0;
-    var numberOfQueues = this.queueNames.length;
+    let queue;
+    let queueName;
+    let queueNameIndex = 0;
+    let numberOfQueues = this.queueNames.length;
 
     while (queueNameIndex < numberOfQueues) {
       queueName = this.queueNames[queueNameIndex];

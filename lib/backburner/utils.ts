@@ -1,9 +1,9 @@
-var NUMBER = /\d+/;
+const NUMBER = /\d+/;
 
-export var now = Date.now;
+export const now = Date.now;
 
 export function each<T>(collection: T[], callback: (v: T) => void) {
-  for (var i = 0; i < collection.length; i++) {
+  for (let i = 0; i < collection.length; i++) {
     callback(collection[i]);
   }
 }
@@ -25,11 +25,11 @@ export function isCoercableNumber(suspect) {
 }
 
 export function noSuchQueue(name) {
-  throw new Error('You attempted to schedule an action in a queue (' + name + ') that doesn\'t exist');
+  throw new Error(`You attempted to schedule an action in a queue (${name}) that doesn\'t exist`);
 }
 
 export function noSuchMethod(name) {
-  throw new Error('You attempted to schedule an action in a queue (' + name + ') for a method that doesn\'t exist');
+  throw new Error(`You attempted to schedule an action in a queue (${name}) for a method that doesn\'t exist`);
 }
 
 export function getOnError(options) {
@@ -45,10 +45,10 @@ export function findThrottler(target, method, throttlers) {
 }
 
 export function findItem(target, method, collection) {
-  var item;
-  var index = -1;
+  let item;
+  let index = -1;
 
-  for (var i = 0, l = collection.length; i < l; i++) {
+  for (let i = 0, l = collection.length; i < l; i++) {
     item = collection[i];
     if (item[0] === target && item[1] === method) {
       index = i;

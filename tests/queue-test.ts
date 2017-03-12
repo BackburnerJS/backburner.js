@@ -5,8 +5,8 @@ QUnit.module('Queue');
 test('actions scheduled on previous queue, start over from beginning', function() {
   expect(5);
 
-  var bb = new Backburner(['one', 'two']);
-  var step = 0;
+  let bb = new Backburner(['one', 'two']);
+  let step = 0;
 
   bb.run(function() {
     equal(step++, 0, '0');
@@ -30,8 +30,8 @@ test('actions scheduled on previous queue, start over from beginning', function(
 test('Queue#flush should be recursive if new items are added', function() {
   expect(2);
 
-  var bb = new Backburner(['one']);
-  var count = 0;
+  let bb = new Backburner(['one']);
+  let count = 0;
 
   bb.run(function() {
     function increment() {
@@ -48,7 +48,7 @@ test('Queue#flush should be recursive if new items are added', function() {
     increment();
     equal(count, 1, 'should not have run yet');
 
-    var currentInstance = bb.currentInstance;
+    let currentInstance = bb.currentInstance;
     if (currentInstance) {
       currentInstance.queues.one.flush();
     }
@@ -58,12 +58,12 @@ test('Queue#flush should be recursive if new items are added', function() {
 });
 
 test('Default queue is automatically set to first queue if none is provided', function() {
-  var bb = new Backburner(['one', 'two']);
+  let bb = new Backburner(['one', 'two']);
   equal(bb.options.defaultQueue, 'one');
 });
 
 test('Default queue can be manually configured', function() {
-  var bb = new Backburner(['one', 'two'], {
+  let bb = new Backburner(['one', 'two'], {
     defaultQueue: 'two'
   });
 
@@ -73,14 +73,14 @@ test('Default queue can be manually configured', function() {
 test('onBegin and onEnd are called and passed the correct parameters', function() {
   expect(2);
 
-  var befores: Array<any | null | undefined> = [];
-  var afters: Array<any | null | undefined> = [];
-  var expectedBefores: Array<any | null | undefined> = [];
-  var expectedAfters: Array<any | null | undefined> = [];
-  var outer: any;
-  var inner: any;
+  let befores: Array<any | null | undefined> = [];
+  let afters: Array<any | null | undefined> = [];
+  let expectedBefores: Array<any | null | undefined> = [];
+  let expectedAfters: Array<any | null | undefined> = [];
+  let outer: any;
+  let inner: any;
 
-  var bb = new Backburner(['one'], {
+  let bb = new Backburner(['one'], {
     onBegin: function(current, previous) {
       befores.push(current);
       befores.push(previous);

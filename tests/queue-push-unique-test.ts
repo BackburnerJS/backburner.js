@@ -1,21 +1,21 @@
 import Backburner from 'backburner';
 
-var Queue = (<any> Backburner).Queue;
+let Queue = (<any> Backburner).Queue;
 
 QUnit.module('Queue.prototpye.pushUnique');
-var slice = [].slice;
+let slice = [].slice;
 
 test('pushUnique: 2 different targets', function() {
-  var queue = new Queue('foo');
-  var target1fooWasCalled: string[][] = [];
-  var target2fooWasCalled: string[][] = [];
-  var target1 = {
+  let queue = new Queue('foo');
+  let target1fooWasCalled: string[][] = [];
+  let target2fooWasCalled: string[][] = [];
+  let target1 = {
     foo: function() {
       target1fooWasCalled.push(slice.call(arguments));
     }
   };
 
-  var target2 = {
+  let target2 = {
     foo: function() {
       target2fooWasCalled.push(slice.call(arguments));
     }
@@ -36,10 +36,10 @@ test('pushUnique: 2 different targets', function() {
 });
 
 test('pushUnique: 1 target, 2 different methods', function() {
-  var queue = new Queue('foo');
-  var target1fooWasCalled: string[][] = [];
-  var target1barWasCalled: string[][] = [];
-  var target1 = {
+  let queue = new Queue('foo');
+  let target1fooWasCalled: string[][] = [];
+  let target1barWasCalled: string[][] = [];
+  let target1 = {
     foo: function() {
       target1fooWasCalled.push(slice.call(arguments));
     },
@@ -63,9 +63,9 @@ test('pushUnique: 1 target, 2 different methods', function() {
 });
 
 test('pushUnique: 1 target, 1 different methods called twice', function() {
-  var queue = new Queue('foo');
-  var target1fooWasCalled: string[][] = [];
-  var target1 = {
+  let queue = new Queue('foo');
+  let target1fooWasCalled: string[][] = [];
+  let target1 = {
     foo: function() {
       target1fooWasCalled.push(slice.call(arguments));
     }
@@ -83,17 +83,17 @@ test('pushUnique: 1 target, 1 different methods called twice', function() {
 });
 
 test('pushUnique: 2 different targets (GUID_KEY)', function() {
-  var queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
-  var target1fooWasCalled: string[][] = [];
-  var target2fooWasCalled: string[][] = [];
-  var target1 = {
+  let queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
+  let target1fooWasCalled: string[][] = [];
+  let target2fooWasCalled: string[][] = [];
+  let target1 = {
     GUID_KEY: 'target1',
     foo: function() {
       target1fooWasCalled.push(slice.call(arguments));
     }
   };
 
-  var target2 = {
+  let target2 = {
     GUID_KEY: 'target2',
     foo: function() {
       target2fooWasCalled.push(slice.call(arguments));
@@ -115,10 +115,10 @@ test('pushUnique: 2 different targets (GUID_KEY)', function() {
 });
 
 test('pushUnique: 1 target, 2 different methods (GUID_KEY)', function() {
-  var queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
-  var target1fooWasCalled: string[][] = [];
-  var target1barWasCalled: string[][] = [];
-  var target1 = {
+  let queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
+  let target1fooWasCalled: string[][] = [];
+  let target1barWasCalled: string[][] = [];
+  let target1 = {
     GUID_KEY: 'target1',
     foo: function() {
       target1fooWasCalled.push(slice.call(arguments));
@@ -143,9 +143,9 @@ test('pushUnique: 1 target, 2 different methods (GUID_KEY)', function() {
 });
 
 test('pushUnique: 1 target, 1 diffe`rent methods called twice (GUID_KEY)', function() {
-  var queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
-  var target1fooWasCalled: string[][] = [];
-  var target1 = {
+  let queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
+  let target1fooWasCalled: string[][] = [];
+  let target1 = {
     GUID_KEY: 'target1',
     foo: function() {
       target1fooWasCalled.push(slice.call(arguments));
@@ -164,9 +164,9 @@ test('pushUnique: 1 target, 1 diffe`rent methods called twice (GUID_KEY)', funct
 });
 
 test('pushUnique: 1 target, 2 different methods, second one called twice (GUID_KEY)', function() {
-  var queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
-  var target1barWasCalled: string[][] = [];
-  var target1 = {
+  let queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
+  let target1barWasCalled: string[][] = [];
+  let target1 = {
     GUID_KEY: 'target1',
     foo: function() {
     },

@@ -5,13 +5,13 @@ QUnit.module('configurable platform.setTimeout');
 test('We can configure a custom platform', function() {
   expect(1);
 
-  var fakePlatform = {
+  let fakePlatform = {
     setTimeout: function() {},
     clearTimeout: function() {},
     isFakePlatform: true
   };
 
-  var bb = new Backburner(['one'], {
+  let bb = new Backburner(['one'], {
     _platform: fakePlatform
   });
 
@@ -21,8 +21,8 @@ test('We can configure a custom platform', function() {
 test('We can use a custom setTimeout', function() {
   expect(2);
 
-  var customTimeoutWasUsed = false;
-  var bb = new Backburner(['one'], {
+  let customTimeoutWasUsed = false;
+  let bb = new Backburner(['one'], {
     _platform: {
       setTimeout: function customSetTimeout(method, wait) {
         customTimeoutWasUsed = true;
@@ -46,9 +46,9 @@ test('We can use a custom setTimeout', function() {
 test('We can use a custom clearTimeout', function() {
   expect(2);
 
-  var functionWasCalled = false;
-  var customClearTimeoutWasUsed = false;
-  var bb = new Backburner(['one'], {
+  let functionWasCalled = false;
+  let customClearTimeoutWasUsed = false;
+  let bb = new Backburner(['one'], {
     _platform: {
       setTimeout: function customSetTimeout(method, wait) {
         return setTimeout(method, wait);

@@ -3,8 +3,8 @@ import Backburner from 'backburner';
 QUnit.module('autorun');
 
 test('autorun', function() {
-  var bb = new Backburner(['zomg']);
-  var step = 0;
+  let bb = new Backburner(['zomg']);
+  let step = 0;
 
   ok(!bb.currentInstance, 'The DeferredActionQueues object is lazily instaniated');
   equal(step++, 0);
