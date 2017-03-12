@@ -17,7 +17,7 @@ test('deferOnce', function() {
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
-  bb.run(function() {
+  bb.run(() => {
     let timer = bb.deferOnce('one', function() {
       functionWasCalled = true;
     });
@@ -33,13 +33,13 @@ test('setTimeout', function() {
 
   let called = false;
   let bb = new Backburner(['one'], {
-    onBegin: function() {
+    onBegin() {
       called = true;
     }
   });
   let functionWasCalled = false;
 
-  let timer = bb.setTimeout(function() {
+  let timer = bb.setTimeout(() => {
     functionWasCalled = true;
   }, 0);
 
@@ -48,7 +48,7 @@ test('setTimeout', function() {
   ok(!called, 'onBegin was not called');
 
   stop();
-  setTimeout(function () {
+  setTimeout(() => {
     start();
     ok(!functionWasCalled, 'function was not called');
     ok(!called, 'onBegin was not called');
@@ -60,20 +60,15 @@ test('setTimeout with multiple pending', function() {
 
   let called = false;
   let bb = new Backburner(['one'], {
-    onBegin: function () {
+    onBegin() {
       called = true;
     }
   });
   let function1WasCalled = false;
   let function2WasCalled = false;
 
-  let timer1 = bb.setTimeout(function () {
-    function1WasCalled = true;
-  }, 0);
-
-  let timer2 = bb.setTimeout(function () {
-    function2WasCalled = true;
-  }, 1);
+  let timer1 = bb.setTimeout(() => function1WasCalled = true);
+  let timer2 = bb.setTimeout(() => function2WasCalled = true);
 
   ok(timer1, 'Timer object 2 was returned');
   ok(bb.cancel(timer1), 'Cancel for timer 1 returned true');
@@ -81,7 +76,7 @@ test('setTimeout with multiple pending', function() {
   ok(!called, 'onBegin was not called');
 
   stop();
-  setTimeout(function () {
+  setTimeout(() => {
     start();
 
     ok(!function1WasCalled, 'function 1 was not called');
@@ -95,29 +90,25 @@ test('setTimeout and creating a new setTimeout', function() {
 
   let called = false;
   let bb = new Backburner(['one'], {
-    onBegin: function () {
+    onBegin() {
       called = true;
     }
   });
   let function1WasCalled = false;
   let function2WasCalled = false;
 
-  let timer1 = bb.setTimeout(function () {
-    function1WasCalled = true;
-  }, 0);
+  let timer1 = bb.setTimeout(() => function1WasCalled = true, 0);
 
   ok(timer1, 'Timer object 2 was returned');
   ok(bb.cancel(timer1), 'Cancel for timer 1 returned true');
 
-  let timer2 = bb.setTimeout(function () {
-    function2WasCalled = true;
-  }, 1);
+  let timer2 = bb.setTimeout(() => function2WasCalled = true, 1);
 
   ok(timer2, 'Timer object 2 was returned');
   ok(!called, 'onBegin was not called');
 
   stop();
-  setTimeout(function () {
+  setTimeout(() => {
     start();
 
     ok(!function1WasCalled, 'function 1 was not called');
@@ -130,9 +121,7 @@ test('cancelTimers', function() {
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
-  let timer = bb.setTimeout(function() {
-    functionWasCalled = true;
-  }, 0);
+  let timer = bb.setTimeout(() => functionWasCalled = true);
 
   ok(timer, 'Timer object was returned');
   ok(bb.hasTimers(), 'bb has scheduled timer');
@@ -149,14 +138,9 @@ test('cancel during flush', function() {
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
-  bb.run(function() {
-    let timer1 = bb.deferOnce('one', function() {
-      bb.cancel(timer2);
-    });
-
-    let timer2 = bb.deferOnce('one', function() {
-      functionWasCalled = true;
-    });
+  bb.run(() => {
+    let  timer1 = bb.deferOnce('one', () => bb.cancel(timer2));
+    let  timer2 = bb.deferOnce('one', () => functionWasCalled = true);
   });
 
   ok(!functionWasCalled, 'function was not called');
@@ -175,23 +159,22 @@ test('with GUID_KEY and target', function() {
 
   let wasCalled = 0;
 
-  function fn () {
+  function fn() {
     wasCalled++;
   }
 
-  bb.run(function() {
+  bb.run(() => {
     let timer = bb.scheduleOnce('action', obj, fn);
 
     equal(wasCalled, 0);
 
     bb.cancel(timer);
-
     bb.scheduleOnce('action', obj, fn);
 
     equal(wasCalled, 0);
   });
-  equal(wasCalled, 1);
 
+  equal(wasCalled, 1);
 });
 
 test('with GUID_KEY and a target without meta', function() {
@@ -209,19 +192,18 @@ test('with GUID_KEY and a target without meta', function() {
     wasCalled++;
   }
 
-  bb.run(function() {
+  bb.run(() => {
     let timer = bb.scheduleOnce('action', obj, fn);
 
     equal(wasCalled, 0);
 
     bb.cancel(timer);
-
     bb.scheduleOnce('action', obj, fn);
 
     equal(wasCalled, 0);
   });
-  equal(wasCalled, 1);
 
+  equal(wasCalled, 1);
 });
 
 test('with GUID_KEY no target', function() {
@@ -237,17 +219,16 @@ test('with GUID_KEY no target', function() {
     wasCalled++;
   }
 
-  bb.run(function() {
+  bb.run(() => {
     let timer = bb.scheduleOnce('action', fn);
 
     equal(wasCalled, 0);
 
     bb.cancel(timer);
-
     bb.scheduleOnce('action', fn);
 
     equal(wasCalled, 0);
   });
-  equal(wasCalled, 1);
 
+  equal(wasCalled, 1);
 });

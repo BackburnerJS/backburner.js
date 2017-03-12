@@ -5,13 +5,13 @@ QUnit.module('debug');
 test('DEBUG flag enables stack tagging', function() {
   let bb = new Backburner(['one']);
 
-  bb.defer('one', function() {});
+  bb.defer('one', () => {});
 
   ok(bb.currentInstance && !bb.currentInstance.queues.one._queue[3], 'No stack is recorded');
 
   bb.DEBUG = true;
 
-  bb.defer('one', function() {});
+  bb.defer('one', () => {});
 
   if (new Error().stack) { // workaround for CLI runner :(
     expect(4);
@@ -26,8 +26,8 @@ test('DEBUG flag enables stack tagging', function() {
     bb = new Backburner(['errors'], {onError: onError});
     bb.DEBUG = true;
 
-    bb.run(function(){
-      bb.defer('errors', function(){
+    bb.run(() => {
+      bb.defer('errors', () => {
         throw new Error('message!');
       });
     });

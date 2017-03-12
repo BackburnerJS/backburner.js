@@ -8,8 +8,8 @@ test('when passed a function', function() {
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
-  bb.run(function() {
-    bb.deferOnce('one', function() {
+  bb.run(() => {
+    bb.deferOnce('one', () => {
       functionWasCalled = true;
     });
   });
@@ -23,7 +23,7 @@ test('when passed a target and method', function() {
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
-  bb.run(function() {
+  bb.run(() => {
     bb.deferOnce('one', {zomg: 'hi'}, function() {
       equal(this.zomg, 'hi', 'the target was properly set');
       functionWasCalled = true;
@@ -46,9 +46,7 @@ test('when passed a target and method name', function() {
     }
   };
 
-  bb.run(function() {
-    bb.deferOnce('one', targetObject, 'checkFunction');
-  });
+  bb.run(() => bb.deferOnce('one', targetObject, 'checkFunction'));
 
   ok(functionWasCalled, 'function was called');
 });
@@ -61,12 +59,10 @@ test('throws when passed a null method', function() {
   }
 
   let bb = new Backburner(['deferErrors'], {
-    onError: onError
+    onError
   });
 
-  bb.run(function() {
-    bb.deferOnce('deferErrors', {zomg: 'hi'}, null);
-  });
+  bb.run(() => bb.deferOnce('deferErrors', {zomg: 'hi'}, null));
 });
 
 test('throws when passed an undefined method', function() {
@@ -77,12 +73,10 @@ test('throws when passed an undefined method', function() {
   }
 
   let bb = new Backburner(['deferErrors'], {
-    onError: onError
+    onError
   });
 
-  bb.run(function() {
-    bb.deferOnce('deferErrors', {zomg: 'hi'}, undefined);
-  });
+  bb.run(() => bb.deferOnce('deferErrors', {zomg: 'hi'}, undefined));
 });
 
 test('throws when passed an method name that does not exists on the target', function() {
@@ -93,12 +87,10 @@ test('throws when passed an method name that does not exists on the target', fun
   }
 
   let bb = new Backburner(['deferErrors'], {
-    onError: onError
+    onError
   });
 
-  bb.run(function() {
-    bb.deferOnce('deferErrors', {zomg: 'hi'}, 'checkFunction');
-  });
+  bb.run(() => bb.deferOnce('deferErrors', {zomg: 'hi'}, 'checkFunction'));
 });
 
 test('when passed a target, method, and arguments', function() {
@@ -107,7 +99,7 @@ test('when passed a target, method, and arguments', function() {
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
-  bb.run(function() {
+  bb.run(() => {
     bb.deferOnce('one', {zomg: 'hi'}, function(a, b, c) {
       equal(this.zomg, 'hi', 'the target was properly set');
       equal(a, 1, 'the first arguments was passed in');
@@ -126,13 +118,14 @@ test('when passed same function twice', function() {
   let bb = new Backburner(['one']);
   let i = 0;
   let functionWasCalled = false;
-  let deferMethod = function(){
+
+  function deferMethod() {
     i++;
     equal(i, 1, 'Function should be called only once');
     functionWasCalled = true;
-  };
+  }
 
-  bb.run(function() {
+  bb.run(() => {
     bb.deferOnce('one', deferMethod);
     bb.deferOnce('one', deferMethod);
   });
@@ -146,15 +139,17 @@ test('when passed same function twice with same target', function() {
   let bb = new Backburner(['one']);
   let i = 0;
   let functionWasCalled = false;
-  let deferMethod = function(){
+
+  function deferMethod() {
     i++;
     equal(i, 1, 'Function should be called only once');
     equal(this['first'], 1, 'the target property was set');
     functionWasCalled = true;
-  };
+  }
+
   let argObj = {first: 1};
 
-  bb.run(function() {
+  bb.run(() => {
     bb.deferOnce('one', argObj, deferMethod);
     bb.deferOnce('one', argObj, deferMethod);
   });
@@ -167,12 +162,13 @@ test('when passed same function twice with different targets', function() {
 
   let bb = new Backburner(['one']);
   let i = 0;
-  let deferMethod = function(){
+
+  function deferMethod() {
     i++;
     equal(this['first'], 1, 'the target property was set');
-  };
+  }
 
-  bb.run(function() {
+  bb.run(() => {
     bb.deferOnce('one', {first: 1}, deferMethod);
     bb.deferOnce('one', {first: 1}, deferMethod);
   });
@@ -185,15 +181,17 @@ test('when passed same function twice with same arguments and same target', func
 
   let bb = new Backburner(['one']);
   let i = 0;
-  let deferMethod = function(a, b){
+
+  function deferMethod(a, b) {
     i++;
     equal(a, 1, 'First argument is set only one time');
     equal(b, 2, 'Second argument remains same');
     equal(this['first'], 1, 'the target property was set');
-  };
+  }
+
   let argObj = {first: 1};
 
-  bb.run(function() {
+  bb.run(() => {
     bb.deferOnce('one', argObj, deferMethod, 1, 2);
     bb.deferOnce('one', argObj, deferMethod, 1, 2);
   });
@@ -206,15 +204,17 @@ test('when passed same function twice with same target and different arguments',
 
   let bb = new Backburner(['one']);
   let i = 0;
-  let deferMethod = function(a, b){
+
+  function deferMethod(a, b) {
     i++;
     equal(a, 3, 'First argument of only second call is set');
     equal(b, 2, 'Second argument remains same');
     equal(this['first'], 1, 'the target property was set');
-  };
+  }
+
   let argObj = {first: 1};
 
-  bb.run(function() {
+  bb.run(() => {
     bb.deferOnce('one', argObj, deferMethod, 1, 2);
     bb.deferOnce('one', argObj, deferMethod, 3, 2);
   });
@@ -227,7 +227,8 @@ test('when passed same function twice with different target and different argume
 
   let bb = new Backburner(['one']);
   let i = 0;
-  let deferMethod = function(a, b){
+
+  function deferMethod(a, b) {
     i++;
     if (i === 1) {
       equal(a, 1, 'First argument set during first call');
@@ -236,10 +237,11 @@ test('when passed same function twice with different target and different argume
     }
     equal(b, 2, 'Second argument remains same');
     equal(this['first'], 1, 'the target property was set');
-  };
+  }
+
   let argObj = {first: 1};
 
-  bb.run(function() {
+  bb.run(() => {
     bb.deferOnce('one', {first: 1}, deferMethod, 1, 2);
     bb.deferOnce('one', {first: 1}, deferMethod, 3, 2);
   });
@@ -252,19 +254,20 @@ test('when passed same function with same target after already triggering in cur
 
   let bb = new Backburner(['one', 'two'], { GUID_KEY: 'GUID_KEY' });
   let i = 0;
-  let deferMethod = function(a){
+
+  function deferMethod(a) {
     i++;
     equal(a, i, 'Correct argument is set');
     equal(this['first'], 1, 'the target property was set');
-  };
+  }
 
-  let scheduleMethod = function() {
+  function scheduleMethod() {
     bb.deferOnce('one', argObj, deferMethod, 2);
-  };
+  }
 
   let argObj = {first: 1, GUID_KEY: '1'};
 
-  bb.run(function() {
+  bb.run(() => {
     bb.deferOnce('one', argObj, deferMethod, 1);
     bb.deferOnce('two', argObj, scheduleMethod);
   });
@@ -281,8 +284,8 @@ test('onError', function() {
 
   let bb = new Backburner(['errors'], { onError: onError });
 
-  bb.run(function() {
-    bb.deferOnce('errors', function() {
+  bb.run(() => {
+    bb.deferOnce('errors', () => {
       throw new Error('test error');
     });
   });
