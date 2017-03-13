@@ -201,28 +201,19 @@ export default class Backburner {
 
     this.begin();
 
-    // guard against Safari 6's double-finally bug
-    let didFinally = false;
-
     if (onError) {
       try {
         return _method.apply(_target, args);
       } catch (error) {
         onError(error);
       } finally {
-        if (!didFinally) {
-          didFinally = true;
-          this.end();
-        }
+        this.end();
       }
     } else {
       try {
         return _method.apply(_target, args);
       } finally {
-        if (!didFinally) {
-          didFinally = true;
-          this.end();
-        }
+        this.end();
       }
     }
   }
