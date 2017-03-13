@@ -236,3 +236,22 @@ QUnit.test('onError', function(assert) {
     throw new Error('test error');
   }, 20);
 });
+
+QUnit.test('throttle + immediate joins existing run loop instances', function(assert) {
+  assert.expect(1);
+
+  function onError(error) {
+    assert.equal('test error', error.message);
+  }
+
+  let bb = new Backburner(['errors'], {
+    onError: onError
+  });
+
+  bb.run(() => {
+    let parentInstance = bb.currentInstance;
+    bb.throttle(null, () => {
+     assert.equal(bb.currentInstance, parentInstance);
+    }, 20, true);
+  });
+});
