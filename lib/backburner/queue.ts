@@ -1,22 +1,21 @@
 import {
   isString
 } from './utils';
-
+export const PAUSE = 1;
 export default class Queue {
-  public _queue: any[];
+  public _queue: any[] = []; // TODO: should be private
+
   private name: string;
   private globalOptions: any;
   private options: any;
-  private targetQueues: any;
-  private _queueBeingFlushed: any | undefined;
+  private _queueBeingFlushed: any[] = [];
+  private targetQueues = {};
+  private index = 0;
 
   constructor(name: string, options: any, globalOptions: any) {
     this.name = name;
     this.globalOptions = globalOptions || {};
     this.options = options;
-    this._queue = [];
-    this.targetQueues = {};
-    this._queueBeingFlushed = undefined;
   }
 
   public push(target, method, args, stack) {
@@ -50,13 +49,6 @@ export default class Queue {
   }
 
   public flush(sync?) {
-    let queue = this._queue;
-    let length = queue.length;
-
-    if (length === 0) {
-      return;
-    }
-
     let globalOptions = this.globalOptions;
     let options = this.options;
     let before = options && options.before;
@@ -70,14 +62,22 @@ export default class Queue {
     let invoke = onError ? this.invokeWithOnError : this.invoke;
 
     this.targetQueues = Object.create(null);
-    let queueItems = this._queueBeingFlushed = this._queue;
-    this._queue = [];
+    let queue = this._queue;
+    let queueItems;
+    if (this._queueBeingFlushed && this._queueBeingFlushed.length > 0) {
+      queueItems = this._queueBeingFlushed;
+    } else {
+      queueItems = this._queueBeingFlushed = this._queue;
+      this._queue = [];
+    }
 
     if (before) {
       before();
     }
 
-    for (let i = 0; i < length; i += 4) {
+    for (let i = this.index; i < queueItems.length; i += 4) {
+      this.index += 4;
+
       target                = queueItems[i];
       method                = queueItems[i + 1];
       args                  = queueItems[i + 2];
@@ -106,19 +106,28 @@ export default class Queue {
         //
         invoke(target, method, args, onError, errorRecordedForStack);
       }
+
+      if (this.index !== this._queueBeingFlushed.length &&
+        this.globalOptions.mustYield && this.globalOptions.mustYield()) {
+        return PAUSE;
+      }
     }
 
     if (after) {
       after();
     }
 
-    this._queueBeingFlushed = undefined;
-
+    this._queueBeingFlushed.length = 0;
+    this.index = 0;
     if (sync !== false &&
         this._queue.length > 0) {
       // check if new items have been added
       this.flush(true);
     }
+  }
+
+  public hasWork() {
+    return this._queueBeingFlushed.length > 0 || this._queue.length > 0;
   }
 
   public cancel(actionToCancel) {

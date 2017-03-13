@@ -56,6 +56,13 @@ QUnit.test('We can use a custom clearTimeout', function(assert) {
       clearTimeout(timer) {
         customClearTimeoutWasUsed = true;
         return clearTimeout(timer);
+      },
+      next(method) {
+        return setTimeout(method, 0);
+      },
+      clearNext(timer) {
+        customClearTimeoutWasUsed = true;
+        return clearTimeout(timer);
       }
     }
   });

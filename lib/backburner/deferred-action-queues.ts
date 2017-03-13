@@ -1,4 +1,4 @@
-import Queue from './queue';
+import Queue, { PAUSE } from './queue';
 import {
   each,
   noSuchMethod,
@@ -14,6 +14,7 @@ export default class DeferredActionQueues {
 
   private options: any;
 
+  private queueNameIndex = 0;
   constructor(queueNames: string[], options: any) {
     let queues = this.queues = {};
     this.queueNames = queueNames = queueNames || [];
@@ -47,18 +48,19 @@ export default class DeferredActionQueues {
   public flush() {
     let queue;
     let queueName;
-    let queueNameIndex = 0;
     let numberOfQueues = this.queueNames.length;
 
-    while (queueNameIndex < numberOfQueues) {
-      queueName = this.queueNames[queueNameIndex];
+    while (this.queueNameIndex < numberOfQueues) {
+      queueName = this.queueNames[this.queueNameIndex];
       queue = this.queues[queueName];
 
-      if (queue._queue.length === 0) {
-        queueNameIndex++;
+      if (queue.hasWork() === false) {
+        this.queueNameIndex++;
       } else {
-        queue.flush(false /* async */);
-        queueNameIndex = 0;
+        if (queue.flush(false /* async */) === PAUSE) {
+          return PAUSE;
+        }
+        this.queueNameIndex = 0; // only reset to first queue if non-pause break
       }
     }
   }

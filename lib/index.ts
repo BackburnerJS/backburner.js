@@ -14,7 +14,7 @@ import {
 import searchTimer from './backburner/binary-search';
 import DeferredActionQueues from './backburner/deferred-action-queues';
 
-import Queue from './backburner/queue';
+import Queue, { PAUSE } from './backburner/queue';
 
 export default class Backburner {
   public static Queue = Queue;
@@ -44,6 +44,8 @@ export default class Backburner {
   private _platform: {
     setTimeout(fn: () => void, ms: number): number;
     clearTimeout(id: number): void;
+    next(fn: () => void): number;
+    clearNext(number): void;
   };
 
   private _boundRunExpiredTimers: () => void;
@@ -79,6 +81,13 @@ export default class Backburner {
       },
       clearTimeout(id) {
         clearTimeout(id);
+      },
+      next(fn) {
+        // TODO: asap
+        return setTimeout(fn, 0);
+      },
+      clearNext(fn) {
+        clearTimeout(fn);
       }
     };
 
@@ -122,11 +131,18 @@ export default class Backburner {
     // Prevent double-finally bug in Safari 6.0.2 and iOS 6
     // This bug appears to be resolved in Safari 6.0.5 and iOS 7
     let finallyAlreadyCalled = false;
+    let result;
     try {
-      currentInstance.flush();
+      result = currentInstance.flush();
     } finally {
       if (!finallyAlreadyCalled) {
         finallyAlreadyCalled = true;
+
+        if (result === PAUSE) {
+          const next = this._platform.next;
+          this._autorun = next(this._boundAutorunEnd);
+          return;
+        }
 
         this.currentInstance = null;
 
@@ -547,7 +563,7 @@ export default class Backburner {
     this._timers = [];
 
     if (this._autorun) {
-      this._platform.clearTimeout(this._autorun);
+      this._platform.clearNext(this._autorun);
       this._autorun = null;
     }
   }
@@ -691,9 +707,9 @@ export default class Backburner {
   private _ensureInstance(): DeferredActionQueues {
     let currentInstance = this.currentInstance;
     if (!currentInstance) {
-      const setTimeout = this._platform.setTimeout;
+      const next = this._platform.next || this._platform.setTimeout // TODO: remove the fallback;
       currentInstance = this.begin();
-      this._autorun = setTimeout(this._boundAutorunEnd, 0);
+      this._autorun = next(this._boundAutorunEnd);
     }
     return currentInstance;
   }
