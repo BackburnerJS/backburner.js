@@ -1,7 +1,9 @@
 import {
   isString
 } from './utils';
-export const PAUSE = 1;
+export const enum QUEUE_STATE {
+  Pause = 1
+}
 export default class Queue {
   public _queue: any[] = []; // TODO: should be private
 
@@ -109,7 +111,7 @@ export default class Queue {
 
       if (this.index !== this._queueBeingFlushed.length &&
         this.globalOptions.mustYield && this.globalOptions.mustYield()) {
-        return PAUSE;
+        return QUEUE_STATE.Pause;
       }
     }
 

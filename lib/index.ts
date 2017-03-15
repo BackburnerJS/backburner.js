@@ -14,7 +14,7 @@ import {
 import searchTimer from './backburner/binary-search';
 import DeferredActionQueues from './backburner/deferred-action-queues';
 
-import Queue, { PAUSE } from './backburner/queue';
+import Queue, { QUEUE_STATE } from './backburner/queue';
 
 export default class Backburner {
   public static Queue = Queue;
@@ -138,7 +138,7 @@ export default class Backburner {
       if (!finallyAlreadyCalled) {
         finallyAlreadyCalled = true;
 
-        if (result === PAUSE) {
+        if (result === QUEUE_STATE.Pause) {
           const next = this._platform.next;
           this._autorun = next(this._boundAutorunEnd);
           return;

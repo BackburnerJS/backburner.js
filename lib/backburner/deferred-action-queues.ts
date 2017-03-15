@@ -1,4 +1,4 @@
-import Queue, { PAUSE } from './queue';
+import Queue, { QUEUE_STATE } from './queue';
 import {
   each,
   noSuchMethod,
@@ -57,8 +57,8 @@ export default class DeferredActionQueues {
       if (queue.hasWork() === false) {
         this.queueNameIndex++;
       } else {
-        if (queue.flush(false /* async */) === PAUSE) {
-          return PAUSE;
+        if (queue.flush(false /* async */) === QUEUE_STATE.Pause) {
+          return QUEUE_STATE.Pause;
         }
         this.queueNameIndex = 0; // only reset to first queue if non-pause break
       }
