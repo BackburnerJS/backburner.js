@@ -9,9 +9,11 @@
     "url": "https://github.com/ebryn/backburner.js.git"
   },
   "scripts": {
-    "prepublish": "ember build --environment=production",
+    "prepublish": "npm run build",
+    "build": "ember build --environment=production",
     "test": "ember test",
     "test:server": "ember test --server",
+    "serve": "ember serve",
     "lint": "tslint lib/**/*.ts tests/**/*.ts",
     "bench": "ember build && node ./bench/index.js"
   },

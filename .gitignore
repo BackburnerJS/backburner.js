@@ -4,3 +4,4 @@ bower_components
 tmp/
 dist/
 npm-debug.log
+.vscode/chrome
