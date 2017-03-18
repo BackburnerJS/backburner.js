@@ -3,15 +3,15 @@ import Backburner from 'backburner';
 QUnit.module('tests/defer-iterable');
 
 class Iterator {
-  private collection: Function[];
-  private iteration = 0;
-  constructor(collection) {
-    this.collection = collection;
+  private _collection: Function[];
+  private _iteration: number = 0;
+  constructor(collection: Function[] = []) {
+    this._collection = collection;
   }
 
   public next() {
-    let iteration = this.iteration++;
-    let collection = this.collection;
+    let iteration = this._iteration++;
+    let collection = this._collection;
     let done = collection.length <= iteration;
 
     let value = done ? undefined : collection[iteration];

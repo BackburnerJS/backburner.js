@@ -94,6 +94,10 @@ export default class Backburner {
     };
   }
 
+  /*
+    @method begin
+    @return instantiated class DeferredActionQueues
+  */
   public begin(): DeferredActionQueues {
     let options = this.options;
     let onBegin = options && options.onBegin;
@@ -191,8 +195,8 @@ export default class Backburner {
       _method = target;
       _target = null;
     } else {
-      _target = target;
       _method = method;
+      _target = target;
     }
 
     if (isString(_method)) {
@@ -279,6 +283,7 @@ export default class Backburner {
   }
 
   /*
+    Alias of Backburner.prototype.schedule()
     Defer the passed function to run inside the specified queue.
 
     @method defer
@@ -287,6 +292,8 @@ export default class Backburner {
     @param {Function|String} method The method or method name to be executed
     @param {any} args The method arguments
     @return method result
+
+    TODO: fix stack as optional argument
   */
   public defer(queueName: string, ...args);
   public defer(queueName /* , target, method, args */) {
@@ -328,9 +335,10 @@ export default class Backburner {
     @param {Iterable} an iterable of functions to execute
     @return method result
   */
-  public deferIterable(queueName: string, iterable: any) {
+  public deferIterable(queueName: string, iterable: Function) {
     let stack = this.DEBUG ? new Error() : undefined;
-    return this._ensureInstance().schedule(queueName, null, iteratorDrain, [iterable], false, stack);
+    let _iteratorDrain = iteratorDrain;
+    return this._ensureInstance().schedule(queueName, null, _iteratorDrain, [iterable], false, stack);
   }
 
   public deferOnce(queueName: string, ...args);
@@ -671,7 +679,7 @@ export default class Backburner {
       let executeAt = timers[i];
       let fn = timers[i + 1];
       if (executeAt <= n) {
-        this.defer(this.options.defaultQueue, null, fn);
+        this.schedule(this.options.defaultQueue, null, fn);
       } else {
         break;
       }
