@@ -23,10 +23,6 @@ export default class Backburner {
 
   public currentInstance: DeferredActionQueues | null | undefined;
 
-  public schedule: Function;
-  public scheduleOnce: Function;
-  public later: Function;
-
   public options: any;
 
   private queueNames: string[];
@@ -274,18 +270,21 @@ export default class Backburner {
     }
   }
 
-  /*
-    Defer the passed function to run inside the specified queue.
-
-    @method defer
-    @param {String} queueName
-    @param {Object} target
-    @param {Function|String} method The method or method name to be executed
-    @param {any} args The method arguments
-    @return method result
-  */
+  /**
+   * @deprecated please use schedule instead.
+   */
   public defer(queueName: string, ...args);
-  public defer(queueName /* , target, method, args */) {
+  public defer() {
+    return this.schedule.apply(this, arguments);
+  }
+
+  /**
+   * Schedule the passed function to run inside the specified queue.
+   */
+  public schedule(queueName: string, method: Function);
+  public schedule<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
+  public schedule(queueName: string, target: any | null, method: Function, ...args);
+  public schedule(queueName: string) {
     let length = arguments.length;
     let method;
     let target;
@@ -316,8 +315,21 @@ export default class Backburner {
     return this._ensureInstance().schedule(queueName, target, method, args, false, stack);
   }
 
+  /**
+   * @deprecated please use scheduleOnce instead.
+   */
   public deferOnce(queueName: string, ...args);
-  public deferOnce(queueName: string /* , target, method, args */) {
+  public deferOnce() {
+    return this.scheduleOnce.apply(this, arguments);
+  }
+
+  /**
+   * Schedule the passed function to run once inside the specified queue.
+   */
+  public scheduleOnce(queueName: string, method: Function);
+  public scheduleOnce<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
+  public scheduleOnce(queueName: string, target: any | null, method: Function, ...args);
+  public scheduleOnce(queueName: string /* , target, method, args */) {
     let length = arguments.length;
     let method;
     let target;
@@ -350,8 +362,16 @@ export default class Backburner {
     return currentInstance.schedule(queueName, target, method, args, true, stack);
   }
 
+  /**
+   * @deprecated use later instead.
+   */
   public setTimeout(...args);
   public setTimeout() {
+    return this.later.apply(this, arguments);
+  }
+
+  public later(...args);
+  public later() {
     let l = arguments.length;
     let args = new Array(l);
 
@@ -547,13 +567,6 @@ export default class Backburner {
     this._cancelAutorun();
   }
 
-  private _cancelAutorun() {
-    if (this._autorun) {
-      this._platform.clearTimeout(this._autorun);
-      this._autorun = null;
-    }
-  }
-
   public hasTimers() {
     return !!this._timers.length || !!this._debouncees.length || !!this._throttlers.length || this._autorun;
   }
@@ -578,6 +591,13 @@ export default class Backburner {
                this._cancelItem(findDebouncee, this._debouncees, timer);
     } else {
       return; // timer was null or not a timer
+    }
+  }
+
+  private _cancelAutorun() {
+    if (this._autorun) {
+      this._platform.clearTimeout(this._autorun);
+      this._autorun = null;
     }
   }
 
@@ -635,7 +655,7 @@ export default class Backburner {
    @param {any} arg1
    @param {any} arg2
    */
-  private _trigger(eventName, arg1, arg2) {
+  private _trigger<T, U>(eventName: string, arg1: T, arg2: U) {
     let callbacks = this._eventCallbacks[eventName];
     if (callbacks) {
       for (let i = 0; i < callbacks.length; i++) {
@@ -700,7 +720,3 @@ export default class Backburner {
     return currentInstance;
   }
 }
-
-Backburner.prototype.schedule = Backburner.prototype.defer;
-Backburner.prototype.scheduleOnce = Backburner.prototype.deferOnce;
-Backburner.prototype.later = Backburner.prototype.setTimeout;

@@ -14,7 +14,7 @@
     "test": "ember test",
     "test:server": "ember test --server",
     "serve": "ember serve",
-    "lint": "tslint lib/**/*.ts tests/**/*.ts",
+    "lint": "tslint --project tsconfig.json",
     "bench": "ember build && node ./bench/index.js"
   },
   "author": "Erik Bryn",
