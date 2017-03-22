@@ -1,6 +1,9 @@
 # backburner.js [![Build Status](https://travis-ci.org/BackburnerJS/backburner.js.svg?branch=master)](https://travis-ci.org/BackburnerJS/backburner.js)
 A rewrite of the Ember.js run loop as a generic microlibrary.
 
+## TL;DR
+A priority queue that will efficiently batch, order, reorder and process work; done via scheduling work on specific queues.
+
 ## Downloads
 
 * master: [globals](http://builds.emberjs.com.s3.amazonaws.com/backburner.js/lastest/backburner.js), [AMD](http://builds.emberjs.com.s3.amazonaws.com/backburner.js/lastest/backburner.amd.js)
