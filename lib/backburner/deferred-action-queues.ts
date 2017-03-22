@@ -25,16 +25,26 @@ export default class DeferredActionQueues {
     });
   }
 
-  public schedule(name, target, method, args, onceFlag, stack) {
+  /*
+    @method schedule
+    @param {String} queueName
+    @param {Any} target
+    @param {Any} method
+    @param {Any} args
+    @param {Boolean} onceFlag
+    @param {Any} stack
+    @return queue
+  */
+  public schedule(queueName: string, target: any, method: any, args: any, onceFlag: boolean, stack: any) {
     let queues = this.queues;
-    let queue = queues[name];
+    let queue = queues[queueName];
 
     if (!queue) {
-      noSuchQueue(name);
+      noSuchQueue(queueName);
     }
 
     if (!method) {
-      noSuchMethod(name);
+      noSuchMethod(queueName);
     }
 
     if (onceFlag) {
@@ -44,6 +54,10 @@ export default class DeferredActionQueues {
     }
   }
 
+  /*
+    @method flush
+    DeferredActionQueues.flush() calls Queue.flush()
+  */
   public flush() {
     let queue;
     let queueName;

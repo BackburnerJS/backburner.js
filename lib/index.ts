@@ -13,6 +13,7 @@ import {
 
 import searchTimer from './backburner/binary-search';
 import DeferredActionQueues from './backburner/deferred-action-queues';
+import iteratorDrain from './backburner/iterator-drain';
 
 import Queue from './backburner/queue';
 
@@ -22,6 +23,8 @@ export default class Backburner {
   public DEBUG = false;
 
   public currentInstance: DeferredActionQueues | null | undefined;
+
+  public scheduleIterable: Function;
 
   public options: any;
 
@@ -88,6 +91,10 @@ export default class Backburner {
     };
   }
 
+  /*
+    @method begin
+    @return instantiated class DeferredActionQueues
+  */
   public begin(): DeferredActionQueues {
     let options = this.options;
     let onBegin = options && options.onBegin;
@@ -192,8 +199,8 @@ export default class Backburner {
       _method = target;
       _target = null;
     } else {
-      _target = target;
       _method = method;
+      _target = target;
     }
 
     if (isString(_method)) {
@@ -313,6 +320,20 @@ export default class Backburner {
       args = undefined;
     }
     return this._ensureInstance().schedule(queueName, target, method, args, false, stack);
+  }
+
+  /*
+    Defer the passed iterable of functions to run inside the specified queue.
+
+    @method deferIterable
+    @param {String} queueName
+    @param {Iterable} an iterable of functions to execute
+    @return method result
+  */
+  public deferIterable(queueName: string, iterable: Function) {
+    let stack = this.DEBUG ? new Error() : undefined;
+    let _iteratorDrain = iteratorDrain;
+    return this._ensureInstance().schedule(queueName, null, _iteratorDrain, [iterable], false, stack);
   }
 
   /**
@@ -678,7 +699,7 @@ export default class Backburner {
       let executeAt = timers[i];
       let fn = timers[i + 1];
       if (executeAt <= n) {
-        this.defer(this.options.defaultQueue, null, fn);
+        this.schedule(this.options.defaultQueue, null, fn);
       } else {
         break;
       }
@@ -720,3 +741,5 @@ export default class Backburner {
     return currentInstance;
   }
 }
+
+Backburner.prototype.scheduleIterable = Backburner.prototype.deferIterable;
