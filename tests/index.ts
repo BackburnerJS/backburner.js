@@ -9,6 +9,7 @@ import './defer-once-test';
 import './defer-test';
 import './events-test';
 import './join-test';
+import './multi-turn-test';
 import './queue-push-unique-test';
 import './queue-test';
 import './run-test';
