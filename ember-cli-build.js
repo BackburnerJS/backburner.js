@@ -6,6 +6,9 @@ const Rollup = require('broccoli-rollup');
 const path = require('path');
 const typescript = require('broccoli-typescript-compiler').typescript;
 const buble = require('rollup-plugin-buble');
+const fs = require('fs');
+
+const SOURCE_MAPPING_DATA_URL = '//# sourceMap' + 'pingURL=data:application/json;base64,';
 
 module.exports = function () {
   const src = new MergeTrees([
@@ -25,6 +28,8 @@ module.exports = function () {
     tsconfig: {
       compilerOptions: {
         baseUrl: '.',
+        inlineSourceMap: true,
+        inlineSources: true,
         module: 'es2015',
         moduleResolution: 'node',
         paths: {
@@ -41,39 +46,47 @@ module.exports = function () {
     rollup: {
       dest: 'es6/backburner.js',
       entry: 'lib/index.js',
-      format: 'es'
+      format: 'es',
+      plugins: [
+        loadWithInlineMap()
+      ],
+      sourceMap: true
     }
   });
 
   return new MergeTrees([
     backburner,
-    new Rollup(backburner, {
+    new Rollup(compiled, {
       rollup: {
-        entry: 'es6/backburner.js',
+        entry: 'lib/index.js',
         plugins: [
+          loadWithInlineMap(),
           buble()
         ],
+        sourceMap: true,
         targets: [{
           dest: 'named-amd/backburner.js',
           exports: 'named',
           format: 'amd',
-          moduleId: 'backburner'
+          moduleId: 'backburner',
         }, {
           dest: 'backburner.js',
-          format: 'cjs'
+          format: 'cjs',
         }]
       }
     }),
     new Rollup(compiled, {
-      annotation: 'tests/tests.js',
+      annotation: 'named-amd/tests.js',
       rollup: {
         entry: 'tests/index.js',
         external: ['backburner'],
         plugins: [
+          loadWithInlineMap(),
           buble()
         ],
+        sourceMap: true,
         targets: [{
-          dest: 'tests/tests.js',
+          dest: 'named-amd/tests.js',
           format: 'amd',
           moduleId: 'backburner-tests'
         }]
@@ -90,10 +103,37 @@ module.exports = function () {
       files: ['loader.js']
     }),
     new Funnel(__dirname + '/tests', {
-      files: ['index.html'],
-      destDir: 'tests'
+      destDir: 'tests',
+      files: ['index.html']
     })
   ], {
     annotation: 'dist'
   });
 };
+
+function loadWithInlineMap() {
+  return {
+    load: function (id) {
+      var code = fs.readFileSync(id, 'utf8');
+      var result = {
+        code: code,
+        map: null
+      };
+      var index = code.lastIndexOf(SOURCE_MAPPING_DATA_URL);
+      if (index === -1) {
+        return result;
+      }
+      result.code = code.slice(0, index);
+      result.map = parseSourceMap(code.slice(index + SOURCE_MAPPING_DATA_URL.length));
+      result.file = id;
+      console.log(id);
+      console.log(result.map.sources);
+      console.log(result.map.sourcesContent.map((c) => !!c));
+      return result;
+    }
+  };
+}
+
+function parseSourceMap(base64) {
+  return JSON.parse(new Buffer(base64, 'base64').toString('utf8'));
+}

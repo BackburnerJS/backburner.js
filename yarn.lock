@@ -3350,6 +3350,12 @@ rollup@^0.41.4:
   dependencies:
     source-map-support "^0.4.0"
 
+rollup@^0.41.6:
+  version "0.41.6"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.41.6.tgz#e0d05497877a398c104d816d2733a718a7a94e2a"
+  dependencies:
+    source-map-support "^0.4.0"
+
 rsvp@^3.0.14, rsvp@^3.0.16, rsvp@^3.0.17, rsvp@^3.0.18, rsvp@^3.0.21, rsvp@^3.2.1, rsvp@^3.3.3:
   version "3.4.0"
   resolved "https://registry.npmjs.org/rsvp/-/rsvp-3.4.0.tgz#96f397d9c7e294351b3c1456a74b3d0e7542988d"
