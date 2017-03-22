@@ -1,0 +1,21 @@
+{
+  // Use IntelliSense to learn about possible Node.js debug attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+        "name": "Launch localhost",
+        "type": "chrome",
+        "request": "launch",
+        "url": "http://localhost:4200/tests/",
+        "userDataDir": "${workspaceRoot}/.vscode/chrome",
+        "sourceMaps": true,
+        "webRoot": "${workspaceRoot}/dist",
+        "sourceMapPathOverrides": {
+          "../lib/*.ts": "${workspaceRoot}/lib/*.ts",
+          "../tests/*.ts": "${workspaceRoot}/tests/*.ts"
+        }
+    }
+  ]
+}

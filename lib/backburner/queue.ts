@@ -25,8 +25,8 @@ export default class Queue {
 
     return {
       queue: this,
-      target: target,
-      method: method
+      target,
+      method
     };
   }
 
@@ -44,8 +44,8 @@ export default class Queue {
 
     return {
       queue: this,
-      target: target,
-      method: method
+      target,
+      method
     };
   }
 
@@ -70,7 +70,7 @@ export default class Queue {
     let invoke = onError ? this.invokeWithOnError : this.invoke;
 
     this.targetQueues = Object.create(null);
-    let queueItems = this._queueBeingFlushed = this._queue.slice();
+    let queueItems = this._queueBeingFlushed = this._queue;
     this._queue = [];
 
     if (before) {
@@ -127,8 +127,7 @@ export default class Queue {
     let currentMethod;
     let i;
     let l;
-    let target = actionToCancel.target;
-    let method = actionToCancel.method;
+    let { target, method }  = actionToCancel;
     let GUID_KEY = this.globalOptions.GUID_KEY;
 
     if (GUID_KEY && this.targetQueues && target) {

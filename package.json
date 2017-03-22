@@ -9,10 +9,12 @@
     "url": "https://github.com/ebryn/backburner.js.git"
   },
   "scripts": {
-    "prepublish": "ember build --environment=production",
+    "prepublish": "npm run build",
+    "build": "ember build --environment=production",
     "test": "ember test",
     "test:server": "ember test --server",
-    "lint": "tslint lib/**/*.ts tests/**/*.ts",
+    "serve": "ember serve",
+    "lint": "tslint --project tsconfig.json",
     "bench": "ember build && node ./bench/index.js"
   },
   "author": "Erik Bryn",
@@ -32,6 +34,7 @@
     "glob": "^7.1.1",
     "loader.js": "^4.2.3",
     "qunitjs": "^2.2.0",
+    "rollup": "^0.41.6",
     "rollup-plugin-buble": "^0.15.0",
     "tslint": "^4.5.1",
     "typescript": "^2.1.6"

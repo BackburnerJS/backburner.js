@@ -12,6 +12,5 @@ import './join-test';
 import './queue-push-unique-test';
 import './queue-test';
 import './run-test';
-import './safari-bug-test';
 import './set-timeout-test';
 import './throttle-test';
