@@ -5,13 +5,13 @@ QUnit.module('tests/debug');
 QUnit.test('DEBUG flag enables stack tagging', function(assert) {
   let bb = new Backburner(['one']);
 
-  bb.defer('one', () => {});
+  bb.schedule('one', () => {});
 
   assert.ok(bb.currentInstance && !bb.currentInstance.queues.one._queue[3], 'No stack is recorded');
 
   bb.DEBUG = true;
 
-  bb.defer('one', () => {});
+  bb.schedule('one', () => {});
 
   if (new Error().stack) { // workaround for CLI runner :(
     assert.expect(4);
@@ -27,7 +27,7 @@ QUnit.test('DEBUG flag enables stack tagging', function(assert) {
     bb.DEBUG = true;
 
     bb.run(() => {
-      bb.defer('errors', () => {
+      bb.schedule('errors', () => {
         throw new Error('message!');
       });
     });

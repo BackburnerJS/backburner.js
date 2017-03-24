@@ -10,7 +10,7 @@ QUnit.module('tests/set-timeout-test', {
   }
 });
 
-QUnit.test('setTimeout', function(assert) {
+QUnit.test('later', function(assert) {
   assert.expect(6);
 
   let bb = new Backburner(['one']);
@@ -23,12 +23,12 @@ QUnit.test('setTimeout', function(assert) {
   let now = +new Date();
   Date.prototype.valueOf = function() { return now; };
 
-  bb.setTimeout(null, () => {
+  bb.later(null, () => {
     instance = bb.currentInstance;
     assert.equal(step++, 0);
   }, 10);
 
-  bb.setTimeout(null, () => {
+  bb.later(null, () => {
     assert.equal(step++, 1);
     assert.equal(instance, bb.currentInstance, 'same instance');
   }, 10);
@@ -39,10 +39,10 @@ QUnit.test('setTimeout', function(assert) {
   // 0ms
   while ((+ new Date()) <= now + 10) {};
 
-  bb.setTimeout(null, () => {
+  bb.later(null, () => {
     assert.equal(step++, 2);
 
-    bb.setTimeout(null, () => {
+    bb.later(null, () => {
       assert.equal(step++, 3);
       assert.ok(true, 'Another later will execute correctly');
       done();
@@ -50,7 +50,7 @@ QUnit.test('setTimeout', function(assert) {
   }, 20);
 });
 
-QUnit.test('setTimeout can continue when `Date.now` is monkey-patched', function(assert) {
+QUnit.test('later can continue when `Date.now` is monkey-patched', function(assert) {
   assert.expect(1);
 
   let arbitraryTime = +new Date();
@@ -59,14 +59,14 @@ QUnit.test('setTimeout can continue when `Date.now` is monkey-patched', function
 
   Date.now = function() { return arbitraryTime; };
 
-  bb.setTimeout(() => {
+  bb.later(() => {
     assert.ok(true);
     done();
   }, 1);
 });
 
 let bb;
-QUnit.module('setTimeout arguments / arity', {
+QUnit.module('later arguments / arity', {
   beforeEach() {
     bb = new Backburner(['one']);
   },
@@ -80,7 +80,7 @@ QUnit.test('[callback]', function(assert) {
 
   let done = assert.async();
 
-  bb.setTimeout(function() {
+  bb.later(function() {
     assert.equal(arguments.length, 0);
     assert.ok(true, 'was called');
     done();
@@ -91,7 +91,7 @@ QUnit.test('[callback, undefined]', function(assert) {
   assert.expect(2);
   let done = assert.async();
 
-  bb.setTimeout(function() {
+  bb.later(function() {
     assert.equal(arguments.length, 1);
     assert.ok(true, 'was called');
     done();
@@ -102,7 +102,7 @@ QUnit.test('[null, callback, undefined]', function(assert) {
   assert.expect(2);
   let done = assert.async();
 
-  bb.setTimeout(null, function() {
+  bb.later(null, function() {
     assert.equal(arguments.length, 0);
     assert.ok(true, 'was called');
     done();
@@ -113,7 +113,7 @@ QUnit.test('[null, callback, undefined]', function(assert) {
   assert.expect(2);
   let done = assert.async();
 
-  bb.setTimeout(null, function() {
+  bb.later(null, function() {
     assert.equal(arguments.length, 1);
     assert.ok(true, 'was called');
     done();
@@ -125,7 +125,7 @@ QUnit.test('[null, callback, null]', function(assert) {
 
   let done = assert.async();
 
-  bb.setTimeout(null, function() {
+  bb.later(null, function() {
     assert.equal(arguments.length, 1);
     assert.equal(arguments[0], null);
     assert.ok(true, 'was called');
@@ -138,7 +138,7 @@ QUnit.test('[callback, string, string, string]', function(assert) {
 
   let done = assert.async();
 
-  bb.setTimeout(function() {
+  bb.later(function() {
     assert.equal(arguments.length, 3);
     assert.equal(arguments[0], 'a');
     assert.equal(arguments[1], 'b');
@@ -153,7 +153,7 @@ QUnit.test('[null, callback, string, string, string]', function(assert) {
 
   let done = assert.async();
 
-  bb.setTimeout(null, function() {
+  bb.later(null, function() {
     assert.equal(arguments.length, 3);
     assert.equal(arguments[0], 'a');
     assert.equal(arguments[1], 'b');
@@ -166,7 +166,7 @@ QUnit.test('[null, callback, string, string, string]', function(assert) {
 QUnit.test('[null, callback, string, string, string, number]', function(assert) {
   assert.expect(5);
   let done = assert.async();
-  bb.setTimeout(null, function() {
+  bb.later(null, function() {
     assert.equal(arguments.length, 3);
     assert.equal(arguments[0], 'a');
     assert.equal(arguments[1], 'b');
@@ -179,7 +179,7 @@ QUnit.test('[null, callback, string, string, string, number]', function(assert) 
 QUnit.test('[null, callback, string, string, string, numericString]', function(assert) {
   assert.expect(5);
   let done = assert.async();
-  bb.setTimeout(null, function() {
+  bb.later(null, function() {
     assert.equal(arguments.length, 3);
     assert.equal(arguments[0], 'a');
     assert.equal(arguments[1], 'b');
@@ -192,7 +192,7 @@ QUnit.test('[null, callback, string, string, string, numericString]', function(a
 QUnit.test('[obj, string]', function(assert) {
   assert.expect(1);
   let done = assert.async();
-  bb.setTimeout({
+  bb.later({
     bro() {
       assert.ok(true, 'was called');
       done();
@@ -203,7 +203,7 @@ QUnit.test('[obj, string]', function(assert) {
 QUnit.test('[obj, string, value]', function(assert) {
   assert.expect(3);
   let done = assert.async();
-  bb.setTimeout({
+  bb.later({
     bro() {
       assert.equal(arguments.length, 1);
       assert.equal(arguments[0], 'value');
@@ -215,7 +215,7 @@ QUnit.test('[obj, string, value]', function(assert) {
 
 QUnit.test('[obj, string, value, number]', function(assert) {
   let done = assert.async();
-  bb.setTimeout({
+  bb.later({
     bro() {
       assert.equal(arguments.length, 1);
       assert.equal(arguments[0], 'value');
@@ -227,7 +227,7 @@ QUnit.test('[obj, string, value, number]', function(assert) {
 
 QUnit.test('[obj, string, value, numericString]', function(assert) {
   let done = assert.async();
-  bb.setTimeout({
+  bb.later({
     bro() {
       assert.equal(arguments.length, 1);
       assert.equal(arguments[0], 'value');
@@ -249,10 +249,10 @@ QUnit.test('onError', function(assert) {
 
   bb = new Backburner(['errors'], { onError });
 
-  bb.setTimeout(() => { throw new Error('test error'); }, 1);
+  bb.later(() => { throw new Error('test error'); }, 1);
 });
 
-QUnit.test('setTimeout doesn\'t trigger twice with earlier setTimeout', function(assert) {
+QUnit.test('later doesn\'t trigger twice with earlier later', function(assert) {
   assert.expect(3);
 
   bb = new Backburner(['one']);
@@ -268,8 +268,8 @@ QUnit.test('setTimeout doesn\'t trigger twice with earlier setTimeout', function
     oldRun.apply(bb, arguments);
   };
 
-  bb.setTimeout(() => called1++, 50);
-  bb.setTimeout(() => called2++, 10);
+  bb.later(() => called1++, 50);
+  bb.later(() => called2++, 10);
 
   setTimeout(() => {
     assert.equal(called1, 1, 'timeout 1 was called once');
@@ -279,7 +279,7 @@ QUnit.test('setTimeout doesn\'t trigger twice with earlier setTimeout', function
   }, 100);
 });
 
-QUnit.test('setTimeout with two Backburner instances', function(assert) {
+QUnit.test('later with two Backburner instances', function(assert) {
   assert.expect(8);
 
   let steps = 0;
@@ -297,11 +297,11 @@ QUnit.test('setTimeout with two Backburner instances', function(assert) {
 
   assert.equal(++steps, 1);
 
-  bb1.setTimeout(() => assert.equal(++steps, 5), 10);
+  bb1.later(() => assert.equal(++steps, 5), 10);
 
   assert.equal(++steps, 2);
 
-  bb2.setTimeout(() => assert.equal(++steps, 7), 10);
+  bb2.later(() => assert.equal(++steps, 7), 10);
 
   assert.equal(++steps, 3);
 
@@ -318,13 +318,13 @@ QUnit.test('expired timeout doesn\'t hang when setting a new timeout', function(
   let called2At = 0;
   let done = assert.async();
 
-  bb.setTimeout(() => called1At = Date.now(), 1);
+  bb.later(() => called1At = Date.now(), 1);
 
   // Block JS to simulate https://github.com/ebryn/backburner.js/issues/135
   let waitUntil = Date.now() + 5;
   while (Date.now() < waitUntil) { }
 
-  bb.setTimeout(() => called2At = Date.now(), 50);
+  bb.later(() => called2At = Date.now(), 50);
 
   setTimeout(() => {
     assert.ok(called1At !== 0, 'timeout 1 was called');
@@ -341,9 +341,9 @@ QUnit.test('NaN timeout doesn\'t hang other timeouts', function(assert) {
   let called1At = 0;
   let called2At = 0;
 
-  bb.setTimeout(() => called1At = Date.now(), 1);
-  bb.setTimeout(() => {}, NaN);
-  bb.setTimeout(() => called2At = Date.now(), 10);
+  bb.later(() => called1At = Date.now(), 1);
+  bb.later(() => {}, NaN);
+  bb.later(() => called2At = Date.now(), 10);
 
   setTimeout(() => {
     assert.ok(called1At !== 0, 'timeout 1 was called');

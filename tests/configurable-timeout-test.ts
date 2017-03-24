@@ -18,7 +18,7 @@ QUnit.test('We can configure a custom platform', function(assert) {
   assert.ok(bb.options._platform.isFakePlatform, 'We can pass in a custom platform');
 });
 
-QUnit.test('We can use a custom setTimeout', function(assert) {
+QUnit.test('We can use a custom later', function(assert) {
   assert.expect(2);
   let done = assert.async();
 
@@ -36,9 +36,9 @@ QUnit.test('We can use a custom setTimeout', function(assert) {
     }
   });
 
-  bb.deferOnce('one', () => {
+  bb.scheduleOnce('one', () => {
     assert.ok(bb.options._platform.isFakePlatform, 'we are using the fake platform');
-    assert.ok(customTimeoutWasUsed , 'custom setTimeout was used');
+    assert.ok(customTimeoutWasUsed , 'custom later was used');
     done();
   });
 });
@@ -67,11 +67,11 @@ QUnit.test('We can use a custom clearTimeout', function(assert) {
     }
   });
 
-  bb.deferOnce('one', () => functionWasCalled = true);
+  bb.scheduleOnce('one', () => functionWasCalled = true);
   bb.cancelTimers();
 
   bb.run(() => {
-    bb.deferOnce('one', () => {
+    bb.scheduleOnce('one', () => {
       assert.ok(!functionWasCalled, 'function was not called');
       assert.ok(customClearTimeoutWasUsed, 'custom clearTimeout was used');
     });
