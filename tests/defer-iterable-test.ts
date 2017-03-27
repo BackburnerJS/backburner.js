@@ -51,7 +51,7 @@ QUnit.test('deferIterable', function(assert) {
   let iterator = () => new Iterator([task1, task2, task3]);
 
   bb.run(() => {
-    bb.deferIterable('zomg', iterator);
+    bb.scheduleIterable('zomg', iterator);
 
     assert.deepEqual(tasks, {
       one:   { count: 0,  order: -1 },
@@ -65,9 +65,4 @@ QUnit.test('deferIterable', function(assert) {
     two:   { count: 1,  order: 1 },
     three: { count: 1,  order: 2 }
   });
-});
-
-QUnit.test('deferIterable aliased to scheduleIterable', function(assert) {
-  let bb = new Backburner(['zomg']);
-  assert.equal(bb.deferIterable, bb.scheduleIterable);
 });

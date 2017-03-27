@@ -55,24 +55,24 @@ QUnit.test('nesting run loops preserves the stack', function(assert) {
   let outerAfterFunctionWasCalled = false;
 
   bb.run(function () {
-    bb.defer('one', () => {
+    bb.schedule('one', () => {
       outerBeforeFunctionWasCalled = true;
     });
 
     bb.run(function () {
-      bb.defer('one', () => {
+      bb.schedule('one', () => {
         middleBeforeFunctionWasCalled = true;
       });
 
       bb.run(function () {
-        bb.defer('one', function () {
+        bb.schedule('one', function () {
           innerFunctionWasCalled = true;
         });
         assert.ok(!innerFunctionWasCalled, 'function is deferred');
       });
       assert.ok(innerFunctionWasCalled, 'function is called');
 
-      bb.defer('one', function () {
+      bb.schedule('one', function () {
         middleAfterFunctionWasCalled = true;
       });
 
@@ -83,7 +83,7 @@ QUnit.test('nesting run loops preserves the stack', function(assert) {
     assert.ok(middleBeforeFunctionWasCalled, 'function is called');
     assert.ok(middleAfterFunctionWasCalled, 'function is called');
 
-    bb.defer('one', function () {
+    bb.schedule('one', function () {
       outerAfterFunctionWasCalled = true;
     });
 

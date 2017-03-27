@@ -14,7 +14,7 @@ QUnit.test('when passed a function', function(assert) {
   let functionWasCalled = false;
 
   bb.run(() => {
-    bb.defer('one', () => functionWasCalled = true);
+    bb.schedule('one', () => functionWasCalled = true);
   });
 
   assert.ok(functionWasCalled, 'function was called');
@@ -27,7 +27,7 @@ QUnit.test('when passed a target and method', function(assert) {
   let functionWasCalled = false;
 
   bb.run(() => {
-    bb.defer('one', { zomg: 'hi' }, function() {
+    bb.schedule('one', { zomg: 'hi' }, function() {
       assert.equal(this.zomg, 'hi', 'the target was properly set');
       functionWasCalled = true;
     });
@@ -49,7 +49,7 @@ QUnit.test('when passed a target and method name', function(assert) {
     }
   };
 
-  bb.run(() => bb.defer('one', targetObject, 'checkFunction'));
+  bb.run(() => bb.schedule('one', targetObject, 'checkFunction'));
 
   assert.ok(functionWasCalled, 'function was called');
 });
@@ -65,7 +65,7 @@ QUnit.test('throws when passed a null method', function(assert) {
     onError
   });
 
-  bb.run(() => bb.defer('deferErrors', { zomg: 'hi' }, null));
+  bb.run(() => bb.schedule('deferErrors', { zomg: 'hi' }, null));
 });
 
 QUnit.test('throws when passed an undefined method', function(assert) {
@@ -79,7 +79,7 @@ QUnit.test('throws when passed an undefined method', function(assert) {
     onError
   });
 
-  bb.run(() => bb.defer('deferErrors', { zomg: 'hi' }, undefined));
+  bb.run(() => bb.schedule('deferErrors', { zomg: 'hi' }, undefined));
 });
 
 QUnit.test('throws when passed an method name that does not exists on the target', function(assert) {
@@ -93,7 +93,7 @@ QUnit.test('throws when passed an method name that does not exists on the target
     onError
   });
 
-  bb.run(() => bb.defer('deferErrors', { zomg: 'hi' }, 'checkFunction'));
+  bb.run(() => bb.schedule('deferErrors', { zomg: 'hi' }, 'checkFunction'));
 });
 
 QUnit.test('when passed a target, method, and arguments', function(assert) {
@@ -103,7 +103,7 @@ QUnit.test('when passed a target, method, and arguments', function(assert) {
   let functionWasCalled = false;
 
   bb.run(() => {
-    bb.defer('one', { zomg: 'hi' }, function(a, b, c) {
+    bb.schedule('one', { zomg: 'hi' }, function(a, b, c) {
       assert.equal(this.zomg, 'hi', 'the target was properly set');
       assert.equal(a, 1, 'the first arguments was passed in');
       assert.equal(b, 2, 'the second arguments was passed in');
@@ -126,8 +126,8 @@ QUnit.test('when passed same function twice', function(assert) {
   }
 
   bb.run(() => {
-    bb.defer('one', deferMethod);
-    bb.defer('one', deferMethod);
+    bb.schedule('one', deferMethod);
+    bb.schedule('one', deferMethod);
   });
 
   assert.equal(i, 2, 'function was called twice');
@@ -145,8 +145,8 @@ QUnit.test('when passed same function twice with arguments', function(assert) {
   }
 
   bb.run(() => {
-    bb.defer('one', argObj, deferMethod);
-    bb.defer('one', argObj, deferMethod);
+    bb.schedule('one', argObj, deferMethod);
+    bb.schedule('one', argObj, deferMethod);
   });
 });
 
@@ -166,8 +166,8 @@ QUnit.test('when passed same function twice with same arguments and same target'
   let argObj = { first: 1 };
 
   bb.run(() => {
-    bb.defer('one', argObj, deferMethod, 1, 2);
-    bb.defer('one', argObj, deferMethod, 1, 2);
+    bb.schedule('one', argObj, deferMethod, 1, 2);
+    bb.schedule('one', argObj, deferMethod, 1, 2);
   });
 
   assert.equal(i, 2, 'function was called twice');
@@ -193,8 +193,8 @@ QUnit.test('when passed same function twice with same target and different argum
   let argObj = { first: 1 };
 
   bb.run(() => {
-    bb.defer('one', argObj, deferMethod, 1, 2);
-    bb.defer('one', argObj, deferMethod, 3, 2);
+    bb.schedule('one', argObj, deferMethod, 1, 2);
+    bb.schedule('one', argObj, deferMethod, 3, 2);
   });
 
   assert.equal(i, 2, 'function was called twice');
@@ -220,8 +220,8 @@ QUnit.test('when passed same function twice with different target and different 
   let argObj = {first: 1};
 
   bb.run(() => {
-    bb.defer('one', { first: 1 }, deferMethod, 1, 2);
-    bb.defer('one', { first: 1 }, deferMethod, 3, 2);
+    bb.schedule('one', { first: 1 }, deferMethod, 1, 2);
+    bb.schedule('one', { first: 1 }, deferMethod, 3, 2);
   });
 
   assert.equal(i, 2, 'function was called twice');
@@ -239,7 +239,7 @@ QUnit.test('onError', function(assert) {
   });
 
   bb.run(() => {
-    bb.defer('errors', () => {
+    bb.schedule('errors', () => {
       throw new Error('QUnit.test error');
     });
   });

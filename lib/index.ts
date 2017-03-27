@@ -24,8 +24,6 @@ export default class Backburner {
 
   public currentInstance: DeferredActionQueues | null | undefined;
 
-  public scheduleIterable: Function;
-
   public options: any;
 
   private queueNames: string[];
@@ -305,7 +303,7 @@ export default class Backburner {
    */
   public schedule(queueName: string, method: Function);
   public schedule<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
-  public schedule(queueName: string, target: any | null, method: Function, ...args);
+  public schedule(queueName: string, target: any | null, method: any | Function, ...args);
   public schedule(queueName: string) {
     let length = arguments.length;
     let method;
@@ -340,12 +338,12 @@ export default class Backburner {
   /*
     Defer the passed iterable of functions to run inside the specified queue.
 
-    @method deferIterable
+    @method scheduleIterable
     @param {String} queueName
     @param {Iterable} an iterable of functions to execute
     @return method result
   */
-  public deferIterable(queueName: string, iterable: Function) {
+  public scheduleIterable(queueName: string, iterable: Function) {
     let stack = this.DEBUG ? new Error() : undefined;
     let _iteratorDrain = iteratorDrain;
     return this._ensureInstance().schedule(queueName, null, _iteratorDrain, [iterable], false, stack);
@@ -364,7 +362,7 @@ export default class Backburner {
    */
   public scheduleOnce(queueName: string, method: Function);
   public scheduleOnce<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
-  public scheduleOnce(queueName: string, target: any | null, method: Function, ...args);
+  public scheduleOnce(queueName: string, target: any | null, method: any | Function, ...args);
   public scheduleOnce(queueName: string /* , target, method, args */) {
     let length = arguments.length;
     let method;
@@ -761,5 +759,3 @@ export default class Backburner {
     return currentInstance;
   }
 }
-
-Backburner.prototype.scheduleIterable = Backburner.prototype.deferIterable;
