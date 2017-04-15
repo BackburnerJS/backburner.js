@@ -275,6 +275,36 @@ QUnit.test('when passed same function with same target after already triggering 
   assert.equal(i, 2, 'function was called twice');
 });
 
+QUnit.test('when passed same function with same target after already triggering in current loop (peekGuid)', function(assert) {
+  assert.expect(5);
+
+  let argObj = {first: 1};
+  let bb = new Backburner(['one', 'two'], {
+    peekGuid(obj) {
+      if (argObj === obj) { return '1'; }
+    }
+  });
+
+  let i = 0;
+
+  function deferMethod(a) {
+    i++;
+    assert.equal(a, i, 'Correct argument is set');
+    assert.equal(this['first'], 1, 'the target property was set');
+  }
+
+  function scheduleMethod() {
+    bb.scheduleOnce('one', argObj, deferMethod, 2);
+  }
+
+  bb.run(() => {
+    bb.scheduleOnce('one', argObj, deferMethod, 1);
+    bb.scheduleOnce('two', argObj, scheduleMethod);
+  });
+
+  assert.equal(i, 2, 'function was called twice');
+});
+
 QUnit.test('onError', function(assert) {
   assert.expect(1);
 

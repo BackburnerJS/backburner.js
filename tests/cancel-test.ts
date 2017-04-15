@@ -227,3 +227,90 @@ QUnit.test('with GUID_KEY no target', function(assert) {
 
   assert.equal(wasCalled, 1);
 });
+
+QUnit.test('with peekGuid and target', function(assert) {
+  assert.expect(3);
+
+  let obj = {};
+
+  let bb = new Backburner(['action'], {
+    peekGuid(obj2) {
+      if (obj === obj2) { return 1; }
+    }
+  });
+
+  let wasCalled = 0;
+
+  function fn() {
+    wasCalled++;
+  }
+
+  bb.run(() => {
+    let timer = bb.scheduleOnce('action', obj, fn);
+
+    assert.equal(wasCalled, 0);
+
+    bb.cancel(timer);
+    bb.scheduleOnce('action', obj, fn);
+
+    assert.equal(wasCalled, 0);
+  });
+
+  assert.equal(wasCalled, 1);
+});
+
+QUnit.test('with peekGuid and a target without guid', function(assert) {
+  assert.expect(3);
+
+  let obj = { };
+
+  let bb = new Backburner(['action'], {
+    peekGuid() { }
+  });
+
+  let wasCalled = 0;
+
+  function fn () {
+    wasCalled++;
+  }
+
+  bb.run(() => {
+    let timer = bb.scheduleOnce('action', obj, fn);
+
+    assert.equal(wasCalled, 0);
+
+    bb.cancel(timer);
+    bb.scheduleOnce('action', obj, fn);
+
+    assert.equal(wasCalled, 0);
+  });
+
+  assert.equal(wasCalled, 1);
+});
+
+QUnit.test('with peekGuid no target', function(assert) {
+  assert.expect(3);
+
+  let bb = new Backburner(['action'], {
+    peekGuid() { }
+  });
+
+  let wasCalled = 0;
+
+  function fn () {
+    wasCalled++;
+  }
+
+  bb.run(() => {
+    let timer = bb.scheduleOnce('action', fn);
+
+    assert.equal(wasCalled, 0);
+
+    bb.cancel(timer);
+    bb.scheduleOnce('action', fn);
+
+    assert.equal(wasCalled, 0);
+  });
+
+  assert.equal(wasCalled, 1);
+});

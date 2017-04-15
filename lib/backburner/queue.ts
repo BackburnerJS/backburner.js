@@ -32,13 +32,10 @@ export default class Queue {
   }
 
   public pushUnique(target, method, args, stack) {
-    let KEY = this.globalOptions.GUID_KEY;
+    let guid = this.guidForTarget(target);
 
-    if (target && KEY) {
-      let guid = target[KEY];
-      if (guid) {
-        return this.pushUniqueWithGuid(guid, target, method, args, stack);
-      }
+    if (guid) {
+      return this.pushUniqueWithGuid(guid, target, method, args, stack);
     }
 
     this.pushUniqueWithoutGuid(target, method, args, stack);
@@ -139,10 +136,10 @@ export default class Queue {
     let i;
     let l;
     let { target, method }  = actionToCancel;
-    let GUID_KEY = this.globalOptions.GUID_KEY;
 
-    if (GUID_KEY && this.targetQueues && target) {
-      let targetQueue = this.targetQueues[target[GUID_KEY]];
+    if (this.targetQueues && target) {
+      let guid = this.guidForTarget(target);
+      let targetQueue = this.targetQueues[guid];
 
       if (targetQueue) {
         for (i = 0, l = targetQueue.length; i < l; i++) {
@@ -183,6 +180,20 @@ export default class Queue {
         queue[i + 1] = null;
         return true;
       }
+    }
+  }
+
+  private guidForTarget(target) {
+    if (!target) { return; }
+
+    let peekGuid = this.globalOptions.peekGuid;
+    if (peekGuid) {
+      return peekGuid(target);
+    }
+
+    let KEY = this.globalOptions.GUID_KEY;
+    if (KEY) {
+      return target[KEY];
     }
   }
 
