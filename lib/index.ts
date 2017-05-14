@@ -412,8 +412,8 @@ export default class Backburner {
     }
 
     let length = args.length;
+    let wait = 0;
     let method;
-    let wait;
     let target;
     let methodOrTarget;
     let methodOrWait;
@@ -423,7 +423,6 @@ export default class Backburner {
       return;
     } else if (length === 1) {
       method = args.shift();
-      wait = 0;
     } else if (length === 2) {
       methodOrTarget = args[0];
       methodOrWait = args[1];
@@ -431,25 +430,20 @@ export default class Backburner {
       if (isFunction(methodOrWait)) {
         target = args.shift();
         method = args.shift();
-        wait = 0;
       } else if (isString(methodOrWait) && methodOrTarget !== null && methodOrWait in methodOrTarget) {
         target = args.shift();
         method = target[args.shift()];
-        wait = 0;
       } else if (isCoercableNumber(methodOrWait)) {
         method = args.shift();
         wait = args.shift();
       } else {
         method = args.shift();
-        wait =  0;
       }
     } else {
       let last = args[args.length - 1];
 
       if (isCoercableNumber(last)) {
         wait = args.pop();
-      } else {
-        wait = 0;
       }
 
       methodOrTarget = args[0];
@@ -466,7 +460,7 @@ export default class Backburner {
       }
     }
 
-    let executeAt = now() + parseInt(wait !== wait ? 0 : wait, 10);
+    let executeAt = now() + parseInt(wait, 10);
     let onError = getOnError(this.options);
 
     function fn() {
