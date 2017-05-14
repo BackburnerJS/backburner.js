@@ -108,7 +108,7 @@ export default class Backburner {
     let previousInstance = this.currentInstance;
     let current;
 
-    if (this._autorun) {
+    if (this._autorun !== null) {
       current = previousInstance;
       this._cancelAutorun();
     } else {
@@ -152,7 +152,7 @@ export default class Backburner {
         } else {
           this.currentInstance = null;
 
-          if (this.instanceStack.length) {
+          if (this.instanceStack.length > 0) {
             nextInstance = this.instanceStack.pop();
             this.currentInstance = nextInstance;
           }
@@ -170,7 +170,7 @@ export default class Backburner {
       throw new TypeError(`Callback must be a function`);
     }
     let callbacks = this._eventCallbacks[eventName];
-    if (callbacks) {
+    if (callbacks !== undefined) {
       callbacks.push(callback);
     } else {
       throw new TypeError(`Cannot on() event ${eventName} because it does not exist`);
@@ -181,7 +181,7 @@ export default class Backburner {
     if (eventName) {
       let callbacks = this._eventCallbacks[eventName];
       let callbackFound = false;
-      if (!callbacks) {
+      if (callbacks === undefined) {
         return;
       }
       if (callback) {
@@ -257,7 +257,7 @@ export default class Backburner {
   */
   public join(...args);
   public join() {
-    if (!this.currentInstance) {
+    if (this.currentInstance === null || this.currentInstance === undefined) {
       return this.run.apply(this, arguments);
     }
 
@@ -494,6 +494,7 @@ export default class Backburner {
       args[i] = arguments[i];
     }
     let immediate = args.pop();
+    let isImmediate;
     let wait;
     let throttler;
     let index;
@@ -501,9 +502,10 @@ export default class Backburner {
 
     if (isNumber(immediate) || isString(immediate)) {
       wait = immediate;
-      immediate = true;
+      isImmediate = true;
     } else {
       wait = args.pop();
+      isImmediate = immediate === true;
     }
 
     wait = parseInt(wait, 10);
@@ -512,7 +514,7 @@ export default class Backburner {
     if (index > -1) { return this._throttlers[index]; } // throttled
 
     timer = this._platform.setTimeout(function() {
-      if (!immediate) {
+      if (isImmediate === false) {
         backburner.run.apply(backburner, args);
       }
       index = findThrottler(target, method, backburner._throttlers);
@@ -521,7 +523,7 @@ export default class Backburner {
       }
     }, wait);
 
-    if (immediate) {
+    if (isImmediate) {
       this.join.apply(this, args);
     }
 
@@ -541,6 +543,7 @@ export default class Backburner {
     }
 
     let immediate = args.pop();
+    let isImmediate;
     let wait;
     let index;
     let debouncee;
@@ -548,9 +551,10 @@ export default class Backburner {
 
     if (isNumber(immediate) || isString(immediate)) {
       wait = immediate;
-      immediate = false;
+      isImmediate = false;
     } else {
       wait = args.pop();
+      isImmediate = immediate === true;
     }
 
     wait = parseInt(wait, 10);
@@ -564,7 +568,7 @@ export default class Backburner {
     }
 
     timer = this._platform.setTimeout(function() {
-      if (!immediate) {
+      if (isImmediate === false) {
         backburner.run.apply(backburner, args);
       }
       index = findDebouncee(target, method, backburner._debouncees);
@@ -573,7 +577,7 @@ export default class Backburner {
       }
     }, wait);
 
-    if (immediate && index === -1) {
+    if (isImmediate && index === -1) {
       backburner.run.apply(backburner, args);
     }
 
@@ -598,7 +602,7 @@ export default class Backburner {
     this._clearTimerTimeout();
     this._timers = [];
 
-    if (this._autorun) {
+    if (this._autorun !== null) {
       this._platform.clearNext(this._autorun);
       this._autorun = null;
     }
@@ -607,7 +611,7 @@ export default class Backburner {
   }
 
   public hasTimers() {
-    return !!this._timers.length || !!this._debouncees.length || !!this._throttlers.length || this._autorun;
+    return this._timers.length > 0 || this._debouncees.length > 0 || this._throttlers.length > 0 || this._autorun !== null;
   }
 
   public cancel(timer?) {
@@ -634,7 +638,7 @@ export default class Backburner {
   }
 
   private _cancelAutorun() {
-    if (this._autorun) {
+    if (this._autorun !== null) {
       this._platform.clearTimeout(this._autorun);
       this._autorun = null;
     }
@@ -696,7 +700,7 @@ export default class Backburner {
    */
   private _trigger<T, U>(eventName: string, arg1: T, arg2: U) {
     let callbacks = this._eventCallbacks[eventName];
-    if (callbacks) {
+    if (callbacks !== undefined) {
       for (let i = 0; i < callbacks.length; i++) {
         callbacks[i](arg1, arg2);
       }
@@ -732,7 +736,7 @@ export default class Backburner {
   }
 
   private _clearTimerTimeout() {
-    if (!this._timerTimeoutId) {
+    if (this._timerTimeoutId === undefined) {
       return;
     }
     this._platform.clearTimeout(this._timerTimeoutId);
@@ -740,7 +744,7 @@ export default class Backburner {
   }
 
   private _installTimerTimeout() {
-    if (!this._timers.length) {
+    if (this._timers.length === 0) {
       return;
     }
     let minExpiresAt = this._timers[0];
@@ -751,7 +755,7 @@ export default class Backburner {
 
   private _ensureInstance(): DeferredActionQueues {
     let currentInstance = this.currentInstance;
-    if (!currentInstance) {
+    if (currentInstance === undefined || currentInstance === null) {
       const next = this._platform.next || this._platform.setTimeout; // TODO: remove the fallback
       currentInstance = this.begin();
       this._autorun = next(this._boundAutorunEnd);
