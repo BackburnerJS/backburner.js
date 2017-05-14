@@ -6,7 +6,6 @@ import {
   getOnError,
   isCoercableNumber,
   isFunction,
-  isNumber,
   isString,
   now
 } from './backburner/utils';
@@ -499,7 +498,7 @@ export default class Backburner {
     let index;
     let timer;
 
-    if (isNumber(immediate) || isString(immediate)) {
+    if (isCoercableNumber(immediate)) {
       wait = immediate;
       immediate = true;
     } else {
@@ -546,7 +545,7 @@ export default class Backburner {
     let debouncee;
     let timer;
 
-    if (isNumber(immediate) || isString(immediate)) {
+    if (isCoercableNumber(immediate)) {
       wait = immediate;
       immediate = false;
     } else {
