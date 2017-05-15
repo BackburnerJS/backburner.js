@@ -50,9 +50,9 @@ export default class Backburner {
   private _autorun: number | null = null;
   private _boundAutorunEnd: () => void;
 
-  constructor(queueNames: string[], options?: any) {
+  constructor(queueNames: string[], options: any = {} ) {
     this.queueNames = queueNames;
-    this.options = options || {};
+    this.options = options;
     if (!this.options.defaultQueue) {
       this.options.defaultQueue = queueNames[0];
     }
@@ -104,7 +104,7 @@ export default class Backburner {
   */
   public begin(): DeferredActionQueues {
     let options = this.options;
-    let onBegin = options && options.onBegin;
+    let { onBegin } = options;
     let previousInstance = this.currentInstance;
     let current;
 
@@ -127,8 +127,7 @@ export default class Backburner {
   }
 
   public end() {
-    let options = this.options;
-    let onEnd = options && options.onEnd;
+    let { onEnd } = this.options;
     let currentInstance = this.currentInstance;
     let nextInstance: DeferredActionQueues | null | undefined = null;
 
