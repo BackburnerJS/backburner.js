@@ -14,10 +14,13 @@ export default class Queue {
   private targetQueues = Object.create(null);
   private index = 0;
 
-  constructor(name: string, options: any, globalOptions: any) {
+  constructor(name: string, options: any = {}, globalOptions: any = {}) {
     this.name = name;
-    this.globalOptions = globalOptions || {};
     this.options = options;
+    this.globalOptions = globalOptions;
+
+    this.globalOptions.onError = globalOptions.onError ||
+      (globalOptions.onErrorTarget && globalOptions.onErrorTarget[globalOptions.onErrorMethod]);
   }
 
   public push(target, method, args, stack) {
@@ -47,16 +50,12 @@ export default class Queue {
   }
 
   public flush(sync?) {
-    let globalOptions = this.globalOptions;
-    let options = this.options;
-    let before = options && options.before;
-    let after = options && options.after;
-    let onError = globalOptions.onError || (globalOptions.onErrorTarget &&
-                                            globalOptions.onErrorTarget[globalOptions.onErrorMethod]);
+    let { before, after } = this.options;
     let target;
     let method;
     let args;
     let errorRecordedForStack;
+    let onError = this.globalOptions.onError;
     let invoke = onError ? this.invokeWithOnError : this.invoke;
 
     this.targetQueues = Object.create(null);
