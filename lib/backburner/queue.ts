@@ -1,4 +1,5 @@
 import {
+  getOnError,
   isString
 } from './utils';
 export const enum QUEUE_STATE {
@@ -19,8 +20,7 @@ export default class Queue {
     this.options = options;
     this.globalOptions = globalOptions;
 
-    this.globalOptions.onError = globalOptions.onError ||
-      (globalOptions.onErrorTarget && globalOptions.onErrorTarget[globalOptions.onErrorMethod]);
+    this.globalOptions.onError = getOnError(globalOptions);
   }
 
   public push(target, method, args, stack) {
