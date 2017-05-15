@@ -435,7 +435,7 @@ export default class Backburner {
         method = target[args.shift()];
       } else if (isCoercableNumber(methodOrWait)) {
         method = args.shift();
-        wait = args.shift();
+        wait = parseInt(args.shift(), 10);
       } else {
         method = args.shift();
       }
@@ -443,7 +443,7 @@ export default class Backburner {
       let last = args[args.length - 1];
 
       if (isCoercableNumber(last)) {
-        wait = args.pop();
+        wait = parseInt(args.pop(), 10);
       }
 
       methodOrTarget = args[0];
@@ -460,7 +460,7 @@ export default class Backburner {
       }
     }
 
-    let executeAt = now() + parseInt(wait, 10);
+    let executeAt = now() + wait;
     let onError = getOnError(this.options);
 
     function fn() {
