@@ -21,7 +21,7 @@ export function isNumber(suspect: any): suspect is number {
 }
 
 export function isCoercableNumber(suspect) {
-  return isNumber(suspect) || NUMBER.test(suspect);
+  return isNumber(suspect) && suspect === suspect || NUMBER.test(suspect);
 }
 
 export function noSuchQueue(name) {
