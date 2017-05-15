@@ -11,7 +11,7 @@ export default class Queue {
   private globalOptions: any;
   private options: any;
   private _queueBeingFlushed: any[] = [];
-  private targetQueues = {};
+  private targetQueues = Object.create(null);
   private index = 0;
 
   constructor(name: string, options: any, globalOptions: any) {
@@ -21,8 +21,7 @@ export default class Queue {
   }
 
   public push(target, method, args, stack) {
-    let queue = this._queue;
-    queue.push(target, method, args, stack);
+    this._queue.push(target, method, args, stack);
 
     return {
       queue: this,
@@ -137,15 +136,13 @@ export default class Queue {
     let l;
     let { target, method }  = actionToCancel;
 
-    if (this.targetQueues && target) {
-      let guid = this.guidForTarget(target);
-      let targetQueue = this.targetQueues[guid];
+    let guid = this.guidForTarget(target);
+    let targetQueue = this.targetQueues[guid];
 
-      if (targetQueue) {
-        for (i = 0, l = targetQueue.length; i < l; i++) {
-          if (targetQueue[i] === method) {
-            targetQueue.splice(i, 1);
-          }
+    if (targetQueue) {
+      for (i = 0, l = targetQueue.length; i < l; i++) {
+        if (targetQueue[i] === method) {
+          targetQueue.splice(i, 1);
         }
       }
     }
@@ -248,8 +245,8 @@ export default class Queue {
 
     return {
       queue: this,
-      target: target,
-      method: method
+      target,
+      method
     };
   }
 
