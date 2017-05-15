@@ -20,10 +20,6 @@ export function isNumber(suspect: any): suspect is number {
   return typeof suspect === 'number';
 }
 
-export function isArray(suspect: any): suspect is T[] {
-  return Object.prototype.toString.call(suspect) === '[object Array]';
-}
-
 export function isCoercableNumber(suspect) {
   return isNumber(suspect) || NUMBER.test(suspect);
 }

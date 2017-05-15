@@ -4,7 +4,6 @@ import {
   findItem,
   findThrottler,
   getOnError,
-  isArray,
   isCoercableNumber,
   isFunction,
   isNumber,
@@ -626,7 +625,7 @@ export default class Backburner {
           return true;
         }
       }
-    } else if (isArray(timer)) { // we're cancelling a throttle or debounce
+    } else if (Array.isArray(timer)) { // we're cancelling a throttle or debounce
       return this._cancelItem(findThrottler, this._throttlers, timer) ||
         this._cancelItem(findDebouncee, this._debouncees, timer);
     } else {
