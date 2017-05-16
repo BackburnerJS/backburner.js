@@ -6,21 +6,17 @@ import {
 } from './utils';
 
 export default class DeferredActionQueues {
-  public queues: {
-    [name: string]: Queue
-  };
+  public queues: { [name: string]: Queue } = {};
 
   private queueNames: string[];
-
   private options: any;
-
   private queueNameIndex = 0;
-  constructor(queueNames: string[], options: any) {
-    let queues = this.queues = {};
-    this.queueNames = queueNames = queueNames || [];
 
+  constructor(queueNames: string[] = [], options: any) {
     this.options = options;
+    this.queueNames = queueNames;
 
+    let queues = this.queues;
     each(queueNames, function(queueName) {
       queues[queueName] = new Queue(queueName, options[queueName], options);
     });

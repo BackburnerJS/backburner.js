@@ -1,7 +1,6 @@
 import {
   each,
   findDebouncee,
-  findItem,
   findThrottler,
   getOnError,
   isCoercableNumber,
@@ -402,16 +401,10 @@ export default class Backburner {
     return this.later.apply(this, arguments);
   }
 
-  public later(...args);
-  public later() {
-    let l = arguments.length;
-    let args = new Array(l);
-
-    for (let x = 0; x < l; x++) {
-      args[x] = arguments[x];
-    }
-
+  public later()
+  public later(...args) {
     let length = args.length;
+
     let wait = 0;
     let method;
     let target;
@@ -479,12 +472,13 @@ export default class Backburner {
   }
 
   public throttle(...args);
-  public throttle(target, method /* , args, wait, [immediate] */) {
+  public throttle(target, method /*, ...args, wait, [immediate] */) {
     let backburner = this;
     let args = new Array(arguments.length);
     for (let i = 0; i < arguments.length; i++) {
       args[i] = arguments[i];
     }
+
     let immediate = args.pop();
     let isImmediate;
     let wait;
