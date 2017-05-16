@@ -2,9 +2,11 @@ import {
   getOnError,
   isString
 } from './utils';
+
 export const enum QUEUE_STATE {
   Pause = 1
 }
+
 export default class Queue {
   public _queue: any[] = []; // TODO: should be private
 
@@ -127,13 +129,12 @@ export default class Queue {
     return this._queueBeingFlushed.length > 0 || this._queue.length > 0;
   }
 
-  public cancel(actionToCancel) {
+  public cancel({ target, method }) {
     let queue = this._queue;
     let currentTarget;
     let currentMethod;
     let i;
     let l;
-    let { target, method }  = actionToCancel;
 
     let guid = this.guidForTarget(target);
     let targetQueue = this.targetQueues[guid];
