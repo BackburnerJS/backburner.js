@@ -16,6 +16,8 @@ import iteratorDrain from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
+const noop = function() {};
+
 export default class Backburner {
   public static Queue = Queue;
 
@@ -218,24 +220,20 @@ export default class Backburner {
       _method = <Function> _target[_method];
     }
 
-    let onError = getOnError(this.options);
+    let onError = getOnError(this.options) || noop;
 
     this.begin();
 
-    if (onError) {
-      try {
+    try {
+      if (args.length === 0) {
+        return _method.call(_target);
+      } else {
         return _method.apply(_target, args);
-      } catch (error) {
-        onError(error);
-      } finally {
-        this.end();
       }
-    } else {
-      try {
-        return _method.apply(_target, args);
-      } finally {
-        this.end();
-      }
+    } catch (error) {
+      onError(error);
+    } finally {
+      this.end();
     }
   }
 
