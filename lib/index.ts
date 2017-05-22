@@ -601,10 +601,16 @@ export default class Backburner {
   }
 
   public cancel(timer?) {
+    if (!timer) { return; }
     let timerType = typeof timer;
 
-    if (timer && timerType === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
-      return timer.queue.cancel(timer);
+    if (timerType === 'object') {
+      if (timer.queue && timer.method) { // we're cancelling a deferOnce
+        return timer.queue.cancel(timer);
+      } else if (Array.isArray(timer)) { // we're cancelling a throttle or debounce
+        return this._cancelItem(findThrottler, this._throttlers, timer) ||
+          this._cancelItem(findDebouncee, this._debouncees, timer);
+      }
     } else if (timerType === 'function') { // we're cancelling a setTimeout
       for (let i = 0, l = this._timers.length; i < l; i += 2) {
         if (this._timers[i + 1] === timer) {
@@ -615,11 +621,6 @@ export default class Backburner {
           return true;
         }
       }
-    } else if (Array.isArray(timer)) { // we're cancelling a throttle or debounce
-      return this._cancelItem(findThrottler, this._throttlers, timer) ||
-        this._cancelItem(findDebouncee, this._debouncees, timer);
-    } else {
-      return; // timer was null or not a timer
     }
   }
 
