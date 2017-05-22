@@ -175,26 +175,22 @@ export default class Backburner {
   }
 
   public off(eventName, callback) {
-    if (eventName) {
-      let callbacks = this._eventCallbacks[eventName];
-      let callbackFound = false;
-      if (callbacks === undefined) {
-        return;
-      }
-      if (callback) {
-        for (let i = 0; i < callbacks.length; i++) {
-          if (callbacks[i] === callback) {
-            callbackFound = true;
-            callbacks.splice(i, 1);
-            i--;
-          }
+    let callbacks = this._eventCallbacks[eventName];
+    if (!eventName || callbacks === undefined) {
+      throw new TypeError(`Cannot off() event ${eventName} because it does not exist`);
+    }
+    let callbackFound = false;
+    if (callback) {
+      for (let i = 0; i < callbacks.length; i++) {
+        if (callbacks[i] === callback) {
+          callbackFound = true;
+          callbacks.splice(i, 1);
+          i--;
         }
       }
-      if (!callbackFound) {
-        throw new TypeError(`Cannot off() callback that does not exist`);
-      }
-    } else {
-      throw new TypeError(`Cannot off() event ${eventName} because it does not exist`);
+    }
+    if (!callbackFound) {
+      throw new TypeError(`Cannot off() callback that does not exist`);
     }
   }
 
