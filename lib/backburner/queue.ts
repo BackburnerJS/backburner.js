@@ -1,6 +1,5 @@
 import {
-  getOnError,
-  isString
+  getOnError
 } from './utils';
 
 export const enum QUEUE_STATE {
@@ -81,10 +80,6 @@ export default class Queue {
       method                = queueItems[i + 1];
       args                  = queueItems[i + 2];
       errorRecordedForStack = queueItems[i + 3]; // Debugging assistance
-
-      if (isString(method)) {
-        method = target[method];
-      }
 
       // method could have been nullified / canceled during flush
       if (method) {
