@@ -62,7 +62,7 @@ export default class Queue {
     this.targetQueues = Object.create(null);
     let queue = this._queue;
     let queueItems;
-    if (this._queueBeingFlushed && this._queueBeingFlushed.length > 0) {
+    if (this._queueBeingFlushed.length > 0) {
       queueItems = this._queueBeingFlushed;
     } else {
       queueItems = this._queueBeingFlushed = this._queue;
@@ -156,10 +156,6 @@ export default class Queue {
     // if not found in current queue
     // could be in the queue that is being flushed
     queue = this._queueBeingFlushed;
-
-    if (!queue) {
-      return;
-    }
 
     for (i = 0, l = queue.length; i < l; i += 4) {
       currentTarget = queue[i];
