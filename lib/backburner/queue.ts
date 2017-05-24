@@ -38,10 +38,10 @@ export default class Queue {
     let guid = this.guidForTarget(target);
 
     if (guid) {
-      return this.pushUniqueWithGuid(guid, target, method, args, stack);
+      this.pushUniqueWithGuid(guid, target, method, args, stack);
+    } else {
+      this.pushUniqueWithoutGuid(target, method, args, stack);
     }
-
-    this.pushUniqueWithoutGuid(target, method, args, stack);
 
     return {
       queue: this,
@@ -233,12 +233,6 @@ export default class Queue {
         this._queue.push(target, method, args, stack) - 4
       ];
     }
-
-    return {
-      queue: this,
-      target,
-      method
-    };
   }
 
   private invoke(target, method, args /*, onError, errorRecordedForStack */) {
