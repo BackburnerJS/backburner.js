@@ -82,7 +82,7 @@ export default class Queue {
       errorRecordedForStack = queueItems[i + 3]; // Debugging assistance
 
       // method could have been nullified / canceled during flush
-      if (method) {
+      if (method !== null) {
         //
         //    ** Attention intrepid developer **
         //
