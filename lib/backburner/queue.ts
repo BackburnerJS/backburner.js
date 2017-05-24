@@ -129,13 +129,15 @@ export default class Queue {
     let currentMethod;
     let i;
     let l;
+    let t;
 
     let guid = this.guidForTarget(target);
-    let targetQueue = this.targetQueues[guid];
+    let targetQueue = guid ? this.targetQueues[guid] : undefined;
 
-    if (targetQueue) {
-      for (i = 0, l = targetQueue.length; i < l; i++) {
-        if (targetQueue[i] === method) {
+    if (targetQueue !== undefined) {
+      for (i = 0, l = targetQueue.length; i < l; i += 2) {
+        t = targetQueue[i];
+        if (t === method) {
           targetQueue.splice(i, 1);
         }
       }
