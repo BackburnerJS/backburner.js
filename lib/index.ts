@@ -207,10 +207,10 @@ export default class Backburner {
     } else {
       _method = method;
       _target = target;
-    }
 
-    if (isString(_method)) {
-      _method = <Function> _target[_method];
+      if (isString(_method)) {
+        _method = <Function> _target[_method];
+      }
     }
 
     let onError = getOnError(this.options);
@@ -257,6 +257,7 @@ export default class Backburner {
     let length = arguments.length;
     let method;
     let target;
+    let args;
 
     if (length === 1) {
       method = arguments[0];
@@ -264,10 +265,16 @@ export default class Backburner {
     } else {
       target = arguments[0];
       method = arguments[1];
-    }
+      if (isString(method)) {
+        method = target[method];
+      }
 
-    if (isString(method)) {
-      method = target[method];
+      if (length > 2) {
+        args = new Array(length - 2);
+        for (let i = 0, l = length - 2; i < l; i++) {
+          args[i] = arguments[i + 2];
+        }
+      }
     }
 
     if (length === 1) {
@@ -275,10 +282,6 @@ export default class Backburner {
     } else if (length === 2) {
       return method.call(target);
     } else {
-      let args = new Array(length - 2);
-      for (let i = 0, l = length - 2; i < l; i++) {
-        args[i] = arguments[i + 2];
-      }
       return method.apply(target, args);
     }
   }
@@ -309,22 +312,20 @@ export default class Backburner {
     } else {
       target = arguments[1];
       method = arguments[2];
-    }
 
-    if (isString(method)) {
-      method = target[method];
+      if (isString(method)) {
+        method = target[method];
+      }
+
+      if (length > 3) {
+        args = new Array(length - 3);
+        for (let i = 3; i < length; i++) {
+          args[i - 3] = arguments[i];
+        }
+      }
     }
 
     let stack = this.DEBUG ? new Error() : undefined;
-
-    if (length > 3) {
-      args = new Array(length - 3);
-      for (let i = 3; i < length; i++) {
-        args[i - 3] = arguments[i];
-      }
-    } else {
-      args = undefined;
-    }
     return this._ensureInstance().schedule(queueName, target, method, args, false, stack);
   }
 
@@ -338,8 +339,7 @@ export default class Backburner {
   */
   public scheduleIterable(queueName: string, iterable: Function) {
     let stack = this.DEBUG ? new Error() : undefined;
-    let _iteratorDrain = iteratorDrain;
-    return this._ensureInstance().schedule(queueName, null, _iteratorDrain, [iterable], false, stack);
+    return this._ensureInstance().schedule(queueName, null, iteratorDrain, [iterable], false, stack);
   }
 
   /**
@@ -368,25 +368,21 @@ export default class Backburner {
     } else {
       target = arguments[1];
       method = arguments[2];
-    }
 
-    if (isString(method)) {
-      method = target[method];
+      if (isString(method)) {
+        method = target[method];
+      }
+
+      if (length > 3) {
+        args = new Array(length - 3);
+        for (let i = 3; i < length; i++) {
+          args[i - 3] = arguments[i];
+        }
+      }
     }
 
     let stack = this.DEBUG ? new Error() : undefined;
-
-    if (length > 3) {
-      args = new Array(length - 3);
-      for (let i = 3; i < length; i++) {
-        args[i - 3] = arguments[i];
-      }
-    } else {
-      args = undefined;
-    }
-
-    let currentInstance = this._ensureInstance();
-    return currentInstance.schedule(queueName, target, method, args, true, stack);
+    return this._ensureInstance().schedule(queueName, target, method, args, true, stack);
   }
 
   /**
@@ -419,7 +415,7 @@ export default class Backburner {
       if (isFunction(methodOrWait)) {
         target = args.shift();
         method = args.shift();
-      } else if (isString(methodOrWait) && methodOrTarget !== null && methodOrWait in methodOrTarget) {
+      } else if (methodOrTarget !== null && isString(methodOrWait) && methodOrWait in methodOrTarget) {
         target = args.shift();
         method = target[args.shift()];
       } else if (isCoercableNumber(methodOrWait)) {
@@ -441,7 +437,7 @@ export default class Backburner {
       if (isFunction(methodOrArgs)) {
         target = args.shift();
         method = args.shift();
-      } else if (isString(methodOrArgs) && methodOrTarget !== null && methodOrArgs in methodOrTarget) {
+      } else if (methodOrTarget !== null && isString(methodOrArgs) && methodOrArgs in methodOrTarget) {
         target = args.shift();
         method = target[args.shift()];
       } else {
@@ -452,16 +448,19 @@ export default class Backburner {
     let executeAt = now() + wait;
     let onError = getOnError(this.options);
 
-    function fn() {
-      if (onError) {
+    let fn;
+    if (onError) {
+      fn = function() {
         try {
           method.apply(target, args);
         } catch (e) {
           onError(e);
         }
-      } else {
+      };
+    } else {
+      fn = function() {
         method.apply(target, args);
-      }
+      };
     }
 
     return this._setTimeout(fn, executeAt);
