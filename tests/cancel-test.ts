@@ -314,3 +314,30 @@ QUnit.test('with peekGuid no target', function(assert) {
 
   assert.equal(wasCalled, 1);
 });
+
+QUnit.test('cancel always returns boolean', function(assert) {
+  let bb = new Backburner(['one']);
+
+  bb.run(function() {
+    let timer1 = bb.schedule('one', null, function() {});
+    assert.equal(bb.cancel(timer1), true);
+    assert.equal(bb.cancel(timer1), false);
+    assert.equal(bb.cancel(timer1), false);
+
+    let timer2 = bb.later(function() {}, 10);
+    assert.equal(bb.cancel(timer2), true);
+    assert.equal(bb.cancel(timer2), false);
+    assert.equal(bb.cancel(timer2), false);
+
+    let timer3 = bb.debounce(function() {}, 10);
+    assert.equal(bb.cancel(timer3), true);
+    assert.equal(bb.cancel(timer3), false);
+    assert.equal(bb.cancel(timer3), false);
+
+    assert.equal(bb.cancel(null), false);
+    assert.equal(bb.cancel({}), false);
+    assert.equal(bb.cancel([]), false);
+    assert.equal(bb.cancel(42), false);
+    assert.equal(bb.cancel('42'), false);
+  });
+});

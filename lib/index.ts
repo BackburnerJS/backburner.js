@@ -596,7 +596,7 @@ export default class Backburner {
   }
 
   public cancel(timer?) {
-    if (!timer) { return; }
+    if (!timer) { return false; }
     let timerType = typeof timer;
 
     if (timerType === 'object') {
@@ -617,6 +617,8 @@ export default class Backburner {
         }
       }
     }
+
+    return false;
   }
 
   private _cancelAutorun() {

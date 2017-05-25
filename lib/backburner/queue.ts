@@ -169,6 +169,8 @@ export default class Queue {
         return true;
       }
     }
+
+    return false;
   }
 
   private guidForTarget(target) {
