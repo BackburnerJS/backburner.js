@@ -137,7 +137,7 @@ export default class Queue {
     if (targetQueue) {
       for (i = 0, l = targetQueue.length; i < l; i++) {
         if (targetQueue[i] === method) {
-          targetQueue[i] = null;
+          targetQueue.splice(i, 1);
         }
       }
     }
@@ -148,7 +148,7 @@ export default class Queue {
 
       if (currentTarget === target &&
           currentMethod === method) {
-        queue[i] = queue[i + 1] = null;
+        queue.splice(i, 4);
         return true;
       }
     }
@@ -165,7 +165,7 @@ export default class Queue {
           currentMethod === method) {
         // don't mess with array during flush
         // just nullify the method
-        queue[i] = queue[i + 1] = null;
+        queue[i + 1] = null;
         return true;
       }
     }
