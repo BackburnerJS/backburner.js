@@ -3,15 +3,6 @@ import Backburner from 'backburner';
 
 QUnit.module('tests/cancel');
 
-QUnit.test('null', function(assert) {
-  // mimic browser behavior: window.clearTimeout(null) -> undefined
-  assert.expect(3);
-  let bb = new Backburner(['cancel']);
-  assert.equal(bb.cancel(), undefined, 'cancel with no arguments should return undefined');
-  assert.equal(bb.cancel(null), undefined, 'cancel a null timer should return undefined');
-  assert.equal(bb.cancel(undefined), undefined, 'cancel an undefined timer should return undefined');
-});
-
 QUnit.test('scheduleOnce', function(assert) {
   assert.expect(3);
 
@@ -334,6 +325,7 @@ QUnit.test('cancel always returns boolean', function(assert) {
     assert.equal(bb.cancel(timer3), false);
     assert.equal(bb.cancel(timer3), false);
 
+    assert.equal(bb.cancel(undefined), false);
     assert.equal(bb.cancel(null), false);
     assert.equal(bb.cancel({}), false);
     assert.equal(bb.cancel([]), false);
