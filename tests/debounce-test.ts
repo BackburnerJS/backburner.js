@@ -172,7 +172,7 @@ QUnit.test('debounce accept time interval like string numbers', function(assert)
   }, 60);
 });
 
-QUnit.test('debounce returns timer information usable for cancelling', function(assert) {
+QUnit.test('debounce returns timer information usable for canceling', function(assert) {
   assert.expect(3);
 
   let done = assert.async();
