@@ -266,7 +266,7 @@ export default class Backburner {
       target = arguments[0];
       method = arguments[1];
       if (isString(method)) {
-        method = target[method];
+        method = <Function> target[method];
       }
 
       if (length > 2) {
@@ -314,7 +314,7 @@ export default class Backburner {
       method = arguments[2];
 
       if (isString(method)) {
-        method = target[method];
+        method = <Function> target[method];
       }
 
       if (length > 3) {
@@ -370,7 +370,7 @@ export default class Backburner {
       method = arguments[2];
 
       if (isString(method)) {
-        method = target[method];
+        method = <Function> target[method];
       }
 
       if (length > 3) {
@@ -417,7 +417,7 @@ export default class Backburner {
         method = args.shift();
       } else if (methodOrTarget !== null && isString(methodOrWait) && methodOrWait in methodOrTarget) {
         target = args.shift();
-        method = target[args.shift()];
+        method = <Function> target[args.shift()];
       } else if (isCoercableNumber(methodOrWait)) {
         method = args.shift();
         wait = parseInt(args.shift(), 10);
@@ -468,7 +468,6 @@ export default class Backburner {
 
   public throttle(...args);
   public throttle(target, method /*, ...args, wait, [immediate] */) {
-    let backburner = this;
     let args = new Array(arguments.length);
     for (let i = 0; i < arguments.length; i++) {
       args[i] = arguments[i];
@@ -494,13 +493,13 @@ export default class Backburner {
     index = findThrottler(target, method, this._throttlers);
     if (index > -1) { return this._throttlers[index]; } // throttled
 
-    timer = this._platform.setTimeout(function() {
+    timer = this._platform.setTimeout(() => {
       if (isImmediate === false) {
-        backburner.run.apply(backburner, args);
+        this.run.apply(this, args);
       }
-      index = findThrottler(target, method, backburner._throttlers);
+      index = findThrottler(target, method, this._throttlers);
       if (index > -1) {
-        backburner._throttlers.splice(index, 1);
+        this._throttlers.splice(index, 1);
       }
     }, wait);
 
@@ -517,7 +516,6 @@ export default class Backburner {
 
   public debounce(...args);
   public debounce(target, method /* , args, wait, [immediate] */) {
-    let backburner = this;
     let args = new Array(arguments.length);
     for (let i = 0; i < arguments.length; i++) {
       args[i] = arguments[i];
@@ -548,18 +546,18 @@ export default class Backburner {
       this._platform.clearTimeout(debouncee[2]);
     }
 
-    timer = this._platform.setTimeout(function() {
+    timer = this._platform.setTimeout(() => {
       if (isImmediate === false) {
-        backburner.run.apply(backburner, args);
+        this.run.apply(this, args);
       }
-      index = findDebouncee(target, method, backburner._debouncees);
+      index = findDebouncee(target, method, this._debouncees);
       if (index > -1) {
-        backburner._debouncees.splice(index, 1);
+        this._debouncees.splice(index, 1);
       }
     }, wait);
 
     if (isImmediate && index === -1) {
-      backburner.run.apply(backburner, args);
+      this.run.apply(this, args);
     }
 
     debouncee = [
@@ -568,7 +566,7 @@ export default class Backburner {
       timer
     ];
 
-    backburner._debouncees.push(debouncee);
+    this._debouncees.push(debouncee);
 
     return debouncee;
   }
