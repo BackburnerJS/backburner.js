@@ -37,10 +37,9 @@ export function getOnError(options) {
 }
 
 export function findItem(target, method, collection) {
-  let item;
   let index = -1;
 
-  for (let i = 0, l = collection.length; i < l; i++) {
+  for (let i = 0, l = collection.length; i < l; i += 3) {
     if (collection[i] === target && collection[i + 1] === method) {
       index = i;
       break;
@@ -50,11 +49,11 @@ export function findItem(target, method, collection) {
   return index;
 }
 
-export function findItem2(item, collection) {
+export function findTimer(timer, collection) {
   let index = -1;
 
-  for (let i = 0, l = collection.length; i < l; i++) {
-    if (collection[i + 2] === item) {
+  for (let i = 0, l = collection.length; i < l; i += 3) {
+    if (collection[i + 2] === timer) {
       index = i;
       break;
     }

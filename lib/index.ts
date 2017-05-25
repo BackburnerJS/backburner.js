@@ -1,7 +1,7 @@
 import {
   each,
   findItem,
-  findItem2,
+  findTimer,
   getOnError,
   isCoercableNumber,
   isFunction,
@@ -593,7 +593,7 @@ export default class Backburner {
     if (timerType === 'number' || timerType === 'string') {
       // we're cancelling a throttle or debounce
       return this._cancelItem(timer, this._throttlers) || this._cancelItem(timer, this._debouncees);
-    } else if (timerType === 'object' &&  timer.queue && timer.method) { // we're cancelling a deferOnce
+    } else if (timerType === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
       return timer.queue.cancel(timer);
     } else if (timerType === 'function') { // we're cancelling a setTimeout
       for (let i = 0, l = this._timers.length; i < l; i += 2) {
@@ -638,9 +638,9 @@ export default class Backburner {
   }
 
   private _cancelItem(timer, array) {
-    if (!timer || !array.length) { return false; }
+    if (!array.length) { return false; }
 
-    let index = findItem2(timer, array);
+    let index = findTimer(timer, array);
 
     if (index > -1) {
       let timerId = array[index + 2];

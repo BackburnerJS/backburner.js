@@ -107,7 +107,7 @@ QUnit.test('throttle with cancelTimers', function(assert) {
 });
 
 QUnit.test('throttle leading edge', function(assert) {
-  assert.expect(9);
+  assert.expect(10);
 
   let bb = new Backburner(['zerg']);
   let throttle;
@@ -130,7 +130,7 @@ QUnit.test('throttle leading edge', function(assert) {
   // let's schedule `throttler` to run again, it shouldn't be allowed to queue for another 40 msec
   throttle2 = bb.throttle(null, throttler, 40);
 
-  // assert.equal(throttle, throttle2, 'No new throttle was inserted, returns old throttle');
+  assert.equal(throttle, throttle2, 'No new throttle was inserted, returns old throttle');
 
   setTimeout(() => {
     assert.ok(!wasCalled, 'attempt to call throttle again didn\'t happen');
