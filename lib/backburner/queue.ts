@@ -207,9 +207,9 @@ export default class Queue {
 
     for (let i = 0, l = targetQueue.length; i < l; i += 2) {
       let currentMethod = targetQueue[i];
-      let currentIndex  = targetQueue[i + 1];
 
       if (currentMethod === method) {
+        let currentIndex  = targetQueue[i + 1];
         queue[currentIndex + 2] = args;  // replace args
         queue[currentIndex + 3] = stack; // replace stack
         return;
