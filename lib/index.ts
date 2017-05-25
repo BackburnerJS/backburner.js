@@ -1,7 +1,7 @@
 import {
   each,
-  findDebouncee,
-  findThrottler,
+  findItem,
+  findTimer,
   getOnError,
   isCoercableNumber,
   isFunction,
@@ -63,8 +63,8 @@ export default class Backburner {
       begin: []
     };
 
-    this._boundClearItems = (item) => {
-      this._platform.clearTimeout(item[2]);
+    this._boundClearItems = (timerId) => {
+      this._platform.clearTimeout(timerId);
     };
 
     this._timerTimeoutId = undefined;
@@ -476,7 +476,6 @@ export default class Backburner {
     let immediate = args.pop();
     let isImmediate;
     let wait;
-    let throttler;
     let index;
     let timer;
 
@@ -490,16 +489,19 @@ export default class Backburner {
 
     wait = parseInt(wait, 10);
 
-    index = findThrottler(target, method, this._throttlers);
-    if (index > -1) { return this._throttlers[index]; } // throttled
+    index = findItem(target, method, this._throttlers);
+    if (index > -1) {
+      return this._throttlers[index + 2];
+    } // throttled
 
     timer = this._platform.setTimeout(() => {
       if (isImmediate === false) {
         this.run.apply(this, args);
       }
-      index = findThrottler(target, method, this._throttlers);
+
+      index = findItem(target, method, this._throttlers);
       if (index > -1) {
-        this._throttlers.splice(index, 1);
+        this._throttlers.splice(index, 3);
       }
     }, wait);
 
@@ -507,11 +509,9 @@ export default class Backburner {
       this.join.apply(this, args);
     }
 
-    throttler = [target, method, timer];
+    this._throttlers.push(target, method, timer);
 
-    this._throttlers.push(throttler);
-
-    return throttler;
+    return timer;
   }
 
   public debounce(...args);
@@ -525,7 +525,6 @@ export default class Backburner {
     let isImmediate;
     let wait;
     let index;
-    let debouncee;
     let timer;
 
     if (isCoercableNumber(immediate)) {
@@ -538,21 +537,21 @@ export default class Backburner {
 
     wait = parseInt(wait, 10);
     // Remove debouncee
-    index = findDebouncee(target, method, this._debouncees);
+    index = findItem(target, method, this._debouncees);
 
     if (index > -1) {
-      debouncee = this._debouncees[index];
-      this._debouncees.splice(index, 1);
-      this._platform.clearTimeout(debouncee[2]);
+      let timerId = this._debouncees[index + 2];
+      this._debouncees.splice(index, 3);
+      this._platform.clearTimeout(timerId);
     }
 
     timer = this._platform.setTimeout(() => {
       if (isImmediate === false) {
         this.run.apply(this, args);
       }
-      index = findDebouncee(target, method, this._debouncees);
+      index = findItem(target, method, this._debouncees);
       if (index > -1) {
-        this._debouncees.splice(index, 1);
+        this._debouncees.splice(index, 3);
       }
     }, wait);
 
@@ -560,22 +559,16 @@ export default class Backburner {
       this.run.apply(this, args);
     }
 
-    debouncee = [
-      target,
-      method,
-      timer
-    ];
+    this._debouncees.push(target, method, timer);
 
-    this._debouncees.push(debouncee);
-
-    return debouncee;
+    return timer;
   }
 
   public cancelTimers() {
-    each(this._throttlers, this._boundClearItems);
+    each(this._throttlers, this._boundClearItems, 3);
     this._throttlers = [];
 
-    each(this._debouncees, this._boundClearItems);
+    each(this._debouncees, this._boundClearItems, 3);
     this._debouncees = [];
 
     this._clearTimerTimeout();
@@ -597,13 +590,11 @@ export default class Backburner {
     if (!timer) { return false; }
     let timerType = typeof timer;
 
-    if (timerType === 'object') {
-      if (timer.queue && timer.method) { // we're cancelling a deferOnce
-        return timer.queue.cancel(timer);
-      } else if (Array.isArray(timer)) { // we're cancelling a throttle or debounce
-        return this._cancelItem(findThrottler, this._throttlers, timer) ||
-          this._cancelItem(findDebouncee, this._debouncees, timer);
-      }
+    if (timerType === 'number' || timerType === 'string') {
+      // we're cancelling a throttle or debounce
+      return this._cancelItem(timer, this._throttlers) || this._cancelItem(timer, this._debouncees);
+    } else if (timerType === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
+      return timer.queue.cancel(timer);
     } else if (timerType === 'function') { // we're cancelling a setTimeout
       for (let i = 0, l = this._timers.length; i < l; i += 2) {
         if (this._timers[i + 1] === timer) {
@@ -646,25 +637,19 @@ export default class Backburner {
     return fn;
   }
 
-  private _cancelItem(findMethod, array, timer) {
-    let item;
-    let index;
+  private _cancelItem(timer, array) {
+    if (!array.length) { return false; }
 
-    if (timer.length < 3) { return false; }
-
-    index = findMethod(timer[0], timer[1], array);
+    let index = findTimer(timer, array);
 
     if (index > -1) {
-
-      item = array[index];
-
-      if (item[2] === timer[2]) {
-        array.splice(index, 1);
-        this._platform.clearTimeout(timer[2]);
+      let timerId = array[index + 2];
+      if (timerId === timer) {
+        array.splice(index, 3);
+        this._platform.clearTimeout(timerId);
         return true;
       }
     }
-
     return false;
   }
 

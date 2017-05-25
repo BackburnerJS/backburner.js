@@ -2,8 +2,8 @@ const NUMBER = /\d+/;
 
 export const now = Date.now;
 
-export function each<T>(collection: T[], callback: (v: T) => void) {
-  for (let i = 0; i < collection.length; i++) {
+export function each<T>(collection: T[], callback: (v: T) => void, increment = 1) {
+  for (let i = 0; i < collection.length; i += increment) {
     callback(collection[i]);
   }
 }
@@ -36,21 +36,24 @@ export function getOnError(options) {
   return options.onError || (options.onErrorTarget && options.onErrorTarget[options.onErrorMethod]);
 }
 
-export function findDebouncee(target, method, debouncees) {
-  return findItem(target, method, debouncees);
-}
-
-export function findThrottler(target, method, throttlers) {
-  return findItem(target, method, throttlers);
-}
-
 export function findItem(target, method, collection) {
-  let item;
   let index = -1;
 
-  for (let i = 0, l = collection.length; i < l; i++) {
-    item = collection[i];
-    if (item[0] === target && item[1] === method) {
+  for (let i = 0, l = collection.length; i < l; i += 3) {
+    if (collection[i] === target && collection[i + 1] === method) {
+      index = i;
+      break;
+    }
+  }
+
+  return index;
+}
+
+export function findTimer(timer, collection) {
+  let index = -1;
+
+  for (let i = 0, l = collection.length; i < l; i += 3) {
+    if (collection[i + 2] === timer) {
       index = i;
       break;
     }
