@@ -60,7 +60,6 @@ export default class Queue {
     let invoke = onError ? this.invokeWithOnError : this.invoke;
 
     this.targetQueues = Object.create(null);
-    let queue = this._queue;
     let queueItems;
     if (this._queueBeingFlushed.length > 0) {
       queueItems = this._queueBeingFlushed;
@@ -223,10 +222,10 @@ export default class Queue {
   }
 
   private pushUniqueWithGuid(guid, target, method, args, stack) {
-    let hasLocalQueue = this.targetQueues[guid];
+    let localQueue = this.targetQueues[guid];
 
-    if (hasLocalQueue) {
-      this.targetQueue(hasLocalQueue, target, method, args, stack);
+    if (localQueue !== undefined) {
+      this.targetQueue(localQueue, target, method, args, stack);
     } else {
       this.targetQueues[guid] = [
         method,
