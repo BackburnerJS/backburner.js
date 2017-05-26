@@ -20,7 +20,7 @@ export default class Backburner {
 
   public DEBUG = false;
 
-  public currentInstance: DeferredActionQueues | null | undefined = null;
+  public currentInstance: DeferredActionQueues | null = null;
 
   public options: any;
 
@@ -444,8 +444,8 @@ export default class Backburner {
       }
     }
 
-    let executeAt = now() + wait;
     let onError = getOnError(this.options);
+    let executeAt = now() + wait;
 
     let fn;
     if (onError) {
@@ -676,19 +676,21 @@ export default class Backburner {
   }
 
   private _scheduleExpiredTimers() {
-    let n = now();
-    let timers = this._timers;
     let i = 0;
+    let timers = this._timers;
     let l = timers.length;
+    let defaultQueue = this.options.defaultQueue;
+    let n = now();
     for (; i < l; i += 2) {
       let executeAt = timers[i];
-      let fn = timers[i + 1];
       if (executeAt <= n) {
-        this.schedule(this.options.defaultQueue, null, fn);
+        let fn = timers[i + 1];
+        this.schedule(defaultQueue, null, fn);
       } else {
         break;
       }
     }
+
     timers.splice(0, i);
     this._installTimerTimeout();
   }
