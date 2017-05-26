@@ -549,7 +549,7 @@ export default class Backburner {
       if (isImmediate === false) {
         this.run.apply(this, args);
       }
-      index = findItem(target, method, this._debouncees);
+      index = findTimer(timer, this._debouncees);
       if (index > -1) {
         this._debouncees.splice(index, 3);
       }
