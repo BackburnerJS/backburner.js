@@ -95,3 +95,19 @@ QUnit.test('queue execution order', function(assert) {
   });
   assert.deepEqual(items, [0, 1, 2, 3, 4, 5, 6]);
 });
+
+QUnit.test('onError', function(assert) {
+  assert.expect(1);
+
+  function onError(error) {
+    assert.equal('test error', error.message);
+  }
+
+  let bb = new Backburner(['errors'], {
+    onError: onError
+  });
+
+  bb.join(() => {
+    throw new Error('test error');
+  });
+});
