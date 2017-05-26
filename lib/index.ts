@@ -643,12 +643,9 @@ export default class Backburner {
     let index = findTimer(timer, array);
 
     if (index > -1) {
-      let timerId = array[index + 2];
-      if (timerId === timer) {
-        array.splice(index, 3);
-        this._platform.clearTimeout(timerId);
-        return true;
-      }
+      array.splice(index, 3);
+      this._platform.clearTimeout(timer);
+      return true;
     }
     return false;
   }
