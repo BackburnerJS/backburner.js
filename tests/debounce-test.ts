@@ -145,6 +145,25 @@ QUnit.test('debounce - immediate', function(assert) {
   }, 120);
 });
 
+QUnit.test('debounce + immediate joins existing run loop instances', function(assert) {
+  assert.expect(1);
+
+  function onError(error) {
+    throw error;
+  }
+
+  let bb = new Backburner(['errors'], {
+    onError: onError
+  });
+
+  bb.run(() => {
+    let parentInstance = bb.currentInstance;
+    bb.debounce(null, () => {
+      assert.equal(bb.currentInstance, parentInstance);
+    }, 20, true);
+  });
+});
+
 QUnit.test('debounce accept time interval like string numbers', function(assert) {
   let done = assert.async();
   let bb = new Backburner(['zomg']);

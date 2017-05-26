@@ -535,9 +535,9 @@ export default class Backburner {
     }
 
     wait = parseInt(wait, 10);
+
     // Remove debouncee
     index = findItem(target, method, this._debouncees);
-
     if (index > -1) {
       let timerId = this._debouncees[index + 2];
       this._debouncees.splice(index, 3);
@@ -555,7 +555,7 @@ export default class Backburner {
     }, wait);
 
     if (isImmediate && index === -1) {
-      this.run.apply(this, args);
+      this.join.apply(this, args);
     }
 
     this._debouncees.push(target, method, timer);
