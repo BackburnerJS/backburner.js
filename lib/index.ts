@@ -20,7 +20,7 @@ export default class Backburner {
 
   public DEBUG = false;
 
-  public currentInstance: DeferredActionQueues | null | undefined;
+  public currentInstance: DeferredActionQueues | null | undefined = null;
 
   public options: any;
 
@@ -34,7 +34,7 @@ export default class Backburner {
   };
 
   private _boundClearItems: (item) => void;
-  private _timerTimeoutId: number | undefined;
+  private _timerTimeoutId: number | null = null;
   private _timers: any[];
   private _platform: {
     setTimeout(fn: () => void, ms: number): number;
@@ -54,7 +54,7 @@ export default class Backburner {
     if (!this.options.defaultQueue) {
       this.options.defaultQueue = queueNames[0];
     }
-    this.currentInstance = null;
+
     this.instanceStack = [];
     this._debouncees = [];
     this._throttlers = [];
@@ -67,7 +67,6 @@ export default class Backburner {
       this._platform.clearTimeout(timerId);
     };
 
-    this._timerTimeoutId = undefined;
     this._timers = [];
 
     this._platform = this.options._platform || {
@@ -110,7 +109,7 @@ export default class Backburner {
       current = previousInstance;
       this._cancelAutorun();
     } else {
-      if (previousInstance) {
+      if (previousInstance !== null) {
         this.instanceStack.push(previousInstance);
       }
       current = this.currentInstance = new DeferredActionQueues(this.queueNames, options);
@@ -127,9 +126,9 @@ export default class Backburner {
   public end() {
     let { onEnd } = this.options;
     let currentInstance = this.currentInstance;
-    let nextInstance: DeferredActionQueues | null | undefined = null;
+    let nextInstance: DeferredActionQueues | null  = null;
 
-    if (!currentInstance) {
+    if (currentInstance === null) {
       throw new Error(`end called without begin`);
     }
 
@@ -250,7 +249,7 @@ export default class Backburner {
   */
   public join(...args);
   public join() {
-    if (this.currentInstance === null || this.currentInstance === undefined) {
+    if (this.currentInstance === null) {
       return this.run.apply(this, arguments);
     }
 
@@ -700,11 +699,11 @@ export default class Backburner {
   }
 
   private _clearTimerTimeout() {
-    if (this._timerTimeoutId === undefined) {
+    if (this._timerTimeoutId === null) {
       return;
     }
     this._platform.clearTimeout(this._timerTimeoutId);
-    this._timerTimeoutId = undefined;
+    this._timerTimeoutId = null;
   }
 
   private _installTimerTimeout() {
@@ -719,7 +718,7 @@ export default class Backburner {
 
   private _ensureInstance(): DeferredActionQueues {
     let currentInstance = this.currentInstance;
-    if (currentInstance === undefined || currentInstance === null) {
+    if (currentInstance === null) {
       const next = this._platform.next || this._platform.setTimeout; // TODO: remove the fallback
       currentInstance = this.begin();
       this._autorun = next(this._boundAutorunEnd);
