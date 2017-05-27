@@ -253,19 +253,25 @@ QUnit.test('onError', function(assert) {
 });
 
 QUnit.test('later doesn\'t trigger twice with earlier later', function(assert) {
-  assert.expect(3);
+  assert.expect(4);
 
   bb = new Backburner(['one']);
   let called1 = 0;
   let called2 = 0;
-  let calls = 0;
-  let oldRun = bb.run;
+  let beginCalls = 0;
+  let endCalls = 0;
+  let oldBegin = bb.begin;
+  let oldEnd = bb.end;
   let done = assert.async();
 
-  // Count run() calls and relay them to original function
-  bb.run = function () {
-    calls++;
-    oldRun.apply(bb, arguments);
+  bb.begin = function () {
+    beginCalls++;
+    oldBegin.call(bb);
+  };
+
+  bb.end = function () {
+    endCalls++;
+    oldEnd.call(bb);
   };
 
   bb.later(() => called1++, 50);
@@ -274,7 +280,8 @@ QUnit.test('later doesn\'t trigger twice with earlier later', function(assert) {
   setTimeout(() => {
     assert.equal(called1, 1, 'timeout 1 was called once');
     assert.equal(called2, 1, 'timeout 2 was called once');
-    assert.equal(calls, 2, 'run() was called twice');
+    assert.equal(beginCalls, 2, 'begin() was called twice');
+    assert.equal(endCalls, 2, 'end() was called twice');
     done();
   }, 100);
 });
