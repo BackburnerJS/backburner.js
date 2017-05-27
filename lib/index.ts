@@ -217,19 +217,18 @@ export default class Backburner {
     this.begin();
 
     if (onError) {
+      let val;
       try {
-        return _method.apply(_target, args);
+        val = _method.apply(_target, args);
       } catch (error) {
         onError(error);
-      } finally {
-        this.end();
       }
+      this.end();
+      return val;
     } else {
-      try {
-        return _method.apply(_target, args);
-      } finally {
-        this.end();
-      }
+      let val = _method.apply(_target, args);
+      this.end();
+      return val;
     }
   }
 
