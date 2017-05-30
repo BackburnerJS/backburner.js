@@ -672,7 +672,7 @@ export default class Backburner {
   }
 
   private _runExpiredTimers() {
-    this._timerTimeoutId = undefined;
+    this._timerTimeoutId = null;
     this.run(this, this._scheduleExpiredTimers);
   }
 
