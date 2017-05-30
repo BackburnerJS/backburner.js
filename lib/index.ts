@@ -15,6 +15,8 @@ import iteratorDrain from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
+const noop = function() {};
+
 export default class Backburner {
   public static Queue = Queue;
 
@@ -24,6 +26,8 @@ export default class Backburner {
 
   public options: any;
 
+  private _onBegin: Function;
+  private _onEnd: Function;
   private queueNames: string[];
   private instanceStack: DeferredActionQueues[];
   private _debouncees: any[];
@@ -63,6 +67,9 @@ export default class Backburner {
       begin: []
     };
 
+    this._onBegin = this.options.onBegin || noop;
+    this._onEnd = this.options.onEnd || noop;
+
     this._boundClearItems = (timerId) => {
       this._platform.clearTimeout(timerId);
     };
@@ -101,7 +108,6 @@ export default class Backburner {
   */
   public begin(): DeferredActionQueues {
     let options = this.options;
-    let { onBegin } = options;
     let previousInstance = this.currentInstance;
     let current;
 
@@ -116,15 +122,12 @@ export default class Backburner {
       this._trigger('begin', current, previousInstance);
     }
 
-    if (onBegin) {
-      onBegin(current, previousInstance);
-    }
+    this._onBegin(current, previousInstance);
 
     return current;
   }
 
   public end() {
-    let { onEnd } = this.options;
     let currentInstance = this.currentInstance;
     let nextInstance: DeferredActionQueues | null  = null;
 
@@ -153,9 +156,7 @@ export default class Backburner {
             this.currentInstance = nextInstance;
           }
           this._trigger('end', currentInstance, nextInstance);
-          if (onEnd) {
-            onEnd(currentInstance, nextInstance);
-          }
+          this._onEnd(currentInstance, nextInstance);
         }
       }
     }
