@@ -1,7 +1,5 @@
 const NUMBER = /\d+/;
 
-export const now = Date.now;
-
 export function each<T>(collection: T[], callback: (v: T) => void, increment = 1) {
   for (let i = 0; i < collection.length; i += increment) {
     callback(collection[i]);
