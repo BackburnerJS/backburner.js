@@ -5,8 +5,7 @@ import {
   getOnError,
   isCoercableNumber,
   isFunction,
-  isString,
-  now
+  isString
 } from './backburner/utils';
 
 import searchTimer from './backburner/binary-search';
@@ -15,6 +14,7 @@ import iteratorDrain from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
+const now = Date.now;
 const noop = function() {};
 
 export default class Backburner {
