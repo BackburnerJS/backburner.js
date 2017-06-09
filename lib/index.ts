@@ -60,6 +60,7 @@ export default class Backburner {
     }
 
     this.instanceStack = [];
+    this._timers = [];
     this._debouncees = [];
     this._throttlers = [];
     this._eventCallbacks = {
@@ -73,8 +74,6 @@ export default class Backburner {
     this._boundClearItems = (timerId) => {
       this._platform.clearTimeout(timerId);
     };
-
-    this._timers = [];
 
     this._platform = this.options._platform || {
       setTimeout(fn, ms) {
@@ -596,15 +595,7 @@ export default class Backburner {
     } else if (timerType === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
       return timer.queue.cancel(timer);
     } else if (timerType === 'function') { // we're cancelling a setTimeout
-      for (let i = 0, l = this._timers.length; i < l; i += 2) {
-        if (this._timers[i + 1] === timer) {
-          this._timers.splice(i, 2); // remove the two elements
-          if (i === 0) {
-            this._reinstallTimerTimeout();
-          }
-          return true;
-        }
-      }
+      return this._cancelLaterTimer(timer);
     }
 
     return false;
@@ -637,9 +628,21 @@ export default class Backburner {
     return fn;
   }
 
-  private _cancelItem(timer, array) {
-    if (!array.length) { return false; }
+  private _cancelLaterTimer(timer) {
+    for (let i = 1; i < this._timers.length; i += 2) {
+      if (this._timers[i] === timer) {
+        i = i - 1;
+        this._timers.splice(i, 2); // remove the two elements
+        if (i === 0) {
+          this._reinstallTimerTimeout();
+        }
+        return true;
+      }
+    }
+    return false;
+  }
 
+  private _cancelItem(timer, array) {
     let index = findTimer(timer, array);
 
     if (index > -1) {
@@ -679,9 +682,10 @@ export default class Backburner {
   }
 
   private _scheduleExpiredTimers() {
-    let i = 0;
     let timers = this._timers;
     let l = timers.length;
+    if (l === 0) { return; }
+    let i = 0;
     let defaultQueue = this.options.defaultQueue;
     let n = now();
     for (; i < l; i += 2) {
@@ -712,9 +716,7 @@ export default class Backburner {
   }
 
   private _installTimerTimeout() {
-    if (this._timers.length === 0) {
-      return;
-    }
+    if (this._timers.length === 0) { return; }
     let minExpiresAt = this._timers[0];
     let n = now();
     let wait = Math.max(0, minExpiresAt - n);
