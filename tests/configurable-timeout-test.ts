@@ -36,11 +36,11 @@ QUnit.test('We can use a custom later', function(assert) {
     }
   });
 
-  bb.scheduleOnce('one', () => {
+  bb.later(() => {
     assert.ok(bb.options._platform.isFakePlatform, 'we are using the fake platform');
     assert.ok(customTimeoutWasUsed , 'custom later was used');
     done();
-  });
+  }, 0);
 });
 
 QUnit.test('We can use a custom clearTimeout', function(assert) {

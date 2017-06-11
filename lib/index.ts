@@ -75,21 +75,11 @@ export default class Backburner {
       this._platform.clearTimeout(timerId);
     };
 
-    this._platform = this.options._platform || {
-      setTimeout(fn, ms) {
-        return setTimeout(fn, ms);
-      },
-      clearTimeout(id) {
-        clearTimeout(id);
-      },
-      next(fn) {
-        // TODO: asap
-        return setTimeout(fn, 0);
-      },
-      clearNext(fn) {
-        clearTimeout(fn);
-      }
-    };
+    this._platform = this.options._platform || {};
+    this._platform.setTimeout = this._platform.setTimeout || ((fn, ms) => setTimeout(fn, ms));
+    this._platform.clearTimeout = this._platform.clearTimeout || ((id) => clearTimeout(id));
+    this._platform.next = this._platform.next || ((fn) => setTimeout(fn, 0));
+    this._platform.clearNext = this._platform.clearNext || ((id) => clearTimeout(id));
 
     this._boundRunExpiredTimers = () => {
       this._runExpiredTimers();
