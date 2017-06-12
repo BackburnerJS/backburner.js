@@ -1,5 +1,4 @@
 import {
-  each,
   findItem,
   findTimer,
   getOnError,
@@ -37,7 +36,6 @@ export default class Backburner {
     begin: Function[];
   };
 
-  private _boundClearItems: (item) => void;
   private _timerTimeoutId: number | null = null;
   private _timers: any[];
   private _platform: {
@@ -70,10 +68,6 @@ export default class Backburner {
 
     this._onBegin = this.options.onBegin || noop;
     this._onEnd = this.options.onEnd || noop;
-
-    this._boundClearItems = (timerId) => {
-      this._platform.clearTimeout(timerId);
-    };
 
     let _platform = this.options._platform || {};
     let platform = Object.create(null);
@@ -556,10 +550,14 @@ export default class Backburner {
   }
 
   public cancelTimers() {
-    each(this._throttlers, this._boundClearItems, 3, 2);
+    for (let i = 2; i < this._throttlers.length; i += 3) {
+      this._platform.clearTimeout(this._throttlers[i]);
+    }
     this._throttlers = [];
 
-    each(this._debouncees, this._boundClearItems, 3, 2);
+    for (let t = 2; t < this._debouncees.length; t += 3) {
+      this._platform.clearTimeout(this._debouncees[t]);
+    }
     this._debouncees = [];
 
     this._clearTimerTimeout();
