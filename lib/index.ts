@@ -497,8 +497,7 @@ export default class Backburner {
       if (isImmediate === false) {
         this.run.apply(this, args);
       }
-
-      index = findItem(target, method, this._throttlers);
+      index = findTimer(timer, this._throttlers);
       if (index > -1) {
         this._throttlers.splice(index, 3);
       }
@@ -548,7 +547,7 @@ export default class Backburner {
       if (isImmediate === false) {
         this.run.apply(this, args);
       }
-      index = findItem(target, method, this._debouncees);
+      index = findTimer(timer, this._debouncees);
       if (index > -1) {
         this._debouncees.splice(index, 3);
       }

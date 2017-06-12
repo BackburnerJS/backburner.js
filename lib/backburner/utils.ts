@@ -50,7 +50,7 @@ export function findItem(target, method, collection) {
 export function findTimer(timer, collection) {
   let index = -1;
 
-  for (let i = 2, l = collection.length; i < l; i += 3) {
+  for (let i = 2; i < collection.length; i += 3) {
     if (collection[i] === timer) {
       index = i - 2;
       break;
