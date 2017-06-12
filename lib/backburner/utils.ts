@@ -1,11 +1,5 @@
 const NUMBER = /\d+/;
 
-export function each<T>(collection: T[], callback: (v: T) => void, increment = 1) {
-  for (let i = 0; i < collection.length; i += increment) {
-    callback(collection[i]);
-  }
-}
-
 export function isString(suspect: any): suspect is string {
   return typeof suspect === 'string';
 }

@@ -1,6 +1,5 @@
 import Queue, { QUEUE_STATE } from './queue';
 import {
-  each,
   noSuchMethod,
   noSuchQueue
 } from './utils';
@@ -16,10 +15,10 @@ export default class DeferredActionQueues {
     this.options = options;
     this.queueNames = queueNames;
 
-    let queues = this.queues;
-    each(queueNames, function(queueName) {
+    queueNames.reduce(function(queues, queueName) {
       queues[queueName] = new Queue(queueName, options[queueName], options);
-    });
+      return queues;
+    }, this.queues);
   }
 
   /*

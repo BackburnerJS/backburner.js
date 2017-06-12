@@ -104,18 +104,32 @@ QUnit.test('setTimeout and creating a new later', function(assert) {
 });
 
 QUnit.test('cancelTimers', function(assert) {
+  assert.expect(8);
+  let done = assert.async();
+
   let bb = new Backburner(['one']);
-  let functionWasCalled = false;
+  let laterWasCalled = false;
+  let debounceWasCalled = false;
+  let throttleWasCalled = false;
 
-  let timer = bb.later(() => functionWasCalled = true);
+  let timer1 = bb.later(() => laterWasCalled = true, 0);
+  let timer2 = bb.debounce(() => debounceWasCalled = true, 0);
+  let timer3 = bb.throttle(() => throttleWasCalled = true, 0, false);
 
-  assert.ok(timer, 'Timer object was returned');
+  assert.ok(timer1, 'Timer object was returned');
+  assert.ok(timer2, 'Timer object was returned');
+  assert.ok(timer3, 'Timer object was returned');
   assert.ok(bb.hasTimers(), 'bb has scheduled timer');
 
   bb.cancelTimers();
 
-  assert.ok(!bb.hasTimers(), 'bb has no scheduled timer');
-  assert.ok(!functionWasCalled, 'function was not called');
+  setTimeout(function() {
+    assert.ok(!bb.hasTimers(), 'bb has no scheduled timer');
+    assert.ok(!laterWasCalled, 'later function was not called');
+    assert.ok(!debounceWasCalled, 'debounce function was not called');
+    assert.ok(!throttleWasCalled, 'throttle function was not called');
+    done();
+  }, 100);
 });
 
 QUnit.test('cancel during flush', function(assert) {
