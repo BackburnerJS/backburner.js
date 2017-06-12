@@ -75,21 +75,14 @@ export default class Backburner {
       this._platform.clearTimeout(timerId);
     };
 
-    this._platform = this.options._platform || {
-      setTimeout(fn, ms) {
-        return setTimeout(fn, ms);
-      },
-      clearTimeout(id) {
-        clearTimeout(id);
-      },
-      next(fn) {
-        // TODO: asap
-        return setTimeout(fn, 0);
-      },
-      clearNext(fn) {
-        clearTimeout(fn);
-      }
-    };
+    let _platform = this.options._platform || {};
+    let platform = Object.create(null);
+    platform.setTimeout = _platform.setTimeout || ((fn, ms) => setTimeout(fn, ms));
+    platform.clearTimeout = _platform.clearTimeout || ((id) => clearTimeout(id));
+    platform.next = _platform.next || ((fn) => platform.setTimeout(fn, 0));
+    platform.clearNext = _platform.clearNext || platform.clearTimeout;
+
+    this._platform = platform;
 
     this._boundRunExpiredTimers = () => {
       this._runExpiredTimers();
@@ -573,11 +566,6 @@ export default class Backburner {
     this._clearTimerTimeout();
     this._timers = [];
 
-    if (this._autorun !== null) {
-      this._platform.clearNext(this._autorun);
-      this._autorun = null;
-    }
-
     this._cancelAutorun();
   }
 
@@ -589,13 +577,12 @@ export default class Backburner {
     if (!timer) { return false; }
     let timerType = typeof timer;
 
-    if (timerType === 'number' || timerType === 'string') {
-      // we're cancelling a throttle or debounce
+    if (timerType === 'number' || timerType === 'string') { // we're cancelling a throttle or debounce
       return this._cancelItem(timer, this._throttlers) || this._cancelItem(timer, this._debouncees);
-    } else if (timerType === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
-      return timer.queue.cancel(timer);
     } else if (timerType === 'function') { // we're cancelling a setTimeout
       return this._cancelLaterTimer(timer);
+    } else if (timerType === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
+      return timer.queue.cancel(timer);
     }
 
     return false;
@@ -603,7 +590,7 @@ export default class Backburner {
 
   private _cancelAutorun() {
     if (this._autorun !== null) {
-      this._platform.clearTimeout(this._autorun);
+      this._platform.clearNext(this._autorun);
       this._autorun = null;
     }
   }
@@ -726,8 +713,8 @@ export default class Backburner {
   private _ensureInstance(): DeferredActionQueues {
     let currentInstance = this.currentInstance;
     if (currentInstance === null) {
-      const next = this._platform.next || this._platform.setTimeout; // TODO: remove the fallback
       currentInstance = this.begin();
+      const next = this._platform.next;
       this._autorun = next(this._boundAutorunEnd);
     }
     return currentInstance;
