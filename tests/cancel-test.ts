@@ -104,6 +104,7 @@ QUnit.test('setTimeout and creating a new later', function(assert) {
 });
 
 QUnit.test('cancelTimers', function(assert) {
+  assert.expect(8);
   let done = assert.async();
 
   let bb = new Backburner(['one']);
