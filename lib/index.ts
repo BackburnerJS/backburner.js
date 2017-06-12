@@ -556,10 +556,10 @@ export default class Backburner {
   }
 
   public cancelTimers() {
-    each(this._throttlers, this._boundClearItems, 3);
+    each(this._throttlers, this._boundClearItems, 3, 2);
     this._throttlers = [];
 
-    each(this._debouncees, this._boundClearItems, 3);
+    each(this._debouncees, this._boundClearItems, 3, 2);
     this._debouncees = [];
 
     this._clearTimerTimeout();
