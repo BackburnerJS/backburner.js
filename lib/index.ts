@@ -676,6 +676,7 @@ export default class Backburner {
 
   private _runExpiredTimers() {
     this._timerTimeoutId = null;
+    if (this._timers.length === 0) { return; }
     this.begin();
     this._scheduleExpiredTimers();
     this.end();
@@ -684,7 +685,6 @@ export default class Backburner {
   private _scheduleExpiredTimers() {
     let timers = this._timers;
     let l = timers.length;
-    if (l === 0) { return; }
     let i = 0;
     let defaultQueue = this.options.defaultQueue;
     let n = now();
@@ -708,9 +708,7 @@ export default class Backburner {
   }
 
   private _clearTimerTimeout() {
-    if (this._timerTimeoutId === null) {
-      return;
-    }
+    if (this._timerTimeoutId === null) { return; }
     this._platform.clearTimeout(this._timerTimeoutId);
     this._timerTimeoutId = null;
   }
