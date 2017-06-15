@@ -241,7 +241,7 @@ QUnit.test('throttle + immediate joins existing run loop instances', function(as
   assert.expect(1);
 
   function onError(error) {
-    assert.equal('test error', error.message);
+    throw error;
   }
 
   let bb = new Backburner(['errors'], {
@@ -251,7 +251,7 @@ QUnit.test('throttle + immediate joins existing run loop instances', function(as
   bb.run(() => {
     let parentInstance = bb.currentInstance;
     bb.throttle(null, () => {
-     assert.equal(bb.currentInstance, parentInstance);
+      assert.equal(bb.currentInstance, parentInstance);
     }, 20, true);
   });
 });

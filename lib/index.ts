@@ -263,10 +263,14 @@ export default class Backburner {
       }
     }
 
-    if (length === 1) {
-      return method();
-    } else if (length === 2) {
-      return method.call(target);
+    let onError = getOnError(this.options);
+
+    if (onError) {
+      try {
+        return method.apply(target, args);
+      } catch (error) {
+        onError(error);
+      }
     } else {
       return method.apply(target, args);
     }
