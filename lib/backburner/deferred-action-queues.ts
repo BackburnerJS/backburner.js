@@ -8,11 +8,9 @@ export default class DeferredActionQueues {
   public queues: { [name: string]: Queue } = {};
 
   private queueNames: string[];
-  private options: any;
   private queueNameIndex = 0;
 
   constructor(queueNames: string[] = [], options: any) {
-    this.options = options;
     this.queueNames = queueNames;
 
     queueNames.reduce(function(queues, queueName) {
