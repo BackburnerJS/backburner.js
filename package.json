@@ -1,6 +1,6 @@
 {
   "name": "backburner.js",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
   "main": "dist/backburner.js",
   "jsnext:main": "dist/backburner.js",
