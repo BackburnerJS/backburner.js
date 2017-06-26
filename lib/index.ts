@@ -589,6 +589,10 @@ export default class Backburner {
     return false;
   }
 
+  public ensureInstance() {
+    this._ensureInstance();
+  }
+
   private _cancelAutorun() {
     if (this._autorun !== null) {
       this._platform.clearNext(this._autorun);
