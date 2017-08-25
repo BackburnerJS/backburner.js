@@ -151,7 +151,7 @@ QUnit.test('onError set after start', function(assert) {
 });
 
 QUnit.test('onError with target and action', function(assert) {
-  assert.expect(2);
+  assert.expect(3);
 
   let target = {};
 
@@ -161,6 +161,16 @@ QUnit.test('onError with target and action', function(assert) {
   });
 
   bb.run(() => assert.ok(true));
+
+  target['onerror'] = function(error) {
+    assert.equal('QUnit.test error', error.message);
+  };
+
+  bb.run(() => { throw new Error('QUnit.test error'); });
+
+  target['onerror'] = function() { };
+
+  bb.run(() => { throw new Error('QUnit.test error'); });
 
   target['onerror'] = function(error) {
     assert.equal('QUnit.test error', error.message);
