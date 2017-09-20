@@ -13,7 +13,6 @@ import iteratorDrain from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
-const now = Date.now;
 const noop = function() {};
 
 export default class Backburner {
@@ -43,6 +42,7 @@ export default class Backburner {
     clearTimeout(id: number): void;
     next(fn: () => void): number;
     clearNext(fn): void;
+    now(): number;
   };
 
   private _boundRunExpiredTimers: () => void;
@@ -75,6 +75,7 @@ export default class Backburner {
     platform.clearTimeout = _platform.clearTimeout || ((id) => clearTimeout(id));
     platform.next = _platform.next || ((fn) => platform.setTimeout(fn, 0));
     platform.clearNext = _platform.clearNext || platform.clearTimeout;
+    platform.now = _platform.now || Date.now;
 
     this._platform = platform;
 
@@ -436,7 +437,7 @@ export default class Backburner {
     }
 
     let onError = getOnError(this.options);
-    let executeAt = now() + wait;
+    let executeAt = this._platform.now() + wait;
 
     let fn;
     if (onError) {
@@ -679,7 +680,7 @@ export default class Backburner {
     let l = timers.length;
     let i = 0;
     let defaultQueue = this.options.defaultQueue;
-    let n = now();
+    let n = this._platform.now();
     for (; i < l; i += 2) {
       let executeAt = timers[i];
       if (executeAt <= n) {
@@ -708,7 +709,7 @@ export default class Backburner {
   private _installTimerTimeout() {
     if (this._timers.length === 0) { return; }
     let minExpiresAt = this._timers[0];
-    let n = now();
+    let n = this._platform.now();
     let wait = Math.max(0, minExpiresAt - n);
     this._timerTimeoutId = this._platform.setTimeout(this._boundRunExpiredTimers, wait);
   }

@@ -77,3 +77,26 @@ QUnit.test('We can use a custom clearTimeout', function(assert) {
     });
   });
 });
+
+QUnit.test('We can use a custom now', function(assert) {
+  assert.expect(2);
+  let done = assert.async();
+
+  let currentTime = 10;
+  let customNowWasUsed = false;
+  let bb = new Backburner(['one'], {
+    _platform: {
+      now() {
+        customNowWasUsed = true;
+        return currentTime += 10;
+      },
+      isFakePlatform: true
+    }
+  });
+
+  bb.later(() => {
+    assert.ok(bb.options._platform.isFakePlatform, 'we are using the fake platform');
+    assert.ok(customNowWasUsed , 'custom now was used');
+    done();
+  }, 10);
+});
