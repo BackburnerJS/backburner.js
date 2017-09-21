@@ -50,17 +50,20 @@ QUnit.test('later', function(assert) {
   }, 20);
 });
 
-QUnit.test('later can continue when `Date.now` is monkey-patched', function(assert) {
+QUnit.test('later should rely on stubbed `Date.now`', function(assert) {
   assert.expect(1);
 
-  let arbitraryTime = +new Date();
   let bb = new Backburner(['one']);
   let done = assert.async();
+  let globalNowWasUsed = false;
 
-  Date.now = function() { return arbitraryTime; };
+  Date.now = function() {
+    globalNowWasUsed = true;
+    return originalDateNow();
+  };
 
   bb.later(() => {
-    assert.ok(true);
+    assert.ok(globalNowWasUsed);
     done();
   }, 1);
 });
