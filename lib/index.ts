@@ -75,7 +75,7 @@ export default class Backburner {
     platform.clearTimeout = _platform.clearTimeout || ((id) => clearTimeout(id));
     platform.next = _platform.next || ((fn) => platform.setTimeout(fn, 0));
     platform.clearNext = _platform.clearNext || platform.clearTimeout;
-    platform.now = _platform.now || Date.now;
+    platform.now = _platform.now || (() => Date.now());
 
     this._platform = platform;
 
