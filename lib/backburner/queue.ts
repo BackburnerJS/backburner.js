@@ -70,8 +70,7 @@ export default class Queue {
 
     let invoke;
     if (queueItems.length > 0) {
-      let onError = getOnError(this.globalOptions);
-      invoke = onError ? this.invokeWithOnError : this.invoke;
+
       for (let i = this.index; i < queueItems.length; i += 4) {
         this.index += 4;
 
@@ -97,7 +96,7 @@ export default class Queue {
           //    One possible long-term solution is the following Chrome issue:
           //       https://bugs.chromium.org/p/chromium/issues/detail?id=332624
           //
-          invoke(target, method, args, onError, errorRecordedForStack);
+          this.invoke(target, method, args, errorRecordedForStack);
         }
 
         if (this.index !== this._queueBeingFlushed.length &&
@@ -239,23 +238,17 @@ export default class Queue {
     }
   }
 
-  private invoke(target, method, args /*, onError, errorRecordedForStack */) {
-    if (args && args.length > 0) {
+  private invoke(target, method, args, errorRecordedForStack) {
+    try {
       method.apply(target, args);
-    } else {
-      method.call(target);
+    } catch (error) {
+      let onError = getOnError(this.globalOptions);
+      if (onError) {
+        onError(error, errorRecordedForStack);
+      } else {
+        throw error;
+      }
     }
   }
 
-  private invokeWithOnError(target, method, args, onError, errorRecordedForStack) {
-    try {
-      if (args && args.length > 0) {
-        method.apply(target, args);
-      } else {
-        method.call(target);
-      }
-    } catch (error) {
-      onError(error, errorRecordedForStack);
-    }
-  }
 }
