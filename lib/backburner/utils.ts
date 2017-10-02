@@ -1,19 +1,7 @@
 const NUMBER = /\d+/;
 
-export function isString(suspect: any): suspect is string {
-  return typeof suspect === 'string';
-}
-
-export function isFunction(suspect: any): suspect is Function {
-  return typeof suspect === 'function';
-}
-
-export function isNumber(suspect: any): suspect is number {
-  return typeof suspect === 'number';
-}
-
 export function isCoercableNumber(suspect) {
-  return isNumber(suspect) && suspect === suspect || NUMBER.test(suspect);
+  return typeof suspect === 'number' && suspect === suspect || NUMBER.test(suspect);
 }
 
 export function noSuchQueue(name) {
