@@ -1,8 +1,4 @@
 import Queue, { QUEUE_STATE } from './queue';
-import {
-  noSuchMethod,
-  noSuchQueue
-} from './utils';
 
 export default class DeferredActionQueues {
   public queues: { [name: string]: Queue } = {};
@@ -34,11 +30,11 @@ export default class DeferredActionQueues {
     let queue = queues[queueName];
 
     if (queue === undefined) {
-      noSuchQueue(queueName);
+      throw new Error(`You attempted to schedule an action in a queue (${queueName}) that doesn\'t exist`);
     }
 
     if (method === undefined || method === null) {
-      noSuchMethod(queueName);
+      throw new Error(`You attempted to schedule an action in a queue (${queueName}) for a method that doesn\'t exist`);
     }
 
     if (onceFlag) {

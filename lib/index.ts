@@ -424,7 +424,7 @@ export default class Backburner {
       target = targetOrThisArgOrMethod;
       method = args.shift();
       immediate = args.pop();
-      let type = typeof method
+      let type = typeof method;
       if (type === 'string') {
         method = <Function> target[method];
       } else if (type !== 'function') {

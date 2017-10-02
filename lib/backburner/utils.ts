@@ -4,14 +4,6 @@ export function isCoercableNumber(suspect) {
   return typeof suspect === 'number' && suspect === suspect || NUMBER.test(suspect);
 }
 
-export function noSuchQueue(name) {
-  throw new Error(`You attempted to schedule an action in a queue (${name}) that doesn\'t exist`);
-}
-
-export function noSuchMethod(name) {
-  throw new Error(`You attempted to schedule an action in a queue (${name}) for a method that doesn\'t exist`);
-}
-
 export function getOnError(options) {
   return options.onError || (options.onErrorTarget && options.onErrorTarget[options.onErrorMethod]);
 }
