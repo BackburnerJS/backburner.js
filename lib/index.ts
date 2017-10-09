@@ -189,7 +189,7 @@ export default class Backburner {
     let _target: any | null | undefined;
 
     if (length === 1) {
-      _method = target;
+      _method = <Function> target;
       _target = null;
     } else {
       _method = method;
