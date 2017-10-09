@@ -14,6 +14,7 @@ import iteratorDrain from './backburner/iterator-drain';
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
 const noop = function() {};
+const SET_TIMEOUT = setTimeout;
 
 export default class Backburner {
   public static Queue = Queue;
@@ -73,7 +74,7 @@ export default class Backburner {
     let platform = Object.create(null);
     platform.setTimeout = _platform.setTimeout || ((fn, ms) => setTimeout(fn, ms));
     platform.clearTimeout = _platform.clearTimeout || ((id) => clearTimeout(id));
-    platform.next = _platform.next || ((fn) => platform.setTimeout(fn, 0));
+    platform.next = _platform.next || ((fn) => SET_TIMEOUT(fn, 0));
     platform.clearNext = _platform.clearNext || platform.clearTimeout;
     platform.now = _platform.now || (() => Date.now());
 
@@ -139,7 +140,7 @@ export default class Backburner {
           this.currentInstance = null;
 
           if (this.instanceStack.length > 0) {
-            nextInstance = this.instanceStack.pop();
+            nextInstance = <DeferredActionQueues> this.instanceStack.pop();
             this.currentInstance = nextInstance;
           }
           this._trigger('end', currentInstance, nextInstance);
@@ -189,7 +190,7 @@ export default class Backburner {
     let _target: any | null | undefined;
 
     if (length === 1) {
-      _method = target;
+      _method = <Function> target;
       _target = null;
     } else {
       _method = method;
