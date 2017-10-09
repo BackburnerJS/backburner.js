@@ -139,7 +139,7 @@ export default class Backburner {
           this.currentInstance = null;
 
           if (this.instanceStack.length > 0) {
-            nextInstance = this.instanceStack.pop();
+            nextInstance = <DeferredActionQueues> this.instanceStack.pop();
             this.currentInstance = nextInstance;
           }
           this._trigger('end', currentInstance, nextInstance);
