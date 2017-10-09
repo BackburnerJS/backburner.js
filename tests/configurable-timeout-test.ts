@@ -18,16 +18,48 @@ QUnit.test('We can configure a custom platform', function(assert) {
   assert.ok(bb.options._platform.isFakePlatform, 'We can pass in a custom platform');
 });
 
-QUnit.test('We can use a custom later', function(assert) {
+QUnit.test('We can use a custom setTimeout', function(assert) {
   assert.expect(2);
   let done = assert.async();
 
-  let customTimeoutWasUsed = false;
+  let customNextWasUsed = false;
   let bb = new Backburner(['one'], {
     _platform: {
-      setTimeout(method, wait) {
-        customTimeoutWasUsed = true;
-        return setTimeout(method, wait);
+      next() {
+        throw new TypeError('NOT IMPLEMENTED');
+      },
+      setTimeout(cb) {
+        customNextWasUsed = true;
+        return setTimeout(cb);
+      },
+      clearTimeout(timer) {
+        return clearTimeout(timer);
+      },
+      isFakePlatform: true
+    }
+  });
+
+  bb.setTimeout(() => {
+    assert.ok(bb.options._platform.isFakePlatform, 'we are using the fake platform');
+    assert.ok(customNextWasUsed , 'custom later was used');
+    done();
+  });
+});
+
+QUnit.test('We can use a custom next', function(assert) {
+  assert.expect(2);
+  let done = assert.async();
+
+  let customNextWasUsed = false;
+  let bb = new Backburner(['one'], {
+    _platform: {
+      setTimeout() {
+        throw new TypeError('NOT IMPLEMENTED');
+      },
+      next(cb) {
+        // next is used for the autorun
+        customNextWasUsed = true;
+        return setTimeout(cb);
       },
       clearTimeout(timer) {
         return clearTimeout(timer);
@@ -38,7 +70,7 @@ QUnit.test('We can use a custom later', function(assert) {
 
   bb.scheduleOnce('one', () => {
     assert.ok(bb.options._platform.isFakePlatform, 'we are using the fake platform');
-    assert.ok(customTimeoutWasUsed , 'custom later was used');
+    assert.ok(customNextWasUsed , 'custom later was used');
     done();
   });
 });
