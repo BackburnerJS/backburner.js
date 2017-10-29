@@ -1,7 +1,8 @@
 const NUMBER = /\d+/;
 
 export function isCoercableNumber(suspect) {
-  return typeof suspect === 'number' && suspect === suspect || NUMBER.test(suspect);
+  let type = typeof suspect;
+  return type === 'number' && suspect === suspect || type === 'string' && NUMBER.test(suspect);
 }
 
 export function getOnError(options) {
