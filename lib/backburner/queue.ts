@@ -7,14 +7,13 @@ export const enum QUEUE_STATE {
 }
 
 export default class Queue {
-  public _queue: any[] = []; // TODO: should be private
-
   private name: string;
   private globalOptions: any;
   private options: any;
   private _queueBeingFlushed: any[] = [];
   private targetQueues = Object.create(null);
   private index = 0;
+  private _queue: any[] = [];
 
   constructor(name: string, options: any = {}, globalOptions: any = {}) {
     this.name = name;
