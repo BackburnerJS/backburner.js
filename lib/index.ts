@@ -239,7 +239,7 @@ export default class Backburner {
   public join(...args);
   public join() {
     if (this.currentInstance === null) {
-      return this.run.apply(this, arguments);
+      return this.run(...arguments);
     }
 
     let length = arguments.length;
@@ -283,7 +283,7 @@ export default class Backburner {
    */
   public defer(queueName: string, ...args);
   public defer() {
-    return this.schedule.apply(this, arguments);
+    return this.schedule(...arguments);
   }
 
   /**
@@ -339,7 +339,7 @@ export default class Backburner {
    */
   public deferOnce(queueName: string, ...args);
   public deferOnce() {
-    return this.scheduleOnce.apply(this, arguments);
+    return this.scheduleOnce(...arguments);
   }
 
   /**
@@ -382,7 +382,7 @@ export default class Backburner {
    */
   public setTimeout(...args);
   public setTimeout() {
-    return this.later.apply(this, arguments);
+    return this.later(...arguments);
   }
 
   public later()
@@ -488,7 +488,7 @@ export default class Backburner {
 
     timer = this._platform.setTimeout(() => {
       if (isImmediate === false) {
-        this.run.apply(this, args);
+        this.run(...args);
       }
       index = findTimer(timer, this._throttlers);
       if (index > -1) {
@@ -497,7 +497,7 @@ export default class Backburner {
     }, wait);
 
     if (isImmediate) {
-      this.join.apply(this, args);
+      this.join(...args);
     }
 
     this._throttlers.push(target, method, timer);
@@ -538,7 +538,7 @@ export default class Backburner {
 
     timer = this._platform.setTimeout(() => {
       if (isImmediate === false) {
-        this.run.apply(this, args);
+        this.run(...args);
       }
       index = findTimer(timer, this._debouncees);
       if (index > -1) {
@@ -547,7 +547,7 @@ export default class Backburner {
     }, wait);
 
     if (isImmediate && index === -1) {
-      this.join.apply(this, args);
+      this.join(...args);
     }
 
     this._debouncees.push(target, method, timer);
