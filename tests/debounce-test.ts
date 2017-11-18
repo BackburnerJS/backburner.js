@@ -238,6 +238,22 @@ QUnit.test('debounce cancelled after it\'s executed returns false', function(ass
 
 });
 
+QUnit.test('debounced function is called with final argument', function(assert) {
+  assert.expect(1);
+
+  let done = assert.async();
+  let bb = new Backburner(['joker']);
+
+  function debouncee(arg) {
+    assert.equal('bus', arg, 'the debounced is called with right argument');
+    done();
+  }
+
+  bb.debounce(null, debouncee, 'car', 10);
+  bb.debounce(null, debouncee, 'bicycle', 10);
+  bb.debounce(null, debouncee, 'bus', 10);
+});
+
 QUnit.test('debounce cancelled doesn\'t cancel older items', function(assert) {
   assert.expect(4);
 
