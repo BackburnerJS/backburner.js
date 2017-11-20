@@ -459,17 +459,11 @@ export default class Backburner {
   }
 
   public throttle(...args);
-  public throttle(target, method /*, ...args, wait, [immediate] */) {
-    let args = new Array(arguments.length);
-    for (let i = 0; i < arguments.length; i++) {
-      args[i] = arguments[i];
-    }
-
+  public throttle(target, method, ...args /*, ...args, wait, [immediate] */) {
     let immediate = args.pop();
     let isImmediate;
     let wait;
     let index;
-    let timer;
 
     if (isCoercableNumber(immediate)) {
       wait = immediate;
@@ -483,40 +477,33 @@ export default class Backburner {
 
     index = findItem(target, method, this._throttlers);
     if (index > -1) {
-      return this._throttlers[index + 2];
+      this._throttlers[index + 2] = args;
+      return this._throttlers[index + 3];
     } // throttled
 
-    timer = this._platform.setTimeout(() => {
-      if (isImmediate === false) {
-        this.run(...args);
-      }
+    let timer = this._platform.setTimeout(() => {
       index = findTimer(timer, this._throttlers);
-      if (index > -1) {
-        this._throttlers.splice(index, 3);
+      let [context, func, params] = this._throttlers.splice(index, 4);
+      if (isImmediate === false) {
+        this.run(context, func, ...params);
       }
     }, wait);
 
     if (isImmediate) {
-      this.join(...args);
+      this.join(target, method, ...args);
     }
 
-    this._throttlers.push(target, method, timer);
+    this._throttlers.push(target, method, args, timer);
 
     return timer;
   }
 
   public debounce(...args);
-  public debounce(target, method /* , args, wait, [immediate] */) {
-    let args = new Array(arguments.length);
-    for (let i = 0; i < arguments.length; i++) {
-      args[i] = arguments[i];
-    }
-
+  public debounce(target, method, ...args /* , wait, [immediate] */) {
     let immediate = args.pop();
     let isImmediate;
     let wait;
     let index;
-    let timer;
 
     if (isCoercableNumber(immediate)) {
       wait = immediate;
@@ -531,37 +518,35 @@ export default class Backburner {
     // Remove debouncee
     index = findItem(target, method, this._debouncees);
     if (index > -1) {
-      let timerId = this._debouncees[index + 2];
-      this._debouncees.splice(index, 3);
+      let timerId = this._debouncees[index + 3];
       this._platform.clearTimeout(timerId);
+      this._debouncees.splice(index, 4);
     }
 
-    timer = this._platform.setTimeout(() => {
-      if (isImmediate === false) {
-        this.run(...args);
-      }
+    let timer = this._platform.setTimeout(() => {
       index = findTimer(timer, this._debouncees);
-      if (index > -1) {
-        this._debouncees.splice(index, 3);
+      let [context, func, params] = this._debouncees.splice(index, 4);
+      if (isImmediate === false) {
+        this.run(context, func, ...params);
       }
     }, wait);
 
     if (isImmediate && index === -1) {
-      this.join(...args);
+      this.join(target, method, ...args);
     }
 
-    this._debouncees.push(target, method, timer);
+    this._debouncees.push(target, method, args, timer);
 
     return timer;
   }
 
   public cancelTimers() {
-    for (let i = 2; i < this._throttlers.length; i += 3) {
+    for (let i = 3; i < this._throttlers.length; i += 4) {
       this._platform.clearTimeout(this._throttlers[i]);
     }
     this._throttlers = [];
 
-    for (let t = 2; t < this._debouncees.length; t += 3) {
+    for (let t = 3; t < this._debouncees.length; t += 4) {
       this._platform.clearTimeout(this._debouncees[t]);
     }
     this._debouncees = [];
@@ -640,8 +625,8 @@ export default class Backburner {
     let index = findTimer(timer, array);
 
     if (index > -1) {
-      array.splice(index, 3);
       this._platform.clearTimeout(timer);
+      array.splice(index, 4);
       return true;
     }
     return false;

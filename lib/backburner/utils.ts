@@ -44,9 +44,9 @@ export function findItem(target, method, collection) {
 export function findTimer(timer, collection) {
   let index = -1;
 
-  for (let i = 2; i < collection.length; i += 3) {
+  for (let i = 3; i < collection.length; i += 4) {
     if (collection[i] === timer) {
-      index = i - 2;
+      index = i - 3;
       break;
     }
   }

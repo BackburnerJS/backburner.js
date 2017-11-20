@@ -106,6 +106,23 @@ QUnit.test('throttle with cancelTimers', function(assert) {
   assert.equal(count, 0, 'calling cancelTimers while something is being throttled does not throw an error');
 });
 
+QUnit.test('throttled function is called with final argument', function(assert) {
+  assert.expect(1);
+  let done = assert.async();
+
+  let count = 0;
+  let bb = new Backburner(['zomg']);
+
+  function throttled(arg) {
+    assert.equal(arg, 'bus');
+    done();
+  }
+
+  bb.throttle(null, throttled, 'car' , 10, false);
+  bb.throttle(null, throttled, 'bicycle' , 10, false);
+  bb.throttle(null, throttled, 'bus' , 10, false);
+});
+
 QUnit.test('throttle leading edge', function(assert) {
   assert.expect(10);
 
