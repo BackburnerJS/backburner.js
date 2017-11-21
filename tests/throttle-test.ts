@@ -123,6 +123,23 @@ QUnit.test('throttled function is called with final argument', function(assert) 
   bb.throttle(null, throttled, 'bus' , 10, false);
 });
 
+QUnit.test('throttle returns same timer', function(assert) {
+  assert.expect(2);
+
+  let bb = new Backburner(['joker']);
+
+  function throttled1() {}
+  function throttled2() {}
+
+  let timer1 = bb.throttle(null, throttled1, 10);
+  let timer2 = bb.throttle(null, throttled2, 10);
+  let timer3 = bb.throttle(null, throttled1, 10);
+  let timer4 = bb.throttle(null, throttled2, 10);
+
+  assert.equal(timer1, timer3);
+  assert.equal(timer2, timer4);
+});
+
 QUnit.test('throttle leading edge', function(assert) {
   assert.expect(10);
 
