@@ -272,6 +272,7 @@ export default class Backburner {
         return method.apply(target, args);
       } catch (error) {
         onError(error);
+	throw error;
       }
     } else {
       return method.apply(target, args);
