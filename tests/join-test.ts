@@ -96,7 +96,37 @@ QUnit.test('queue execution order', function(assert) {
   assert.deepEqual(items, [0, 1, 2, 3, 4, 5, 6]);
 });
 
-QUnit.test('onError', function(assert) {
+QUnit.test('without an onError run.join can be caught via `try`/`catch`', function(assert) {
+  assert.expect(1);
+
+  let bb = new Backburner(['errors']);
+
+  assert.throws(() => {
+    bb.join(() => {
+      throw new Error('test error');
+    });
+  }, /test error/);
+});
+
+QUnit.test('with an onError which does not rethrow, when joining existing instance, can be caught via `try`/`catch`', function(assert) {
+  assert.expect(1);
+
+  let bb = new Backburner(['errors'], {
+    onError(error) {
+      assert.notOk(true, 'onError should not be called as the error from .join is handled by assert.throws');
+    }
+  });
+
+  bb.run(() => {
+    assert.throws(() => {
+      bb.join(() => {
+        throw new Error('test error');
+      });
+    }, /test error/, 'error from within .join can be caught with try/catch');
+  });
+});
+
+QUnit.test('onError which does not rethrow is invoked (only once) when not joining an existing instance', function(assert) {
   assert.expect(1);
 
   function onError(error) {
@@ -110,4 +140,62 @@ QUnit.test('onError', function(assert) {
   bb.join(() => {
     throw new Error('test error');
   });
+});
+
+QUnit.test('onError which does not rethrow is invoked (only once) when joining an existing instance', function(assert) {
+  assert.expect(1);
+
+  function onError(error) {
+    assert.equal('test error', error.message);
+  }
+
+  let bb = new Backburner(['errors'], {
+    onError: onError
+  });
+
+  bb.run(function() {
+    bb.join(() => {
+      throw new Error('test error');
+    });
+  });
+});
+
+QUnit.test('onError which does rethrow is invoked (only once) when not joining an existing instance', function(assert) {
+  assert.expect(2);
+
+  function onError(error) {
+    assert.equal('test error', error.message);
+    throw error;
+  }
+
+  let bb = new Backburner(['errors'], {
+    onError: onError
+  });
+
+  assert.throws(() => {
+    bb.join(() => {
+      throw new Error('test error');
+    });
+  }, /test error/);
+});
+
+QUnit.test('onError which does rethrow is invoked (only once) when joining an existing instance', function(assert) {
+  assert.expect(2);
+
+  function onError(error) {
+    assert.equal('test error', error.message);
+    throw error;
+  }
+
+  let bb = new Backburner(['errors'], {
+    onError: onError
+  });
+
+  assert.throws(() => {
+    bb.run(function() {
+      bb.join(() => {
+        throw new Error('test error');
+      });
+    });
+  }, /test error/);
 });
