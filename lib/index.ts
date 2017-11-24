@@ -201,24 +201,15 @@ export default class Backburner {
       }
     }
 
-    let onError = getOnError(this.options);
 
     this.begin();
 
-    if (onError) {
-      try {
-        return _method.apply(_target, args);
-      } catch (error) {
-        onError(error);
-      } finally {
-        this.end();
-      }
-    } else {
-      try {
-        return _method.apply(_target, args);
-      } finally {
-        this.end();
-      }
+    try {
+      return _method.apply(_target, args);
+    } catch (error) {
+      this.handleError(error);
+    } finally {
+      this.end();
     }
   }
 
@@ -265,17 +256,13 @@ export default class Backburner {
       }
     }
 
-    let onError = getOnError(this.options);
 
-    if (onError) {
-      try {
-        return method.apply(target, args);
-      } catch (error) {
-        onError(error);
-      }
-    } else {
+    try {
       return method.apply(target, args);
+    } catch (error) {
+      this.handleError(error)
     }
+
   }
 
   /**
@@ -437,25 +424,26 @@ export default class Backburner {
       }
     }
 
-    let onError = getOnError(this.options);
     let executeAt = this._platform.now() + wait;
 
-    let fn;
-    if (onError) {
-      fn = function() {
-        try {
-          method.apply(target, args);
-        } catch (e) {
-          onError(e);
-        }
-      };
-    } else {
-      fn = function() {
+    let fn = ()=> {
+      try {
         method.apply(target, args);
-      };
-    }
+      } catch (error) {
+        this.handleError(error);
+      }
+    };
 
     return this._setTimeout(fn, executeAt);
+  }
+
+  private handleError(error) {
+    let onError = getOnError(this.options);
+    if (onError) {
+      onError(error);
+    } else {
+      throw error;
+    }
   }
 
   public throttle(...args);
