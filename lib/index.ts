@@ -16,6 +16,33 @@ import Queue, { QUEUE_STATE } from './backburner/queue';
 const noop = function() {};
 const SET_TIMEOUT = setTimeout;
 
+function parseArgs() {
+  let length = arguments.length;
+  let method;
+  let target;
+  let args;
+
+  if (length === 1) {
+    method = arguments[0];
+    target = null;
+  } else {
+    target = arguments[0];
+    method = arguments[1];
+    if (isString(method)) {
+      method = <Function> target[method];
+    }
+
+    if (length > 2) {
+      args = new Array(length - 2);
+      for (let i = 0, l = length - 2; i < l; i++) {
+        args[i] = arguments[i + 2];
+      }
+    }
+  }
+
+  return [target, method, args];
+}
+
 export default class Backburner {
   public static Queue = Queue;
 
@@ -184,22 +211,9 @@ export default class Backburner {
 
   public run(method: Function);
   public run(target: Function | any | null, method?: Function | string, ...args);
-  public run(target: any | null | undefined, method?: any, ...args: any[]) {
-    let length = arguments.length;
-    let _method: Function | string;
-    let _target: any | null | undefined;
-
-    if (length === 1) {
-      _method = <Function> target;
-      _target = null;
-    } else {
-      _method = method;
-      _target = target;
-
-      if (isString(_method)) {
-        _method = <Function> _target[_method];
-      }
-    }
+  public run(target: any | null | undefined, method?: any, ...args: any[]);
+  public run() {
+    let [target, method, args] = parseArgs(...arguments);
 
     let onError = getOnError(this.options);
 
@@ -207,7 +221,7 @@ export default class Backburner {
 
     if (onError) {
       try {
-        return _method.apply(_target, args);
+        return method.apply(target, args);
       } catch (error) {
         onError(error);
       } finally {
@@ -215,7 +229,7 @@ export default class Backburner {
       }
     } else {
       try {
-        return _method.apply(_target, args);
+        return method.apply(target, args);
       } finally {
         this.end();
       }
@@ -236,34 +250,12 @@ export default class Backburner {
     @param {any} args The method arguments
     @return method result
   */
-  public join(...args);
   public join() {
     if (this.currentInstance === null) {
       return this.run(...arguments);
     }
-
+    let [target, method, args] = parseArgs(...arguments);
     let length = arguments.length;
-    let method;
-    let target;
-    let args;
-
-    if (length === 1) {
-      method = arguments[0];
-      target = null;
-    } else {
-      target = arguments[0];
-      method = arguments[1];
-      if (isString(method)) {
-        method = <Function> target[method];
-      }
-
-      if (length > 2) {
-        args = new Array(length - 2);
-        for (let i = 0, l = length - 2; i < l; i++) {
-          args[i] = arguments[i + 2];
-        }
-      }
-    }
 
     if (length === 1) {
       return method();
@@ -288,30 +280,8 @@ export default class Backburner {
   public schedule(queueName: string, method: Function);
   public schedule<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
   public schedule(queueName: string, target: any | null, method: any | Function, ...args);
-  public schedule(queueName: string) {
-    let length = arguments.length;
-    let method;
-    let target;
-    let args;
-
-    if (length === 2) {
-      method = arguments[1];
-      target = null;
-    } else {
-      target = arguments[1];
-      method = arguments[2];
-
-      if (isString(method)) {
-        method = <Function> target[method];
-      }
-
-      if (length > 3) {
-        args = new Array(length - 3);
-        for (let i = 3; i < length; i++) {
-          args[i - 3] = arguments[i];
-        }
-      }
-    }
+  public schedule(queueName, ..._args) {
+    let [target, method, args] = parseArgs(..._args);
 
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, target, method, args, false, stack);
@@ -344,30 +314,8 @@ export default class Backburner {
   public scheduleOnce(queueName: string, method: Function);
   public scheduleOnce<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
   public scheduleOnce(queueName: string, target: any | null, method: any | Function, ...args);
-  public scheduleOnce(queueName: string /* , target, method, args */) {
-    let length = arguments.length;
-    let method;
-    let target;
-    let args;
-
-    if (length === 2) {
-      method = arguments[1];
-      target = null;
-    } else {
-      target = arguments[1];
-      method = arguments[2];
-
-      if (isString(method)) {
-        method = <Function> target[method];
-      }
-
-      if (length > 3) {
-        args = new Array(length - 3);
-        for (let i = 3; i < length; i++) {
-          args[i - 3] = arguments[i];
-        }
-      }
-    }
+  public scheduleOnce(queueName, ..._args) {
+    let [target, method, args] = parseArgs(..._args);
 
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, target, method, args, true, stack);
