@@ -55,30 +55,25 @@ export default class Queue {
     let errorRecordedForStack;
 
     this.targetQueues = Object.create(null);
-    let queueItems;
-    if (this._queueBeingFlushed.length > 0) {
-      queueItems = this._queueBeingFlushed;
-    } else {
-      queueItems = this._queueBeingFlushed = this._queue;
+    if (this._queueBeingFlushed.length === 0) {
+      this._queueBeingFlushed = this._queue;
       this._queue = [];
     }
 
-    if (before) {
+    if (before !== undefined) {
       before();
     }
 
     let invoke;
+    let queueItems = this._queueBeingFlushed;
     if (queueItems.length > 0) {
       let onError = getOnError(this.globalOptions);
       invoke = onError ? this.invokeWithOnError : this.invoke;
+
       for (let i = this.index; i < queueItems.length; i += 4) {
         this.index += 4;
 
-        target                = queueItems[i];
         method                = queueItems[i + 1];
-        args                  = queueItems[i + 2];
-        errorRecordedForStack = queueItems[i + 3]; // Debugging assistance
-
         // method could have been nullified / canceled during flush
         if (method !== null) {
           //
@@ -96,6 +91,9 @@ export default class Queue {
           //    One possible long-term solution is the following Chrome issue:
           //       https://bugs.chromium.org/p/chromium/issues/detail?id=332624
           //
+          target                = queueItems[i];
+          args                  = queueItems[i + 2];
+          errorRecordedForStack = queueItems[i + 3]; // Debugging assistance
           invoke(target, method, args, onError, errorRecordedForStack);
         }
 
@@ -106,14 +104,13 @@ export default class Queue {
       }
     }
 
-    if (after) {
+    if (after !== undefined) {
       after();
     }
 
     this._queueBeingFlushed.length = 0;
     this.index = 0;
-    if (sync !== false &&
-        this._queue.length > 0) {
+    if (sync !== false && this._queue.length > 0) {
       // check if new items have been added
       this.flush(true);
     }
