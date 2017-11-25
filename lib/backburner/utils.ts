@@ -31,7 +31,7 @@ export function getOnError(options) {
 export function findItem(target, method, collection) {
   let index = -1;
 
-  for (let i = 0, l = collection.length; i < l; i += 3) {
+  for (let i = 0, l = collection.length; i < l; i += 4) {
     if (collection[i] === target && collection[i + 1] === method) {
       index = i;
       break;
