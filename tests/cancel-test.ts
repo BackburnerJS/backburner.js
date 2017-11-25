@@ -188,7 +188,7 @@ QUnit.test('with GUID_KEY and a target without meta', function(assert) {
 
   let wasCalled = 0;
 
-  function fn () {
+  function fn() {
     wasCalled++;
   }
 
@@ -215,7 +215,7 @@ QUnit.test('with GUID_KEY no target', function(assert) {
 
   let wasCalled = 0;
 
-  function fn () {
+  function fn() {
     wasCalled++;
   }
 
@@ -275,7 +275,7 @@ QUnit.test('with peekGuid and a target without guid', function(assert) {
 
   let wasCalled = 0;
 
-  function fn () {
+  function fn() {
     wasCalled++;
   }
 
@@ -302,7 +302,7 @@ QUnit.test('with peekGuid no target', function(assert) {
 
   let wasCalled = 0;
 
-  function fn () {
+  function fn() {
     wasCalled++;
   }
 

@@ -2,7 +2,7 @@ import Backburner from 'backburner';
 
 QUnit.module('tests/bb-has-timers');
 
-QUnit.test('hasTimers', function (assert) {
+QUnit.test('hasTimers', function(assert) {
   let done = assert.async();
   let bb = new Backburner(['ohai']);
   let timer;

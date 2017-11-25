@@ -1,3 +1,4 @@
+/* tslint:disable:no-shadowed-variable*/
 import Backburner from 'backburner';
 
 const originalDateNow = Date.now;
@@ -37,7 +38,7 @@ QUnit.test('later', function(assert) {
   // spin so that when we execute timers (+new Date()) will be greater than the
   // time scheduled above; not a problem in real life as we will never 'wait'
   // 0ms
-  while ((+ new Date()) <= now + 10) {};
+  while ((+ new Date()) <= now + 10) {}
 
   bb.later(null, () => {
     assert.equal(step++, 2);
@@ -267,12 +268,12 @@ QUnit.test('later doesn\'t trigger twice with earlier later', function(assert) {
   let oldEnd = bb.end;
   let done = assert.async();
 
-  bb.begin = function () {
+  bb.begin = function() {
     beginCalls++;
     oldBegin.call(bb);
   };
 
-  bb.end = function () {
+  bb.end = function() {
     endCalls++;
     oldEnd.call(bb);
   };

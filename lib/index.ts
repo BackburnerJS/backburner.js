@@ -25,15 +25,15 @@ export default class Backburner {
 
   public options: any;
 
-  private _onBegin: Function;
-  private _onEnd: Function;
+  private _onBegin: () => void;
+  private _onEnd: () => void;
   private queueNames: string[];
   private instanceStack: DeferredActionQueues[];
   private _debouncees: any[];
   private _throttlers: any[];
   private _eventCallbacks: {
-    end: Function[];
-    begin: Function[];
+    end: () => [];
+    begin: () => [];
   };
 
   private _timerTimeoutId: number | null = null;
@@ -140,7 +140,7 @@ export default class Backburner {
           this.currentInstance = null;
 
           if (this.instanceStack.length > 0) {
-            nextInstance = <DeferredActionQueues> this.instanceStack.pop();
+            nextInstance = this.instanceStack.pop() as DeferredActionQueues;
             this.currentInstance = nextInstance;
           }
           this._trigger('end', currentInstance, nextInstance);
@@ -182,22 +182,22 @@ export default class Backburner {
     }
   }
 
-  public run(method: Function);
-  public run(target: Function | any | null, method?: Function | string, ...args);
+  public run(method: () => any);
+  public run(target: () => any | any | null, method?: () => any | string, ...args);
   public run(target: any | null | undefined, method?: any, ...args: any[]) {
     let length = arguments.length;
-    let _method: Function | string;
+    let _method: () => any | string;
     let _target: any | null | undefined;
 
     if (length === 1) {
-      _method = <Function> target;
+      _method = target as () => any;
       _target = null;
     } else {
       _method = method;
       _target = target;
 
       if (isString(_method)) {
-        _method = <Function> _target[_method];
+        _method = _target[_method] as () => any;
       }
     }
 
@@ -254,7 +254,7 @@ export default class Backburner {
       target = arguments[0];
       method = arguments[1];
       if (isString(method)) {
-        method = <Function> target[method];
+        method = target[method] as () => any;
       }
 
       if (length > 2) {
@@ -289,9 +289,8 @@ export default class Backburner {
   /**
    * Schedule the passed function to run inside the specified queue.
    */
-  public schedule(queueName: string, method: Function);
+  public schedule(queueName: string, method: () => any);
   public schedule<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
-  public schedule(queueName: string, target: any | null, method: any | Function, ...args);
   public schedule(queueName: string) {
     let length = arguments.length;
     let method;
@@ -306,7 +305,7 @@ export default class Backburner {
       method = arguments[2];
 
       if (isString(method)) {
-        method = <Function> target[method];
+        method = target[method] as () => any;
       }
 
       if (length > 3) {
@@ -329,7 +328,7 @@ export default class Backburner {
     @param {Iterable} an iterable of functions to execute
     @return method result
   */
-  public scheduleIterable(queueName: string, iterable: Function) {
+  public scheduleIterable(queueName: string, iterable: () => any) {
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, null, iteratorDrain, [iterable], false, stack);
   }
@@ -345,9 +344,8 @@ export default class Backburner {
   /**
    * Schedule the passed function to run once inside the specified queue.
    */
-  public scheduleOnce(queueName: string, method: Function);
+  public scheduleOnce(queueName: string, method: () => any);
   public scheduleOnce<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
-  public scheduleOnce(queueName: string, target: any | null, method: any | Function, ...args);
   public scheduleOnce(queueName: string /* , target, method, args */) {
     let length = arguments.length;
     let method;
@@ -362,7 +360,7 @@ export default class Backburner {
       method = arguments[2];
 
       if (isString(method)) {
-        method = <Function> target[method];
+        method = target[method] as () => any;
       }
 
       if (length > 3) {
@@ -385,7 +383,6 @@ export default class Backburner {
     return this.later(...arguments);
   }
 
-  public later()
   public later(...args) {
     let length = args.length;
 
@@ -409,7 +406,7 @@ export default class Backburner {
         method = args.shift();
       } else if (methodOrTarget !== null && isString(methodOrWait) && methodOrWait in methodOrTarget) {
         target = args.shift();
-        method = <Function> target[args.shift()];
+        method = target[args.shift()] as () => any;
       } else if (isCoercableNumber(methodOrWait)) {
         method = args.shift();
         wait = parseInt(args.shift(), 10);

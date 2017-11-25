@@ -4,7 +4,7 @@ export function isString(suspect: any): suspect is string {
   return typeof suspect === 'string';
 }
 
-export function isFunction(suspect: any): suspect is Function {
+export function isFunction(suspect: any): suspect is () => any {
   return typeof suspect === 'function';
 }
 
