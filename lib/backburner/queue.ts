@@ -1,4 +1,5 @@
 import {
+  findItem,
   getOnError
 } from './utils';
 
@@ -122,17 +123,12 @@ export default class Queue {
 
   public cancel({ target, method }) {
     let queue = this._queue;
-    let currentTarget;
-    let currentMethod;
-    let i;
-    let l;
-    let t;
-
     let guid = this.guidForTarget(target);
     let targetQueue = guid ? this.targetQueues[guid] : undefined;
 
     if (targetQueue !== undefined) {
-      for (i = 0, l = targetQueue.length; i < l; i += 2) {
+      let t;
+      for (let i = 0, l = targetQueue.length; i < l; i += 2) {
         t = targetQueue[i];
         if (t === method) {
           targetQueue.splice(i, 1);
@@ -140,32 +136,20 @@ export default class Queue {
       }
     }
 
-    for (i = 0, l = queue.length; i < l; i += 4) {
-      currentTarget = queue[i];
-      currentMethod = queue[i + 1];
-
-      if (currentTarget === target &&
-          currentMethod === method) {
-        queue.splice(i, 4);
-        return true;
-      }
+    let index = findItem(target, method, queue);
+    if (index > -1) {
+      queue.splice(index, 4);
+      return true;
     }
 
     // if not found in current queue
     // could be in the queue that is being flushed
     queue = this._queueBeingFlushed;
 
-    for (i = 0, l = queue.length; i < l; i += 4) {
-      currentTarget = queue[i];
-      currentMethod = queue[i + 1];
-
-      if (currentTarget === target &&
-          currentMethod === method) {
-        // don't mess with array during flush
-        // just nullify the method
-        queue[i + 1] = null;
-        return true;
-      }
+    index = findItem(target, method, queue);
+    if (index > -1) {
+      queue[index + 1] = null;
+      return true;
     }
 
     return false;
@@ -188,18 +172,13 @@ export default class Queue {
   private pushUniqueWithoutGuid(target, method, args, stack) {
     let queue = this._queue;
 
-    for (let i = 0, l = queue.length; i < l; i += 4) {
-      let currentTarget = queue[i];
-      let currentMethod = queue[i + 1];
-
-      if (currentTarget === target && currentMethod === method) {
-        queue[i + 2] = args;  // replace args
-        queue[i + 3] = stack; // replace stack
-        return;
-      }
+    let index = findItem(target, method, queue);
+    if (index > -1) {
+      queue[index + 2] = args;  // replace args
+      queue[index + 3] = stack; // replace stack
+    } else {
+      queue.push(target, method, args, stack);
     }
-
-    queue.push(target, method, args, stack);
   }
 
   private targetQueue(targetQueue, target, method, args, stack) {
