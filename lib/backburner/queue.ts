@@ -215,7 +215,7 @@ export default class Queue {
   }
 
   private invoke(target, method, args /*, onError, errorRecordedForStack */) {
-    if (args && args.length > 0) {
+    if (args !== undefined) {
       method.apply(target, args);
     } else {
       method.call(target);
@@ -224,7 +224,7 @@ export default class Queue {
 
   private invokeWithOnError(target, method, args, onError, errorRecordedForStack) {
     try {
-      if (args && args.length > 0) {
+      if (args !== undefined) {
         method.apply(target, args);
       } else {
         method.call(target);
