@@ -249,10 +249,10 @@ QUnit.test('when passed same function twice with different target and different 
   assert.equal(i, 2, 'function was called twice');
 });
 
-QUnit.test('when passed same function with same target after already triggering in current loop (GUID_KEY)', function(assert) {
+QUnit.test('when passed same function with same target after already triggering in current loop', function(assert) {
   assert.expect(5);
 
-  let bb = new Backburner(['one', 'two'], { GUID_KEY: 'GUID_KEY' });
+  let bb = new Backburner(['one', 'two']);
   let i = 0;
 
   function deferMethod(a) {
@@ -265,7 +265,7 @@ QUnit.test('when passed same function with same target after already triggering 
     bb.scheduleOnce('one', argObj, deferMethod, 2);
   }
 
-  let argObj = {first: 1, GUID_KEY: '1'};
+  let argObj = {first: 1};
 
   bb.run(() => {
     bb.scheduleOnce('one', argObj, deferMethod, 1);
