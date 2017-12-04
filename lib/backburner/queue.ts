@@ -34,10 +34,6 @@ export default class Queue {
 
   public flush(sync?) {
     let { before, after } = this.options;
-    let target;
-    let method;
-    let args;
-    let errorRecordedForStack;
 
     this.targetQueues.clear();
     if (this._queueBeingFlushed.length === 0) {
@@ -49,43 +45,44 @@ export default class Queue {
       before();
     }
 
-    let invoke;
     let queueItems = this._queueBeingFlushed;
-    if (queueItems.length > 0) {
-      let onError = getOnError(this.globalOptions);
-      invoke = onError ? this.invokeWithOnError : this.invoke;
+    let onError = getOnError(this.globalOptions);
+    let invoke = onError ? this.invokeWithOnError : this.invoke;
+    let target;
+    let method;
+    let args;
+    let errorRecordedForStack;
 
-      for (let i = this.index; i < queueItems.length; i += 4) {
-        this.index += 4;
+    for (let i = this.index; i < queueItems.length; i += 4) {
+      this.index += 4;
 
-        method                = queueItems[i + 1];
-        // method could have been nullified / canceled during flush
-        if (method !== null) {
-          //
-          //    ** Attention intrepid developer **
-          //
-          //    To find out the stack of this task when it was scheduled onto
-          //    the run loop, add the following to your app.js:
-          //
-          //    Ember.run.backburner.DEBUG = true; // NOTE: This slows your app, don't leave it on in production.
-          //
-          //    Once that is in place, when you are at a breakpoint and navigate
-          //    here in the stack explorer, you can look at `errorRecordedForStack.stack`,
-          //    which will be the captured stack when this job was scheduled.
-          //
-          //    One possible long-term solution is the following Chrome issue:
-          //       https://bugs.chromium.org/p/chromium/issues/detail?id=332624
-          //
-          target                = queueItems[i];
-          args                  = queueItems[i + 2];
-          errorRecordedForStack = queueItems[i + 3]; // Debugging assistance
-          invoke(target, method, args, onError, errorRecordedForStack);
-        }
+      method                = queueItems[i + 1];
+      // method could have been nullified / canceled during flush
+      if (method !== null) {
+        //
+        //    ** Attention intrepid developer **
+        //
+        //    To find out the stack of this task when it was scheduled onto
+        //    the run loop, add the following to your app.js:
+        //
+        //    Ember.run.backburner.DEBUG = true; // NOTE: This slows your app, don't leave it on in production.
+        //
+        //    Once that is in place, when you are at a breakpoint and navigate
+        //    here in the stack explorer, you can look at `errorRecordedForStack.stack`,
+        //    which will be the captured stack when this job was scheduled.
+        //
+        //    One possible long-term solution is the following Chrome issue:
+        //       https://bugs.chromium.org/p/chromium/issues/detail?id=332624
+        //
+        target                = queueItems[i];
+        args                  = queueItems[i + 2];
+        errorRecordedForStack = queueItems[i + 3]; // Debugging assistance
+        invoke(target, method, args, onError, errorRecordedForStack);
+      }
 
-        if (this.index !== this._queueBeingFlushed.length &&
-          this.globalOptions.mustYield && this.globalOptions.mustYield()) {
-          return QUEUE_STATE.Pause;
-        }
+      if (this.index !== this._queueBeingFlushed.length &&
+        this.globalOptions.mustYield && this.globalOptions.mustYield()) {
+        return QUEUE_STATE.Pause;
       }
     }
 
