@@ -343,14 +343,6 @@ export default class Backburner {
   }
 
   /**
-   * @deprecated please use schedule instead.
-   */
-  public defer(queueName, target, method, ...args) {
-    deferCount++;
-    return this.schedule(queueName, target, method, ...args);
-  }
-
-  /**
    * Schedule the passed function to run inside the specified queue.
    */
   public schedule(queueName: string, method: Function);
@@ -378,14 +370,6 @@ export default class Backburner {
   }
 
   /**
-   * @deprecated please use scheduleOnce instead.
-   */
-  public deferOnce(queueName, target, method, ...args) {
-    deferOnceCount++;
-    return this.scheduleOnce(queueName, target, method, ...args);
-  }
-
-  /**
    * Schedule the passed function to run once inside the specified queue.
    */
   public scheduleOnce(queueName: string, method: Function);
@@ -396,15 +380,6 @@ export default class Backburner {
     let [target, method, args] = parseArgs(..._args);
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, target, method, args, true, stack);
-  }
-
-  /**
-   * @deprecated use later instead.
-   */
-  public setTimeout(...args);
-  public setTimeout() {
-    setTimeoutCount++;
-    return this.later(...arguments);
   }
 
   public later<T>(...args: any[]): Timer; // fixes `this.later(...arguments)` usage in `setTimeout`
@@ -554,7 +529,7 @@ export default class Backburner {
       return this._cancelItem(timer, this._throttlers) || this._cancelItem(timer, this._debouncees);
     } else if (timerType === 'string') { // we're cancelling a setTimeout
       return this._cancelLaterTimer(timer);
-    } else if (timerType === 'object' && timer.queue && timer.method) { // we're cancelling a deferOnce
+    } else if (timerType === 'object' && timer.queue && timer.method) { // we're cancelling a scheduleOnce
       return timer.queue.cancel(timer);
     }
 

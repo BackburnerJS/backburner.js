@@ -18,17 +18,17 @@ A priority queue that will efficiently batch, order, reorder and process work; d
 
 `Backburner#run` - execute the passed function and flush any deferred actions
 
-`Backburner#defer` - defer the passed function to run inside the specified queue
+`Backburner#schedule` - defer the passed function to run inside the specified queue
 
-`Backburner#deferOnce` - defer the passed function to run inside the specified queue, only execute it once
+`Backburner#scheduleOnce` - defer the passed function to run inside the specified queue, only execute it once
 
-`Backburner#setTimeout` - execute the passed function in a specified amount of time
+`Backburner#later` - execute the passed function in a specified amount of time
 
 `Backburner#debounce` - execute the passed function in a specified amount of time, reset timer upon additional calls
 
 `Backburner#throttle` - rate-limit the passed function for a specified amount of time
 
-`Backburner#cancel` - cancel a `deferOnce`, `setTimeout`, `debounce` or `throttle`
+`Backburner#cancel` - cancel a `scheduleOnce`, `later`, `debounce` or `throttle`
 
 `Backburner#on` - Add an event callback. Supports the following events:
 

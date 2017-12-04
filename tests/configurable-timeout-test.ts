@@ -43,7 +43,7 @@ QUnit.test('We can use a custom setTimeout', function(assert) {
     }
   });
 
-  bb.setTimeout(() => {
+  bb.later(() => {
     assert.ok(customNextWasUsed , 'custom later was used');
     done();
   });

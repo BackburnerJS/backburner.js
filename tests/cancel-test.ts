@@ -18,7 +18,7 @@ QUnit.test('scheduleOnce', function(assert) {
   });
 });
 
-QUnit.test('setTimeout', function(assert) {
+QUnit.test('later', function(assert) {
   assert.expect(5);
   let done = assert.async();
 
@@ -43,7 +43,7 @@ QUnit.test('setTimeout', function(assert) {
   }, 0);
 });
 
-QUnit.test('setTimeout with multiple pending', function(assert) {
+QUnit.test('later with multiple pending', function(assert) {
   assert.expect(7);
 
   let done = assert.async();
@@ -73,7 +73,7 @@ QUnit.test('setTimeout with multiple pending', function(assert) {
   }, 10);
 });
 
-QUnit.test('setTimeout and creating a new later', function(assert) {
+QUnit.test('later and creating a new later', function(assert) {
   assert.expect(7);
   let done = assert.async();
   let called = false;

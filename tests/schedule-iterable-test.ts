@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-QUnit.module('tests/defer-iterable');
+QUnit.module('tests/schedule-iterable');
 
 class Iterator {
   private _collection: Function[];
