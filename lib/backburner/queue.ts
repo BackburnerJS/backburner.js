@@ -12,7 +12,7 @@ export default class Queue {
   private globalOptions: any;
   private options: any;
   private _queueBeingFlushed: any[] = [];
-  private targetQueues = Object.create(null);
+  private targetQueues = new Map();
   private index = 0;
   private _queue: any[] = [];
 
@@ -32,22 +32,6 @@ export default class Queue {
     };
   }
 
-  public pushUnique(target, method, args, stack) {
-    let guid = this.guidForTarget(target);
-
-    if (guid) {
-      this.pushUniqueWithGuid(guid, target, method, args, stack);
-    } else {
-      this.pushUniqueWithoutGuid(target, method, args, stack);
-    }
-
-    return {
-      queue: this,
-      target,
-      method
-    };
-  }
-
   public flush(sync?) {
     let { before, after } = this.options;
     let target;
@@ -55,7 +39,7 @@ export default class Queue {
     let args;
     let errorRecordedForStack;
 
-    this.targetQueues = Object.create(null);
+    this.targetQueues.clear();
     if (this._queueBeingFlushed.length === 0) {
       this._queueBeingFlushed = this._queue;
       this._queue = [];
@@ -123,8 +107,7 @@ export default class Queue {
 
   public cancel({ target, method }) {
     let queue = this._queue;
-    let guid = this.guidForTarget(target);
-    let targetQueue = guid ? this.targetQueues[guid] : undefined;
+    let targetQueue = this.targetQueues.get(target);
 
     let index;
     if (targetQueue !== undefined) {
@@ -159,30 +142,21 @@ export default class Queue {
     return false;
   }
 
-  private guidForTarget(target) {
-    if (!target) { return; }
+  public pushUnique(target, method, args, stack) {
+    let localQueue = this.targetQueues.get(target);
 
-    let peekGuid = this.globalOptions.peekGuid;
-    if (peekGuid) {
-      return peekGuid(target);
-    }
-
-    let KEY = this.globalOptions.GUID_KEY;
-    if (KEY) {
-      return target[KEY];
-    }
-  }
-
-  private pushUniqueWithoutGuid(target, method, args, stack) {
-    let queue = this._queue;
-
-    let index = findItem(target, method, queue);
-    if (index > -1) {
-      queue[index + 2] = args;  // replace args
-      queue[index + 3] = stack; // replace stack
+    if (localQueue === undefined) {
+      let queueIndex = this._queue.push(target, method, args, stack) - 4;
+      this.targetQueues.set(target, [ method, queueIndex ]);
     } else {
-      queue.push(target, method, args, stack);
+      this.targetQueue(localQueue, target, method, args, stack);
     }
+
+    return {
+      queue: this,
+      target,
+      method
+    };
   }
 
   private targetQueue(targetQueue, target, method, args, stack) {
@@ -198,40 +172,24 @@ export default class Queue {
         return;
       }
     }
-
-    targetQueue.push(
-      method,
-      queue.push(target, method, args, stack) - 4
-    );
-  }
-
-  private pushUniqueWithGuid(guid, target, method, args, stack) {
-    let localQueue = this.targetQueues[guid];
-
-    if (localQueue !== undefined) {
-      this.targetQueue(localQueue, target, method, args, stack);
-    } else {
-      this.targetQueues[guid] = [
-        method,
-        this._queue.push(target, method, args, stack) - 4
-      ];
-    }
+    let queueIndex = queue.push(target, method, args, stack) - 4;
+    targetQueue.push(method, queueIndex);
   }
 
   private invoke(target, method, args /*, onError, errorRecordedForStack */) {
-    if (args !== undefined) {
-      method.apply(target, args);
-    } else {
+    if (args === undefined) {
       method.call(target);
+    } else {
+      method.apply(target, args);
     }
   }
 
   private invokeWithOnError(target, method, args, onError, errorRecordedForStack) {
     try {
-      if (args !== undefined) {
-        method.apply(target, args);
-      } else {
+      if (args === undefined) {
         method.call(target);
+      } else {
+        method.apply(target, args);
       }
     } catch (error) {
       onError(error, errorRecordedForStack);
