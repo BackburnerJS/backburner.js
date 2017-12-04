@@ -326,3 +326,24 @@ QUnit.test('can cancel property (peekGuid)', function(assert) {
   assert.equal(target1fooWasCalled, 1);
   assert.equal(target2fooWasCalled, 1);
 });
+
+QUnit.test('pushUnique: 1 target, 1 method called twice, canceled 2 call', function(assert) {
+  let queue = new Queue('foo');
+  let invocationArgs: string[][] = [];
+  let target1 = {
+    foo: function() {
+      invocationArgs.push(...arguments);
+    }
+  };
+
+  queue.pushUnique(target1, target1.foo, ['a']);
+  let timer = queue.pushUnique(target1, target1.foo, ['b']);
+
+  assert.deepEqual(invocationArgs, [], 'precond - empty initially');
+
+  queue.cancel(timer);
+
+  queue.flush();
+
+  assert.deepEqual(invocationArgs, [], 'still has not been invoked');
+});
