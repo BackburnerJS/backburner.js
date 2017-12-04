@@ -214,26 +214,7 @@ export default class Backburner {
   public run(target: any | null | undefined, method?: any, ...args: any[]);
   public run() {
     let [target, method, args] = parseArgs(...arguments);
-
-    let onError = getOnError(this.options);
-
-    this.begin();
-
-    if (onError) {
-      try {
-        return method.apply(target, args);
-      } catch (error) {
-        onError(error);
-      } finally {
-        this.end();
-      }
-    } else {
-      try {
-        return method.apply(target, args);
-      } finally {
-        this.end();
-      }
-    }
+    return this._run(target, method, args);
   }
 
   /*
@@ -251,19 +232,8 @@ export default class Backburner {
     @return method result
   */
   public join() {
-    if (this.currentInstance === null) {
-      return this.run(...arguments);
-    }
     let [target, method, args] = parseArgs(...arguments);
-    let length = arguments.length;
-
-    if (length === 1) {
-      return method();
-    } else if (length === 2) {
-      return method.call(target);
-    } else {
-      return method.apply(target, args);
-    }
+    return this._join(target, method, args);
   }
 
   /**
@@ -416,7 +386,9 @@ export default class Backburner {
       isImmediate = immediate === true;
     }
 
-    wait = parseInt(wait, 10);
+    if (isString(method)) {
+      method = <Function> target[method];
+    }
 
     let index = findItem(target, method, this._throttlers);
     if (index > -1) {
@@ -424,16 +396,18 @@ export default class Backburner {
       return this._throttlers[index + 3];
     } // throttled
 
+    wait = parseInt(wait, 10);
+
     let timer = this._platform.setTimeout(() => {
       let i = findTimer(timer, this._throttlers);
       let [context, func, params] = this._throttlers.splice(i, 4);
       if (isImmediate === false) {
-        this.run(context, func, ...params);
+        this._run(context, func, params);
       }
     }, wait);
 
     if (isImmediate) {
-      this.join(target, method, ...args);
+      this._join(target, method, args);
     }
 
     this._throttlers.push(target, method, args, timer);
@@ -455,6 +429,10 @@ export default class Backburner {
       isImmediate = immediate === true;
     }
 
+    if (isString(method)) {
+      method = <Function> target[method];
+    }
+
     wait = parseInt(wait, 10);
 
     // Remove debouncee
@@ -469,12 +447,12 @@ export default class Backburner {
       let i = findTimer(timer, this._debouncees);
       let [context, func, params] = this._debouncees.splice(i, 4);
       if (isImmediate === false) {
-        this.run(context, func, ...params);
+        this._run(context, func, params);
       }
     }, wait);
 
     if (isImmediate && index === -1) {
-      this.join(target, method, ...args);
+      this._join(target, method, args);
     }
 
     this._debouncees.push(target, method, args, timer);
@@ -520,6 +498,40 @@ export default class Backburner {
 
   public ensureInstance() {
     this._ensureInstance();
+  }
+
+  private _join(target, method, args) {
+    if (this.currentInstance === null) {
+      return this._run(target, method, args);
+    }
+
+    if (target === undefined && args === undefined) {
+      return method();
+    } else {
+      return method.apply(target, args);
+    }
+  }
+
+  private _run(target, method, args) {
+    let onError = getOnError(this.options);
+
+    this.begin();
+
+    if (onError) {
+      try {
+        return method.apply(target, args);
+      } catch (error) {
+        onError(error);
+      } finally {
+        this.end();
+      }
+    } else {
+      try {
+        return method.apply(target, args);
+      } finally {
+        this.end();
+      }
+    }
   }
 
   private _cancelAutorun() {
