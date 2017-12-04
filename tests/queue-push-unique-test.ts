@@ -331,5 +331,51 @@ QUnit.test('pushUnique: 1 target, 2 different methods, second one called twice (
 
   queue.flush();
 
-  assert.deepEqual(target1barWasCalled.length, 1, 'expected: target 1.bar to be called only once');
+  assert.equal(target1barWasCalled.length, 1, 'expected: target 1.bar to be called only once');
+});
+
+QUnit.test('can cancel property (peekGuid)', function(assert) {
+  let guidIndexer = [];
+  let queue = new Queue('foo', {}, {
+    peekGuid(obj) {
+      let guid = guidIndexer.indexOf(obj);
+      if (guid === -1) {
+        return null;
+      }
+
+      return guid;
+    }
+  });
+
+  let target1fooWasCalled: number = 0;
+  let target2fooWasCalled: number = 0;
+  let target1 = {
+    foo: function() {
+      target1fooWasCalled++;
+    }
+  };
+  guidIndexer.push(target1);
+
+  let target2 = {
+    foo: function() {
+      target2fooWasCalled++;
+    }
+  };
+  guidIndexer.push(target2);
+
+  let timer1 = queue.pushUnique(target1, target1.foo);
+  let timer2 = queue.pushUnique(target2, target2.foo);
+
+  queue.cancel(timer2);
+  queue.cancel(timer1);
+
+  queue.pushUnique(target1, target1.foo);
+  queue.pushUnique(target1, target1.foo);
+  queue.pushUnique(target2, target2.foo);
+  queue.pushUnique(target2, target2.foo);
+
+  queue.flush();
+
+  assert.equal(target1fooWasCalled, 1);
+  assert.equal(target2fooWasCalled, 1);
 });
