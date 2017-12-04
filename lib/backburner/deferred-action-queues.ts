@@ -33,11 +33,11 @@ export default class DeferredActionQueues {
     let queues = this.queues;
     let queue = queues[queueName];
 
-    if (!queue) {
+    if (queue === undefined) {
       noSuchQueue(queueName);
     }
 
-    if (!method) {
+    if (method === undefined || method === null) {
       noSuchMethod(queueName);
     }
 
