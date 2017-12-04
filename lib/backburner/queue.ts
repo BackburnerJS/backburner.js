@@ -107,16 +107,13 @@ export default class Queue {
 
   public cancel({ target, method }) {
     let queue = this._queue;
-    let targetQueue = this.targetQueues.get(target);
+    let targetQueueMap = this.targetQueues.get(target);
 
     let index;
-    if (targetQueue !== undefined) {
-      let t;
-      for (let i = 0, l = targetQueue.length; i < l; i += 2) {
-        t = targetQueue[i];
-        if (t === method) {
-          index = targetQueue.splice(i, 2)[1];
-        }
+    if (targetQueueMap !== undefined) {
+      index = targetQueueMap.get(method);
+      if (index !== undefined) {
+        targetQueueMap.delete(method);
       }
     }
 
@@ -143,13 +140,21 @@ export default class Queue {
   }
 
   public pushUnique(target, method, args, stack) {
-    let localQueue = this.targetQueues.get(target);
+    let localQueueMap = this.targetQueues.get(target);
 
-    if (localQueue === undefined) {
+    if (localQueueMap === undefined) {
+      localQueueMap = new Map();
+      this.targetQueues.set(target, localQueueMap);
+    }
+
+    let index = localQueueMap.get(method);
+    if (index === undefined) {
       let queueIndex = this._queue.push(target, method, args, stack) - 4;
-      this.targetQueues.set(target, [ method, queueIndex ]);
+      localQueueMap.set(method, queueIndex);
     } else {
-      this.targetQueue(localQueue, target, method, args, stack);
+      let queue = this._queue;
+      queue[index + 2] = args;  // replace args
+      queue[index + 3] = stack; // replace stack
     }
 
     return {
@@ -157,23 +162,6 @@ export default class Queue {
       target,
       method
     };
-  }
-
-  private targetQueue(targetQueue, target, method, args, stack) {
-    let queue = this._queue;
-
-    for (let i = 0, l = targetQueue.length; i < l; i += 2) {
-      let currentMethod = targetQueue[i];
-
-      if (currentMethod === method) {
-        let currentIndex  = targetQueue[i + 1];
-        queue[currentIndex + 2] = args;  // replace args
-        queue[currentIndex + 3] = stack; // replace stack
-        return;
-      }
-    }
-    let queueIndex = queue.push(target, method, args, stack) - 4;
-    targetQueue.push(method, queueIndex);
   }
 
   private invoke(target, method, args /*, onError, errorRecordedForStack */) {
