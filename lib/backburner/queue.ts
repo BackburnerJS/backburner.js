@@ -22,16 +22,6 @@ export default class Queue {
     this.globalOptions = globalOptions;
   }
 
-  public push(target, method, args, stack) {
-    this._queue.push(target, method, args, stack);
-
-    return {
-      queue: this,
-      target,
-      method
-    };
-  }
-
   public flush(sync?) {
     let { before, after } = this.options;
     let target;
@@ -137,6 +127,16 @@ export default class Queue {
     }
 
     return false;
+  }
+
+  public push(target, method, args, stack) {
+    this._queue.push(target, method, args, stack);
+
+    return {
+      queue: this,
+      target,
+      method
+    };
   }
 
   public pushUnique(target, method, args, stack) {
