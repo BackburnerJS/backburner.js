@@ -281,18 +281,8 @@ QUnit.test('pushUnique: 1 target, 2 different methods, second one called twice',
   assert.equal(target1barWasCalled.length, 1, 'expected: target 1.bar to be called only once');
 });
 
-QUnit.test('can cancel property (peekGuid)', function(assert) {
-  let guidIndexer = [];
-  let queue = new Queue('foo', {}, {
-    peekGuid(obj) {
-      let guid = guidIndexer.indexOf(obj);
-      if (guid === -1) {
-        return null;
-      }
-
-      return guid;
-    }
-  });
+QUnit.test('can cancel property', function(assert) {
+  let queue = new Queue('foo', {});
 
   let target1fooWasCalled: number = 0;
   let target2fooWasCalled: number = 0;
@@ -301,14 +291,12 @@ QUnit.test('can cancel property (peekGuid)', function(assert) {
       target1fooWasCalled++;
     }
   };
-  guidIndexer.push(target1);
 
   let target2 = {
     foo: function() {
       target2fooWasCalled++;
     }
   };
-  guidIndexer.push(target2);
 
   let timer1 = queue.pushUnique(target1, target1.foo);
   let timer2 = queue.pushUnique(target2, target2.foo);

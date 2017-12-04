@@ -275,15 +275,11 @@ QUnit.test('when passed same function with same target after already triggering 
   assert.equal(i, 2, 'function was called twice');
 });
 
-QUnit.test('when passed same function with same target after already triggering in current loop (peekGuid)', function(assert) {
+QUnit.test('when passed same function with same target after already triggering in current loop', function(assert) {
   assert.expect(5);
 
   let argObj = {first: 1};
-  let bb = new Backburner(['one', 'two'], {
-    peekGuid(obj) {
-      if (argObj === obj) { return '1'; }
-    }
-  });
+  let bb = new Backburner(['one', 'two'], { });
 
   let i = 0;
 
