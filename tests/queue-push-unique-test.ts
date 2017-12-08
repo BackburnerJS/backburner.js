@@ -342,7 +342,6 @@ QUnit.test('can cancel property (peekGuid)', function(assert) {
       if (guid === -1) {
         return null;
       }
-
       return guid;
     }
   });

@@ -126,20 +126,18 @@ export default class Queue {
     let guid = this.guidForTarget(target);
     let targetQueue = guid ? this.targetQueues[guid] : undefined;
 
-    let index;
     if (targetQueue !== undefined) {
       let t;
       for (let i = 0, l = targetQueue.length; i < l; i += 2) {
         t = targetQueue[i];
         if (t === method) {
-          index = targetQueue.splice(i, 2)[1];
+          targetQueue.splice(i, 2);
+          break;
         }
       }
     }
 
-    if (index === undefined) {
-      index = findItem(target, method, queue);
-    }
+    let index = findItem(target, method, queue);
 
     if (index > -1) {
       queue.splice(index, 4);
