@@ -99,17 +99,11 @@ export default class Queue {
     let queue = this._queue;
     let targetQueueMap = this.targetQueues.get(target);
 
-    let index;
     if (targetQueueMap !== undefined) {
-      index = targetQueueMap.get(method);
-      if (index !== undefined) {
-        targetQueueMap.delete(method);
-      }
+      targetQueueMap.delete(method);
     }
 
-    if (index === undefined) {
-      index = findItem(target, method, queue);
-    }
+    let index = findItem(target, method, queue);
 
     if (index > -1) {
       queue.splice(index, 4);
