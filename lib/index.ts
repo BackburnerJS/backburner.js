@@ -374,6 +374,16 @@ export default class Backburner {
 
   public throttle(...args);
   public throttle(target, method, ...args /*, ...args, wait, [immediate] */) {
+    if (isString(method)) {
+      method = <Function> target[method];
+    }
+
+    let index = findItem(target, method, this._throttlers);
+    if (index > -1) {
+      this._throttlers[index + 2] = args;
+      return this._throttlers[index + 3];
+    } // throttled
+
     let immediate = args.pop();
     let isImmediate;
     let wait;
@@ -385,16 +395,6 @@ export default class Backburner {
       wait = args.pop();
       isImmediate = immediate === true;
     }
-
-    if (isString(method)) {
-      method = <Function> target[method];
-    }
-
-    let index = findItem(target, method, this._throttlers);
-    if (index > -1) {
-      this._throttlers[index + 2] = args;
-      return this._throttlers[index + 3];
-    } // throttled
 
     wait = parseInt(wait, 10);
 
