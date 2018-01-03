@@ -13,6 +13,8 @@ import iteratorDrain from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
+type Timer = any;
+
 const noop = function() {};
 const SET_TIMEOUT = setTimeout;
 
@@ -372,8 +374,44 @@ export default class Backburner {
     return this._setTimeout(fn, executeAt);
   }
 
-  public throttle(...args);
-  public throttle(target, method, ...args /*, ...args, wait, [immediate] */) {
+  // with target, with method name
+  public throttle<T>(target: T, methodName: keyof T, wait: number): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, wait: number): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait: number): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait: number): Timer;
+
+  // with target, with method name, with immediate
+  public throttle<T>(target: T, methodName: keyof T, wait: number, immediate: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, wait: number, immediate: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait: number, immediate: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait: number, immediate: boolean): Timer;
+
+  // with target, without immediate
+  public throttle(thisArg: any, method: () => void, wait: number): Timer;
+  public throttle<A>(thisArg: any, method: (arg1: A) => void, arg1: A, wait: number): Timer;
+  public throttle<A, B>(thisArg: any, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number): Timer;
+  public throttle<A, B, C>(thisArg: any, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number): Timer;
+
+  // with target, with immediate
+  public throttle(thisArg: any, method: () => void, wait: number, immediate: boolean): Timer;
+  public throttle<A>(thisArg: any, method: (arg1: A) => void, arg1: A, wait: number, immediate: boolean): Timer;
+  public throttle<A, B>(thisArg: any, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate: boolean): Timer;
+  public throttle<A, B, C>(thisArg: any, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate: boolean): Timer;
+
+  // without target, default immediate
+  public throttle(method: () => void, wait: number): Timer;
+  public throttle<A>(method: (arg1: A) => void, arg1: A, wait: number): Timer;
+  public throttle<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number): Timer;
+  public throttle<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number): Timer;
+
+  // without target, with immediate
+  public throttle(method: () => void, wait: number, immediate: boolean): Timer;
+  public throttle<A>(method: (arg1: A) => void, arg1: A, wait: number, immediate: boolean): Timer;
+  public throttle<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate: boolean): Timer;
+  public throttle<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate: boolean): Timer;
+  public throttle(targetOrThisArgOrMethod: Object | Function, ...args): Timer {
+    let target;
+    let method;
     let immediate;
     let isImmediate;
     let wait;
@@ -384,6 +422,8 @@ export default class Backburner {
       target = null;
       isImmediate = true;
     } else {
+      target = arguments[0];
+      method = args.shift();
       immediate = args.pop();
 
       if (isString(method)) {
@@ -428,8 +468,44 @@ export default class Backburner {
     return timer;
   }
 
-  public debounce(...args);
-  public debounce(target, method, ...args /* , wait, [immediate] */) {
+  // with target, with method name
+  public debounce<T>(target: T, methodName: keyof T, wait: number): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, wait: number): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait: number): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait: number): Timer;
+
+  // with target, with method name, with immediate
+  public debounce<T>(target: T, methodName: keyof T, wait: number, immediate: boolean): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, wait: number, immediate: boolean): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait: number, immediate: boolean): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait: number, immediate: boolean): Timer;
+
+  // with target, without immediate
+  public debounce(thisArg: any, method: () => void, wait: number): Timer;
+  public debounce<A>(thisArg: any, method: (arg1: A) => void, arg1: A, wait: number): Timer;
+  public debounce<A, B>(thisArg: any, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number): Timer;
+  public debounce<A, B, C>(thisArg: any, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number): Timer;
+
+  // with target, with immediate
+  public debounce(thisArg: any, method: () => void, wait: number, immediate: boolean): Timer;
+  public debounce<A>(thisArg: any, method: (arg1: A) => void, arg1: A, wait: number, immediate: boolean): Timer;
+  public debounce<A, B>(thisArg: any, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate: boolean): Timer;
+  public debounce<A, B, C>(thisArg: any, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate: boolean): Timer;
+
+  // without target, default immediate
+  public debounce(method: () => void, wait: number): Timer;
+  public debounce<A>(method: (arg1: A) => void, arg1: A, wait: number): Timer;
+  public debounce<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number): Timer;
+  public debounce<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number): Timer;
+
+  // without target, with immediate
+  public debounce(method: () => void, wait: number, immediate: boolean): Timer;
+  public debounce<A>(method: (arg1: A) => void, arg1: A, wait: number, immediate: boolean): Timer;
+  public debounce<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate: boolean): Timer;
+  public debounce<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate: boolean): Timer;
+  public debounce(targetOrThisArgOrMethod: Object | Function, ...args): Timer {
+    let target;
+    let method;
     let immediate;
     let isImmediate;
     let wait;
@@ -440,6 +516,8 @@ export default class Backburner {
       target = null;
       isImmediate = false;
     } else {
+      target = arguments[0];
+      method = args.shift();
       immediate = args.pop();
 
       if (isString(method)) {
