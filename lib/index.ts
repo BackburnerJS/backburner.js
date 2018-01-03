@@ -374,20 +374,33 @@ export default class Backburner {
 
   public throttle(...args);
   public throttle(target, method, ...args /*, ...args, wait, [immediate] */) {
-    let immediate = args.pop();
+    let immediate;
     let isImmediate;
     let wait;
 
-    if (isCoercableNumber(immediate)) {
-      wait = immediate;
+    if (arguments.length === 2) {
+      method = arguments[0];
+      wait = arguments[1];
+      target = null;
       isImmediate = true;
     } else {
-      wait = args.pop();
-      isImmediate = immediate === true;
-    }
+      immediate = args.pop();
 
-    if (isString(method)) {
-      method = <Function> target[method];
+      if (isString(method)) {
+        method = <Function> target[method];
+      } else if (!isFunction(method)) {
+        args.unshift(method);
+        method = target;
+        target = null;
+      }
+
+      if (isCoercableNumber(immediate)) {
+        wait = immediate;
+        isImmediate = true;
+      } else {
+        wait = args.pop();
+        isImmediate = immediate === true;
+      }
     }
 
     let index = findItem(target, method, this._throttlers);
@@ -417,20 +430,33 @@ export default class Backburner {
 
   public debounce(...args);
   public debounce(target, method, ...args /* , wait, [immediate] */) {
-    let immediate = args.pop();
+    let immediate;
     let isImmediate;
     let wait;
 
-    if (isCoercableNumber(immediate)) {
-      wait = immediate;
+    if (arguments.length === 2) {
+      method = arguments[0];
+      wait = arguments[1];
+      target = null;
       isImmediate = false;
     } else {
-      wait = args.pop();
-      isImmediate = immediate === true;
-    }
+      immediate = args.pop();
 
-    if (isString(method)) {
-      method = <Function> target[method];
+      if (isString(method)) {
+        method = <Function> target[method];
+      } else if (!isFunction(method)) {
+        args.unshift(method);
+        method = target;
+        target = null;
+      }
+
+      if (isCoercableNumber(immediate)) {
+        wait = immediate;
+        isImmediate = false;
+      } else {
+        wait = args.pop();
+        isImmediate = immediate === true;
+      }
     }
 
     wait = parseInt(wait, 10);
