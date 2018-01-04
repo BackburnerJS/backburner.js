@@ -416,13 +416,13 @@ export default class Backburner {
     let isImmediate;
     let wait;
 
-    if (arguments.length === 2) {
-      method = arguments[0];
-      wait = arguments[1];
+    if (args.length === 1) {
+      method = targetOrThisArgOrMethod;
+      wait = args[0];
       target = null;
       isImmediate = true;
     } else {
-      target = arguments[0];
+      target = targetOrThisArgOrMethod;
       method = args.shift();
       immediate = args.pop();
 
@@ -510,13 +510,13 @@ export default class Backburner {
     let isImmediate;
     let wait;
 
-    if (arguments.length === 2) {
-      method = arguments[0];
-      wait = arguments[1];
+    if (args.length === 1) {
+      method = targetOrThisArgOrMethod;
+      wait = args[0];
       target = null;
       isImmediate = false;
     } else {
-      target = arguments[0];
+      target = targetOrThisArgOrMethod;
       method = args.shift();
       immediate = args.pop();
 
