@@ -259,14 +259,17 @@ QUnit.test('throttle without a target, without args', function(assert) {
   let done = assert.async();
   let bb = new Backburner(['batman']);
   let calledCount = 0;
-  function throttled() {
+  let calledWith = new Array();
+  function throttled(...args) {
     calledCount++;
+    calledWith.push(args);
   }
 
   bb.throttle(throttled, 10);
   bb.throttle(throttled, 10);
   bb.throttle(throttled, 10);
   assert.equal(calledCount, 1, 'throttle method was called immediately');
+  assert.deepEqual(calledWith, [ [] ], 'throttle method was called with the correct arguments');
 
   setTimeout(() => {
     bb.throttle(throttled, 10);
@@ -308,8 +311,10 @@ QUnit.test('throttle without a target, without args, not immediate', function(as
   let done = assert.async();
   let bb = new Backburner(['batman']);
   let calledCount = 0;
-  function throttled() {
+  let calledWith = new Array();
+  function throttled(...args) {
     calledCount++;
+    calledWith.push(args);
   }
 
   bb.throttle(throttled, 10, false);
@@ -324,6 +329,7 @@ QUnit.test('throttle without a target, without args, not immediate', function(as
 
   setTimeout(() => {
     assert.equal(calledCount, 1, 'throttle method was was only called once');
+    assert.deepEqual(calledWith, [ [] ], 'throttle method was called with the correct arguments');
     done();
   }, 20);
 });

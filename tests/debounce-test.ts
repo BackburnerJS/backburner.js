@@ -308,8 +308,10 @@ QUnit.test('debounce without a target, without args', function(assert) {
   let done = assert.async();
   let bb = new Backburner(['batman']);
   let calledCount = 0;
-  function debouncee() {
+  let calledWith = new Array();
+  function debouncee(...args) {
     calledCount++;
+    calledWith.push(args);
   }
 
   bb.debounce(debouncee, 10);
@@ -323,6 +325,7 @@ QUnit.test('debounce without a target, without args', function(assert) {
 
   setTimeout(() => {
     assert.equal(calledCount, 1, 'debounced method was was only called once');
+    assert.deepEqual(calledWith, [ [] ], 'debounce called once without arguments');
     done();
   }, 20);
 });
@@ -355,14 +358,17 @@ QUnit.test('debounce without a target, without args, immediate', function(assert
   let done = assert.async();
   let bb = new Backburner(['batman']);
   let calledCount = 0;
-  function debouncee() {
+  let calledWith = new Array();
+  function debouncee(...args) {
     calledCount++;
+    calledWith.push(args);
   }
 
   bb.debounce(debouncee, 10, true);
   bb.debounce(debouncee, 10, true);
   bb.debounce(debouncee, 10, true);
   assert.equal(calledCount, 1, 'debounced method was called immediately');
+  assert.deepEqual(calledWith, [ [] ], 'debounce method was called with the correct arguments');
 
   setTimeout(() => {
     bb.debounce(debouncee, 10, true);
@@ -457,8 +463,8 @@ QUnit.test('debounce without a target, with args, immediate', function(assert) {
   let done = assert.async();
   let bb = new Backburner(['batman']);
   let calledCount = 0;
-  let calledWith: string[] = [];
-  function debouncee(first: string) {
+  let calledWith = new Array();
+  function debouncee(first) {
     calledCount++;
     calledWith.push(first);
   }
@@ -489,7 +495,7 @@ QUnit.test('debounce without a target, with args, immediate - can be canceled', 
   let bb = new Backburner(['batman']);
   let calledCount = 0;
   let calledWith: string[] = [];
-  function debouncee(first: string) {
+  function debouncee(first) {
     calledCount++;
     calledWith.push(first);
   }

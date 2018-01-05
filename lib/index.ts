@@ -418,7 +418,7 @@ export default class Backburner {
 
     if (args.length === 1) {
       method = targetOrThisArgOrMethod;
-      wait = args[0];
+      wait = args.pop();
       target = null;
       isImmediate = true;
     } else {
@@ -512,7 +512,7 @@ export default class Backburner {
 
     if (args.length === 1) {
       method = targetOrThisArgOrMethod;
-      wait = args[0];
+      wait = args.pop();
       target = null;
       isImmediate = false;
     } else {
