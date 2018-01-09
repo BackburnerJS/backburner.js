@@ -10,7 +10,6 @@ script:
   - npm test
 after_success:
   - npm build
-  - "./bin/publish_to_s3.js"
 env:
   global:
     - secure: Sx7SVc3tFbpTdtg494J32I9YDxedYJtDEifssN9Oe8zK02Jw+i74e45Njk1vr/REJjefNa26zMGI+w0UnSywRsKhogN4pzqtaDJKK8H8JaOFf5WoSXbSpEnXMoOLD9DzKjj0j1qxSqXnPlv4czyyO5firmYqOPPAziDED9v8eLM=
