@@ -6,7 +6,7 @@
   "jsnext:main": "dist/backburner.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ebryn/backburner.js.git"
+    "url": "https://github.com/BackburnerJS/backburner.js.git"
   },
   "scripts": {
     "prepublish": "npm run build",
