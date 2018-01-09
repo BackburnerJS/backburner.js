@@ -14,7 +14,7 @@ module.exports = function () {
   const src = new MergeTrees([
     new Funnel(path.dirname(require.resolve('@types/qunit/package')), {
       destDir: 'qunit',
-      include: [ 'index.d.ts' ]
+      include: ['index.d.ts']
     }),
     new Funnel(__dirname + '/lib', {
       destDir: 'lib'
