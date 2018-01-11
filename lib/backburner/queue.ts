@@ -13,17 +13,15 @@ const QUEUE_ITEM_LENGTH = 4;
 
 export default class Queue {
   private name: string;
-  private globalOptions: any;
   private options: any;
   private _queueBeingFlushed: any[] = [];
   private targetQueues = new Map();
   private index = 0;
   private _queue: any[] = [];
 
-  constructor(name: string, options: any = {}, globalOptions: any = {}) {
+  constructor(name: string, options: any = {}) {
     this.name = name;
     this.options = options;
-    this.globalOptions = globalOptions;
   }
 
   public stackFor(index) {
@@ -38,7 +36,6 @@ export default class Queue {
   }
 
   public flush(sync?: Boolean) {
-    let { before, after } = this.options;
     let target;
     let method;
     let args;
@@ -50,14 +47,10 @@ export default class Queue {
       this._queue = [];
     }
 
-    if (before !== undefined) {
-      before();
-    }
-
     let invoke;
     let queueItems = this._queueBeingFlushed;
     if (queueItems.length > 0) {
-      let onError = getOnError(this.globalOptions);
+      let onError = getOnError(this.options);
       invoke = onError ? this.invokeWithOnError : this.invoke;
 
       for (let i = this.index; i < queueItems.length; i += QUEUE_ITEM_LENGTH) {
@@ -88,14 +81,10 @@ export default class Queue {
         }
 
         if (this.index !== this._queueBeingFlushed.length &&
-          this.globalOptions.mustYield && this.globalOptions.mustYield()) {
+          this.options.mustYield && this.options.mustYield()) {
           return QUEUE_STATE.Pause;
         }
       }
-    }
-
-    if (after !== undefined) {
-      after();
     }
 
     this._queueBeingFlushed.length = 0;
