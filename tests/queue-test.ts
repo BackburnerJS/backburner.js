@@ -59,7 +59,7 @@ QUnit.test('Queue#flush should be recursive if new items are added', function(as
 
 QUnit.test('Default queue is automatically set to first queue if none is provided', function(assert) {
   let bb = new Backburner(['one', 'two']);
-  assert.equal(bb.options.defaultQueue, 'one');
+  assert.equal(bb.defaultQueue, 'one');
 });
 
 QUnit.test('Default queue can be manually configured', function(assert) {
@@ -67,7 +67,7 @@ QUnit.test('Default queue can be manually configured', function(assert) {
     defaultQueue: 'two'
   });
 
-  assert.equal(bb.options.defaultQueue, 'two');
+  assert.equal(bb.defaultQueue, 'two');
 });
 
 QUnit.test('onBegin and onEnd are called and passed the correct parameters', function(assert) {

@@ -1,3 +1,12 @@
+export {
+  buildPlatform,
+  IPlatform
+} from './backburner/platform';
+
+import {
+  buildPlatform,
+  IPlatform,
+} from './backburner/platform';
 import {
   findItem,
   findTimer,
@@ -14,7 +23,6 @@ import Queue, { QUEUE_STATE } from './backburner/queue';
 type Timer = any;
 
 const noop = function() {};
-const SET_TIMEOUT = setTimeout;
 
 function parseArgs() {
   let length = arguments.length;
@@ -126,6 +134,17 @@ let autorunsCompletedCount = 0;
 let deferredActionQueuesCreatedCount = 0;
 let nestedDeferredActionQueuesCreated = 0;
 
+export interface IBackburnerOptions {
+  defaultQueue?: string;
+  onBegin?: (currentInstance: DeferredActionQueues, previousInstance: DeferredActionQueues) => void;
+  onEnd?: (currentInstance: DeferredActionQueues, nextInstance: DeferredActionQueues) => void;
+  onError?: (error: any, errorRecordedForStack?: any) => void;
+  onErrorTarget?: any;
+  onErrorMethod?: string;
+  mustYield?: () => boolean;
+  _buildPlatform?: (flush: () => void) => IPlatform;
+}
+
 export default class Backburner {
   public static Queue = Queue;
 
@@ -133,7 +152,7 @@ export default class Backburner {
 
   public currentInstance: DeferredActionQueues | null = null;
 
-  public options: any;
+  public options: IBackburnerOptions;
 
   public get counters() {
     return {
@@ -183,49 +202,45 @@ export default class Backburner {
 
   private _timerTimeoutId: number | null = null;
   private _timers: any[] = [];
-  private _platform: {
-    setTimeout(fn: Function, ms: number): number;
-    clearTimeout(id: number): void;
-    next(fn: Function): number;
-    clearNext(id: any): void;
-    now(): number;
-  };
+  private _platform: IPlatform;
 
   private _boundRunExpiredTimers: () => void;
 
   private _autorun: number | null = null;
   private _boundAutorunEnd: () => void;
+  private _defaultQueue: string;
 
-  constructor(queueNames: string[], options: any = {} ) {
+  constructor(queueNames: string[], options?: IBackburnerOptions) {
     this.queueNames = queueNames;
-    this.options = options;
-    if (!this.options.defaultQueue) {
-      this.options.defaultQueue = queueNames[0];
+    this.options = options || {};
+    if (typeof this.options.defaultQueue === 'string') {
+      this._defaultQueue = this.options.defaultQueue;
+    } else {
+      this._defaultQueue = this.queueNames[0];
     }
 
     this._onBegin = this.options.onBegin || noop;
     this._onEnd = this.options.onEnd || noop;
 
-    let _platform = this.options._platform || {};
-    let platform = Object.create(null);
-
-    platform.setTimeout = _platform.setTimeout || ((fn, ms) => setTimeout(fn, ms));
-    platform.clearTimeout = _platform.clearTimeout || ((id) => clearTimeout(id));
-    platform.next = _platform.next || ((fn) => SET_TIMEOUT(fn, 0));
-    platform.clearNext = _platform.clearNext || platform.clearTimeout;
-    platform.now = _platform.now || (() => Date.now());
-
-    this._platform = platform;
-
     this._boundRunExpiredTimers = this._runExpiredTimers.bind(this);
 
     this._boundAutorunEnd = () => {
       autorunsCompletedCount++;
+
+      // if the autorun was already flushed, do nothing
+      if (this._autorun === null) { return; }
+
       this._autorun = null;
-      this.end();
+      this._end(true /* fromAutorun */);
     };
+
+    let builder = this.options._buildPlatform || buildPlatform;
+    this._platform = builder(this._boundAutorunEnd);
   }
 
+  public get defaultQueue() {
+    return this._defaultQueue;
+  }
   /*
     @method begin
     @return instantiated class DeferredActionQueues
@@ -257,40 +272,7 @@ export default class Backburner {
 
   public end() {
     endCount++;
-    let currentInstance = this.currentInstance;
-    let nextInstance: DeferredActionQueues | null  = null;
-
-    if (currentInstance === null) {
-      throw new Error(`end called without begin`);
-    }
-
-    // Prevent double-finally bug in Safari 6.0.2 and iOS 6
-    // This bug appears to be resolved in Safari 6.0.5 and iOS 7
-    let finallyAlreadyCalled = false;
-    let result;
-    try {
-      result = currentInstance.flush();
-    } finally {
-      if (!finallyAlreadyCalled) {
-        finallyAlreadyCalled = true;
-
-        if (result === QUEUE_STATE.Pause) {
-          autorunsCreatedCount++;
-          const next = this._platform.next;
-          this._autorun = next(this._boundAutorunEnd);
-        } else {
-          this.currentInstance = null;
-
-          if (this.instanceStack.length > 0) {
-            nextInstance = this.instanceStack.pop() as DeferredActionQueues;
-            this.currentInstance = nextInstance;
-          }
-          endEventCount++;
-          this._trigger('end', currentInstance, nextInstance);
-          this._onEnd(currentInstance, nextInstance);
-        }
-      }
-    }
+    this._end(false);
   }
 
   public on(eventName, callback) {
@@ -564,6 +546,40 @@ export default class Backburner {
     this._ensureInstance();
   }
 
+  private _end(fromAutorun: boolean) {
+    let currentInstance = this.currentInstance;
+    let nextInstance: DeferredActionQueues | null  = null;
+
+    if (currentInstance === null) {
+      throw new Error(`end called without begin`);
+    }
+
+    // Prevent double-finally bug in Safari 6.0.2 and iOS 6
+    // This bug appears to be resolved in Safari 6.0.5 and iOS 7
+    let finallyAlreadyCalled = false;
+    let result;
+    try {
+      result = currentInstance.flush(fromAutorun);
+    } finally {
+      if (!finallyAlreadyCalled) {
+        finallyAlreadyCalled = true;
+
+        if (result === QUEUE_STATE.Pause) {
+          this._scheduleAutorun();
+        } else {
+          this.currentInstance = null;
+
+          if (this.instanceStack.length > 0) {
+            nextInstance = this.instanceStack.pop() as DeferredActionQueues;
+            this.currentInstance = nextInstance;
+          }
+          this._trigger('end', currentInstance, nextInstance);
+          this._onEnd(currentInstance, nextInstance);
+        }
+      }
+    }
+  }
+
   private _join(target, method, args) {
     if (this.currentInstance === null) {
       return this._run(target, method, args);
@@ -654,7 +670,7 @@ export default class Backburner {
   /**
    Trigger an event. Supports up to two arguments. Designed around
    triggering transition events from one run loop instance to the
-   next, which requires an argument for the first instance and then
+   next, which requires an argument for the  instance and then
    an argument for the next instance.
 
    @private
@@ -685,7 +701,7 @@ export default class Backburner {
     let timers = this._timers;
     let i = 0;
     let l = timers.length;
-    let defaultQueue = this.options.defaultQueue;
+    let defaultQueue = this._defaultQueue;
     let n = this._platform.now();
 
     for (; i < l; i += 6) {
@@ -725,11 +741,16 @@ export default class Backburner {
   private _ensureInstance(): DeferredActionQueues {
     let currentInstance = this.currentInstance;
     if (currentInstance === null) {
-      autorunsCreatedCount++;
       currentInstance = this.begin();
-      const next = this._platform.next;
-      this._autorun = next(this._boundAutorunEnd);
+      this._scheduleAutorun();
     }
     return currentInstance;
+  }
+
+  private _scheduleAutorun() {
+    autorunsCreatedCount++;
+
+    const next = this._platform.next;
+    this._autorun = next();
   }
 }
