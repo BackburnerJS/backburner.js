@@ -2,6 +2,12 @@ language: node_js
 node_js:
   - "6"
 sudo: required
+dist: trusty
+
+addons:
+  chrome: stable
+  firefox: latest
+
 cache:
   yarn: true
 
