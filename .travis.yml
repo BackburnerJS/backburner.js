@@ -3,8 +3,8 @@ node_js:
   - "6"
 sudo: required
 cache:
-  directories:
-    - node_modules
+  yarn: true
+
 before_install:
   - true && `base64 --decode <<< ZXhwb3J0IEJST1dTRVJTVEFDS19VU0VSTkFNRT1lbWJlcmpzY29yZXRlYW0x`
   - true && `base64 --decode <<< ZXhwb3J0IEJST1dTRVJTVEFDS19BQ0NFU1NfS0VZPVlzUHhYS2NhaHg5WHN6eUhTMkdy`
