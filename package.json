@@ -28,6 +28,7 @@
     "broccoli-typescript-compiler": "^2.1.0",
     "do-you-even-bench": "^1.0.2",
     "ember-cli": "^2.17.0",
+    "ember-cli-browserstack": "^0.0.6",
     "ember-cli-inject-live-reload": "1.7.0",
     "glob": "^7.1.1",
     "loader.js": "^4.4.1",

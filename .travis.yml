@@ -5,13 +5,22 @@ sudo: required
 cache:
   directories:
     - node_modules
+before_install:
+  - true && `base64 --decode <<< ZXhwb3J0IEJST1dTRVJTVEFDS19VU0VSTkFNRT1lbWJlcmpzY29yZXRlYW0x`
+  - true && `base64 --decode <<< ZXhwb3J0IEJST1dTRVJTVEFDS19BQ0NFU1NfS0VZPVlzUHhYS2NhaHg5WHN6eUhTMkdy`
+before_script:
+  - node_modules/.bin/ember browserstack:connect
 script:
   - npm run lint
-  - npm test
+  - npm test -- --test-port 7774 --host 127.0.0.1
 after_success:
   - npm build
+after_script:
+  - node_modules/.bin/ember browserstack:results
+  - node_modules/.bin/ember browserstack:disconnect
 env:
   global:
+    - BROWSERSTACK_BUILD_NAME_PREFIX=backburnerjs
     - secure: Sx7SVc3tFbpTdtg494J32I9YDxedYJtDEifssN9Oe8zK02Jw+i74e45Njk1vr/REJjefNa26zMGI+w0UnSywRsKhogN4pzqtaDJKK8H8JaOFf5WoSXbSpEnXMoOLD9DzKjj0j1qxSqXnPlv4czyyO5firmYqOPPAziDED9v8eLM=
     - secure: Lo7dEbRFHNrQL29iUs88zFQyRNWcK7lnLIoPlBIUDiLOXamsUilxykAPmifIK34yFS4GqN+zv9mkcVEkieRQV5LlZgNd1RLJ5nDM6bkMSRM1K14K36EUy3ldU9Ld1d/sa5yx4cxJXqNRjfF/d+i7OTDQduLYmrFLhLPPu2HetbA=
     - secure: cAsSmFA77dBTgo7JHT3kcXlwAfilDoOwrVo3b77SHj64rWVUjB3xyaCWY+3gCoULTDD/fuEO80TWwzfV2sQGASvJyrSNLw3P7//Ym/dkHcTdQ3CfCagCf689/PfFTMM1+v6gZHSYcryJzRWkLolEgFlkU+lw4rwVlRjrKSwnRgQ=
