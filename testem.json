@@ -35,6 +35,7 @@
   },
   "launch_in_ci": [
     "Chrome",
+    "Firefox",
     "BS_Safari_Current",
     "BS_MS_Edge",
     "BS_IE_11"
@@ -51,6 +52,9 @@
       "--disable-gpu",
       "--remote-debugging-port=9222",
       "--window-size=1440,90"
+    ],
+    "Firefox": [
+      "-headless"
     ]
   }
 }
