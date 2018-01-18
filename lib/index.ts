@@ -617,24 +617,19 @@ export default class Backburner {
   }
 
   private _run(target, method, args) {
-    let onError = getOnError(this.options);
-
     this.begin();
 
-    if (onError) {
-      try {
-        return method.apply(target, args);
-      } catch (error) {
+    try {
+      return method.apply(target, args);
+    } catch (error) {
+      let onError = getOnError(this.options);
+      if (onError) {
         onError(error);
-      } finally {
-        this.end();
+      } else {
+        throw error;
       }
-    } else {
-      try {
-        return method.apply(target, args);
-      } finally {
-        this.end();
-      }
+    } finally {
+      this.end();
     }
   }
 
