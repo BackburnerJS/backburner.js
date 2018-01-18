@@ -41,10 +41,7 @@
     "BS_IE_11"
   ],
   "launch_in_dev": [
-    "Chrome",
-    "BS_Safari_Current",
-    "BS_MS_Edge",
-    "BS_IE_11"
+    "Chrome"
   ],
   "browser_args": {
     "Chrome": [
