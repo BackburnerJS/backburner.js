@@ -18,7 +18,7 @@ QUnit.test('DEBUG flag enables stack tagging', function(assert) {
     let stack = bb.currentInstance && bb.currentInstance.queues.one._queue[7].stack;
     assert.ok(typeof stack === 'string', 'A stack is recorded');
 
-    let onError = function(error, errorRecordedForStack){
+    let onError = function(error, errorRecordedForStack) {
       assert.ok(errorRecordedForStack, 'errorRecordedForStack passed to error function');
       assert.ok(errorRecordedForStack.stack, 'stack is recorded');
     };

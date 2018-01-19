@@ -3,9 +3,9 @@ import Backburner from 'backburner';
 QUnit.module('tests/defer-iterable');
 
 class Iterator {
-  private _collection: Function[];
+  private _collection: () => [];
   private _iteration: number = 0;
-  constructor(collection: Function[] = []) {
+  constructor(collection: () => [] = []) {
     this._collection = collection;
   }
 

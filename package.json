@@ -33,6 +33,6 @@
     "loader.js": "^4.4.1",
     "qunitjs": "^2.2.0",
     "rollup-plugin-buble": "^0.18.0",
-    "tslint": "4.5.1"
+    "tslint": "^5.8.0"
   }
 }

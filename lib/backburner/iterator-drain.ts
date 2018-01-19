@@ -1,6 +1,6 @@
 // accepts a function that when invoked will return an iterator
 // iterator will drain until completion
-export default function(fn: () => { next: () => { done: Boolean, value?: any}}) {
+export default function(fn: () => { next: () => { done: boolean, value?: any}}) {
   let iterator = fn();
   let result = iterator.next();
 
