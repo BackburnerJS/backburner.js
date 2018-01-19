@@ -127,9 +127,6 @@ function loadWithInlineMap() {
       result.code = code.slice(0, index);
       result.map = parseSourceMap(code.slice(index + SOURCE_MAPPING_DATA_URL.length));
       result.file = id;
-      console.log(id);
-      console.log(result.map.sources);
-      console.log(result.map.sourcesContent.map((c) => !!c));
       return result;
     }
   };
