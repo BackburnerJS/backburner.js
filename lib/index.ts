@@ -371,22 +371,22 @@ export default class Backburner {
     return this._setTimeout(fn, executeAt);
   }
 
-  public throttle<T>(target: T, methodName: keyof T, wait: number | string, immediate?: boolean): Timer;
-  public throttle<T>(target: T, methodName: keyof T, arg1: any, wait: number | string, immediate?: boolean): Timer;
-  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait: number | string, immediate?: boolean): Timer;
-  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait: number | string, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait?: number | string, immediate?: boolean): Timer;
 
   // with target, with immediate
-  public throttle(thisArg: any | null, method: () => void, wait: number | string, immediate?: boolean): Timer;
-  public throttle<A>(thisArg: any | null, method: (arg1: A) => void, arg1: A, wait: number | string, immediate?: boolean): Timer;
-  public throttle<A, B>(thisArg: any | null, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number | string, immediate?: boolean): Timer;
-  public throttle<A, B, C>(thisArg: any | null, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number | string, immediate?: boolean): Timer;
+  public throttle(thisArg: any | null, method: () => void, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A>(thisArg: any | null, method: (arg1: A) => void, arg1: A, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A, B>(thisArg: any | null, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A, B, C>(thisArg: any | null, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait?: number | string, immediate?: boolean): Timer;
 
   // without target, with immediate
-  public throttle(method: () => void, wait: number | string, immediate?: boolean): Timer;
-  public throttle<A>(method: (arg1: A) => void, arg1: A, wait: number | string, immediate?: boolean): Timer;
-  public throttle<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number | string, immediate?: boolean): Timer;
-  public throttle<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number | string, immediate?: boolean): Timer;
+  public throttle(method: () => void, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A>(method: (arg1: A) => void, arg1: A, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait?: number | string, immediate?: boolean): Timer;
   public throttle(targetOrThisArgOrMethod: object | (() => any), ...args): Timer {
     let target;
     let method;
