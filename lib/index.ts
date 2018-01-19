@@ -52,15 +52,15 @@ export default class Backburner {
 
   public options: any;
 
-  private _onBegin: () => void;
-  private _onEnd: () => void;
+  private _onBegin: (currentInstance: DeferredActionQueues, previousInstance: DeferredActionQueues | null) => void;
+  private _onEnd: (currentInstance: DeferredActionQueues, nextInstance: DeferredActionQueues | null) => void;
   private queueNames: string[];
   private instanceStack: DeferredActionQueues[];
   private _debouncees: any[];
   private _throttlers: any[];
   private _eventCallbacks: {
-    end: () => [];
-    begin: () => [];
+    end: Function[];
+    begin: Function[];
   };
 
   private _timerTimeoutId: number | null = null;
@@ -90,8 +90,8 @@ export default class Backburner {
     this._debouncees = [];
     this._throttlers = [];
     this._eventCallbacks = {
-      end: [],
-      begin: []
+      end: new Array(),
+      begin: new Array()
     };
 
     this._onBegin = this.options.onBegin || noop;
@@ -242,9 +242,8 @@ export default class Backburner {
   /**
    * @deprecated please use schedule instead.
    */
-  public defer(queueName: string, ...args);
-  public defer() {
-    return this.schedule(...arguments);
+  public defer(queueName, targetOrMethod, ..._args) {
+    return this.schedule(queueName, targetOrMethod, ..._args);
   }
 
   /**
@@ -275,9 +274,8 @@ export default class Backburner {
   /**
    * @deprecated please use scheduleOnce instead.
    */
-  public deferOnce(queueName: string, ...args);
-  public deferOnce() {
-    return this.scheduleOnce(...arguments);
+  public deferOnce(queueName, targetOrMethod, ...args) {
+    return this.scheduleOnce(queueName, targetOrMethod, ...args);
   }
 
   /**
