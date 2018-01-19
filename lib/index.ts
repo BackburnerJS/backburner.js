@@ -209,8 +209,8 @@ export default class Backburner {
     }
   }
 
-  public run(method: () => any);
-  public run(target: () => any | any | null, method?: () => any | string, ...args);
+  public run(target: Function);
+  public run(target: Function | any | null, method?: Function | string, ...args);
   public run(target: any | null | undefined, method?: any, ...args: any[]);
   public run() {
     let [target, method, args] = parseArgs(...arguments);
@@ -231,6 +231,9 @@ export default class Backburner {
     @param {any} args The method arguments
     @return method result
   */
+  public join(target: Function);
+  public join(target: Function | any | null, method?: Function | string, ...args);
+  public join(target: any | null | undefined, method?: any, ...args: any[]);
   public join() {
     let [target, method, args] = parseArgs(...arguments);
     return this._join(target, method, args);

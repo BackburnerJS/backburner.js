@@ -12,7 +12,7 @@ QUnit.test('outside of a run loop', function(assert) {
   let bb = new Backburner(['one']);
 
   assert.equal(depth(bb), 0);
-  let result = bb.join(function() {
+  let result = bb.join(() => {
     assert.equal(depth(bb), 1);
     return 'result';
   });
@@ -26,8 +26,8 @@ QUnit.test('inside of a run loop', function(assert) {
   let bb = new Backburner(['one']);
 
   assert.equal(depth(bb), 0);
-  bb.run(function() {
-    let result = bb.join(function() {
+  bb.run(() => {
+    let result = bb.join(() => {
       assert.equal(depth(bb), 1);
       return 'result';
     });
@@ -42,11 +42,11 @@ QUnit.test('nested join calls', function(assert) {
   let bb = new Backburner(['one']);
 
   assert.equal(depth(bb), 0);
-  bb.join(function() {
+  bb.join(() => {
     assert.equal(depth(bb), 1);
-    bb.join(function() {
+    bb.join(() => {
       assert.equal(depth(bb), 1);
-      bb.join(function() {
+      bb.join(() => {
         assert.equal(depth(bb), 1);
       });
       assert.equal(depth(bb), 1);
@@ -62,11 +62,11 @@ QUnit.test('nested run loops', function(assert) {
   let bb = new Backburner(['one']);
 
   assert.equal(depth(bb), 0);
-  bb.join(function() {
+  bb.join(() => {
     assert.equal(depth(bb), 1);
-    bb.run(function() {
+    bb.run(() => {
       assert.equal(depth(bb), 2);
-      bb.join(function() {
+      bb.join(() => {
         assert.equal(depth(bb), 2);
       });
       assert.equal(depth(bb), 2);
@@ -82,10 +82,10 @@ QUnit.test('queue execution order', function(assert) {
   let bb = new Backburner(['one']);
   let items: number[] = [];
 
-  bb.run(function() {
+  bb.run(() => {
     items.push(0);
     bb.schedule('one', () => items.push(4));
-    bb.join(function() {
+    bb.join(() => {
       items.push(1);
       bb.schedule('one', () => items.push(5));
       items.push(2);
@@ -153,7 +153,7 @@ QUnit.test('onError which does not rethrow is invoked (only once) when joining a
     onError: onError
   });
 
-  bb.run(function() {
+  bb.run(() => {
     bb.join(() => {
       throw new Error('test error');
     });
@@ -192,7 +192,7 @@ QUnit.test('onError which does rethrow is invoked (only once) when joining an ex
   });
 
   assert.throws(() => {
-    bb.run(function() {
+    bb.run(() => {
       bb.join(() => {
         throw new Error('test error');
       });
