@@ -67,7 +67,7 @@ module.exports = function (app) {
           file: 'named-amd/backburner.js',
           exports: 'named',
           format: 'amd',
-          moduleId: 'backburner',
+          amd: { id: 'backburner' },
           sourcemap: true
         }, {
           file: 'backburner.js',
@@ -88,7 +88,7 @@ module.exports = function (app) {
         output: [{
           file: 'named-amd/tests.js',
           format: 'amd',
-          moduleId: 'backburner-tests',
+          amd: { id: 'backburner-tests' },
           sourcemap: true
         }]
       }
