@@ -182,7 +182,7 @@ QUnit.test('no target', function(assert) {
 
   let wasCalled = 0;
 
-  function fn () {
+  function fn() {
     wasCalled++;
   }
 

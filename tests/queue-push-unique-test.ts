@@ -1,6 +1,6 @@
 import Backburner from 'backburner';
 
-let Queue = (<any> Backburner).Queue;
+let Queue = (Backburner as any).Queue;
 
 QUnit.module('tests/queue-push-unique');
 let slice = [].slice;
