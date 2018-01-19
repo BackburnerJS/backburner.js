@@ -2,9 +2,7 @@ import {
   findItem,
   findTimer,
   getOnError,
-  isCoercableNumber,
-  isFunction,
-  isString
+  isCoercableNumber
 } from './backburner/utils';
 
 import searchTimer from './backburner/binary-search';
@@ -30,7 +28,7 @@ function parseArgs() {
   } else {
     target = arguments[0];
     method = arguments[1];
-    if (isString(method)) {
+    if (typeof method === 'string') {
       method = target[method] as () => any;
     }
 
@@ -317,10 +315,11 @@ export default class Backburner {
       methodOrTarget = args[0];
       methodOrWait = args[1];
 
-      if (isFunction(methodOrWait)) {
+      let type = typeof methodOrWait;
+      if (type === 'function') {
         target = args.shift();
         method = args.shift();
-      } else if (methodOrTarget !== null && isString(methodOrWait) && methodOrWait in methodOrTarget) {
+      } else if (methodOrTarget !== null && type === 'string' && methodOrWait in methodOrTarget) {
         target = args.shift();
         method = target[args.shift()] as () => any;
       } else if (isCoercableNumber(methodOrWait)) {
@@ -338,11 +337,11 @@ export default class Backburner {
 
       methodOrTarget = args[0];
       methodOrArgs = args[1];
-
-      if (isFunction(methodOrArgs)) {
+      let type = typeof methodOrArgs;
+      if (type === 'function') {
         target = args.shift();
         method = args.shift();
-      } else if (methodOrTarget !== null && isString(methodOrArgs) && methodOrArgs in methodOrTarget) {
+      } else if (methodOrTarget !== null && type === 'string' && methodOrArgs in methodOrTarget) {
         target = args.shift();
         method = target[args.shift()];
       } else {
@@ -403,10 +402,10 @@ export default class Backburner {
       target = targetOrThisArgOrMethod;
       method = args.shift();
       immediate = args.pop();
-
-      if (isString(method)) {
+      let type = typeof method;
+      if (type === 'string') {
         method = target[method] as () => any;
-      } else if (!isFunction(method)) {
+      } else if (type !== 'function') {
         args.unshift(method);
         method = target;
         target = null;
@@ -480,9 +479,10 @@ export default class Backburner {
       method = args.shift();
       immediate = args.pop();
 
-      if (isString(method)) {
+      let type = typeof method;
+      if (type === 'string') {
         method = target[method] as () => any;
-      } else if (!isFunction(method)) {
+      } else if (type !== 'function') {
         args.unshift(method);
         method = target;
         target = null;
