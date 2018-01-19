@@ -4,7 +4,9 @@
     "target": "es2015",
     "noEmit": true,
     "baseUrl": ".",
-    "module": "amd",
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "module": "es2015",
     "strictNullChecks": true,
     "paths": {
       "backburner": ["lib/index.ts"]

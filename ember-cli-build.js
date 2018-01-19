@@ -22,21 +22,6 @@ module.exports = function (app) {
 
   const compiled = typescript(src, {
     throwOnError: process.env.EMBER_ENV === 'production',
-    tsconfig: {
-      compilerOptions: {
-        baseUrl: '.',
-        inlineSourceMap: true,
-        inlineSources: true,
-        module: 'es2015',
-        moduleResolution: 'node',
-        paths: {
-          backburner: ['lib/index.ts']
-        },
-        strictNullChecks: true,
-        target: 'es2015'
-      },
-      files: ['lib/index.ts', 'tests/index.ts']
-    }
   });
 
   const backburner = new Rollup(compiled, {
