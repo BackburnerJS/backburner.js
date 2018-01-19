@@ -10,12 +10,8 @@ const fs = require('fs');
 
 const SOURCE_MAPPING_DATA_URL = '//# sourceMap' + 'pingURL=data:application/json;base64,';
 
-module.exports = function () {
+module.exports = function (app) {
   const src = new MergeTrees([
-    new Funnel(path.dirname(require.resolve('@types/qunit/package')), {
-      destDir: 'qunit',
-      include: ['index.d.ts']
-    }),
     new Funnel(__dirname + '/lib', {
       destDir: 'lib'
     }),
@@ -25,21 +21,7 @@ module.exports = function () {
   ]);
 
   const compiled = typescript(src, {
-    tsconfig: {
-      compilerOptions: {
-        baseUrl: '.',
-        inlineSourceMap: true,
-        inlineSources: true,
-        module: 'es2015',
-        moduleResolution: 'node',
-        paths: {
-          backburner: ['lib/index.ts']
-        },
-        strictNullChecks: true,
-        target: 'es2015'
-      },
-      files: ['qunit/index.d.ts', 'lib/index.ts', 'tests/index.ts']
-    }
+    throwOnError: process.env.EMBER_ENV === 'production',
   });
 
   const backburner = new Rollup(compiled, {
@@ -70,7 +52,7 @@ module.exports = function () {
           file: 'named-amd/backburner.js',
           exports: 'named',
           format: 'amd',
-          moduleId: 'backburner',
+          amd: { id: 'backburner' },
           sourcemap: true
         }, {
           file: 'backburner.js',
@@ -91,7 +73,7 @@ module.exports = function () {
         output: [{
           file: 'named-amd/tests.js',
           format: 'amd',
-          moduleId: 'backburner-tests',
+          amd: { id: 'backburner-tests' },
           sourcemap: true
         }]
       }
@@ -130,9 +112,6 @@ function loadWithInlineMap() {
       result.code = code.slice(0, index);
       result.map = parseSourceMap(code.slice(index + SOURCE_MAPPING_DATA_URL.length));
       result.file = id;
-      console.log(id);
-      console.log(result.map.sources);
-      console.log(result.map.sourcesContent.map((c) => !!c));
       return result;
     }
   };

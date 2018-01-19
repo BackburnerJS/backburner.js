@@ -54,25 +54,25 @@ QUnit.test('nesting run loops preserves the stack', function(assert) {
   let middleAfterFunctionWasCalled = false;
   let outerAfterFunctionWasCalled = false;
 
-  bb.run(function() {
+  bb.run(() => {
     bb.schedule('one', () => {
       outerBeforeFunctionWasCalled = true;
     });
 
-    bb.run(function() {
+    bb.run(() => {
       bb.schedule('one', () => {
         middleBeforeFunctionWasCalled = true;
       });
 
-      bb.run(function() {
-        bb.schedule('one', function() {
+      bb.run(() => {
+        bb.schedule('one', () => {
           innerFunctionWasCalled = true;
         });
         assert.ok(!innerFunctionWasCalled, 'function is deferred');
       });
       assert.ok(innerFunctionWasCalled, 'function is called');
 
-      bb.schedule('one', function() {
+      bb.schedule('one', () => {
         middleAfterFunctionWasCalled = true;
       });
 
@@ -83,7 +83,7 @@ QUnit.test('nesting run loops preserves the stack', function(assert) {
     assert.ok(middleBeforeFunctionWasCalled, 'function is called');
     assert.ok(middleAfterFunctionWasCalled, 'function is called');
 
-    bb.schedule('one', function() {
+    bb.schedule('one', () => {
       outerAfterFunctionWasCalled = true;
     });
 
@@ -101,10 +101,10 @@ QUnit.test('runs can be nested', function(assert) {
   let bb = new Backburner(['one']);
   let step = 0;
 
-  bb.run(function() {
+  bb.run(() => {
     assert.equal(step++, 0);
 
-    bb.run(function() {
+    bb.run(() => {
       assert.equal(step++, 1);
     });
   });
@@ -112,10 +112,7 @@ QUnit.test('runs can be nested', function(assert) {
 
 QUnit.test('run returns value', function(assert) {
   let bb = new Backburner(['one']);
-
-  let value = bb.run(function() {
-    return 'hi';
-  });
+  let value = bb.run(() => 'hi');
 
   assert.equal(value, 'hi');
 });
@@ -131,7 +128,7 @@ QUnit.test('onError', function(assert) {
     onError: onError
   });
 
-  bb.run(function() {
+  bb.run(() => {
     throw new Error('QUnit.test error');
   });
 });

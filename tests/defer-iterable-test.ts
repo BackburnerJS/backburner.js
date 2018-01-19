@@ -3,9 +3,9 @@ import Backburner from 'backburner';
 QUnit.module('tests/defer-iterable');
 
 class Iterator {
-  private _collection: () => [];
+  private _collection: Function[];
   private _iteration: number = 0;
-  constructor(collection: () => [] = []) {
+  constructor(collection: Function[]) {
     this._collection = collection;
   }
 
@@ -48,7 +48,11 @@ QUnit.test('deferIterable', function(assert) {
     tasks.three.order = order++;
   }
 
-  let iterator = () => new Iterator([task1, task2, task3]);
+  let iterator = () => new Iterator([
+    task1,
+    task2,
+    task3
+  ]);
 
   bb.run(() => {
     bb.scheduleIterable('zomg', iterator);

@@ -1,6 +1,10 @@
 // accepts a function that when invoked will return an iterator
 // iterator will drain until completion
-export default function(fn: () => { next: () => { done: boolean, value?: any}}) {
+export interface Iteratable {
+  next: () => { done: boolean, value?: any };
+}
+
+export default function(fn: () => Iteratable) {
   let iterator = fn();
   let result = iterator.next();
 

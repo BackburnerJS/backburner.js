@@ -378,7 +378,7 @@ QUnit.test('throttle without a target, without args, not immediate - can be canc
 QUnit.test('throttle without a target, with args', function(assert) {
   let bb = new Backburner(['batman']);
   let calledWith: string[] = [];
-  function throttled(first: string) {
+  function throttled(first) {
     calledWith.push(first);
   }
 
@@ -397,7 +397,7 @@ QUnit.test('throttle without a target, with args - can be canceled', function(as
   let bb = new Backburner(['batman']);
   let calledCount = 0;
   let calledWith: string[] = [];
-  function throttled(first: string) {
+  function throttled(first) {
     calledCount++;
     calledWith.push(first);
   }
@@ -428,7 +428,7 @@ QUnit.test('throttle without a target, with args, not immediate', function(asser
   let done = assert.async();
   let bb = new Backburner(['batman']);
   let calledWith: string[] = [];
-  function throttler(first: string) {
+  function throttler(first) {
     calledWith.push(first);
   }
 
@@ -451,7 +451,7 @@ QUnit.test('throttle without a target, with args, not immediate - can be cancele
   let bb = new Backburner(['batman']);
   let calledCount = 0;
   let calledWith: string[] = [];
-  function throttled(first: string) {
+  function throttled(first) {
     calledCount++;
     calledWith.push(first);
   }

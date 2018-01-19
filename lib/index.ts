@@ -7,7 +7,7 @@ import {
 
 import searchTimer from './backburner/binary-search';
 import DeferredActionQueues from './backburner/deferred-action-queues';
-import iteratorDrain from './backburner/iterator-drain';
+import iteratorDrain, { Iteratable } from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
@@ -29,7 +29,7 @@ function parseArgs() {
     target = arguments[0];
     method = arguments[1];
     if (typeof method === 'string') {
-      method = target[method] as () => any;
+      method = target[method];
     }
 
     if (length > 2) {
@@ -52,24 +52,27 @@ export default class Backburner {
 
   public options: any;
 
-  private _onBegin: () => void;
-  private _onEnd: () => void;
+  private _onBegin: (currentInstance: DeferredActionQueues, previousInstance: DeferredActionQueues | null) => void;
+  private _onEnd: (currentInstance: DeferredActionQueues, nextInstance: DeferredActionQueues | null) => void;
   private queueNames: string[];
-  private instanceStack: DeferredActionQueues[];
-  private _debouncees: any[];
-  private _throttlers: any[];
+  private instanceStack: DeferredActionQueues[] = [];
+  private _debouncees: any[] = [];
+  private _throttlers: any[] = [];
   private _eventCallbacks: {
-    end: () => [];
-    begin: () => [];
+    end: Function[];
+    begin: Function[];
+  } = {
+    end: [],
+    begin: []
   };
 
   private _timerTimeoutId: number | null = null;
-  private _timers: any[];
+  private _timers: any[] = [];
   private _platform: {
-    setTimeout(fn: () => void, ms: number): number;
+    setTimeout(fn: Function, ms: number): number;
     clearTimeout(id: number): void;
-    next(fn: () => void): number;
-    clearNext(fn): void;
+    next(fn: Function): number;
+    clearNext(id: any): void;
     now(): number;
   };
 
@@ -85,20 +88,12 @@ export default class Backburner {
       this.options.defaultQueue = queueNames[0];
     }
 
-    this.instanceStack = [];
-    this._timers = [];
-    this._debouncees = [];
-    this._throttlers = [];
-    this._eventCallbacks = {
-      end: [],
-      begin: []
-    };
-
     this._onBegin = this.options.onBegin || noop;
     this._onEnd = this.options.onEnd || noop;
 
     let _platform = this.options._platform || {};
     let platform = Object.create(null);
+
     platform.setTimeout = _platform.setTimeout || ((fn, ms) => setTimeout(fn, ms));
     platform.clearTimeout = _platform.clearTimeout || ((id) => clearTimeout(id));
     platform.next = _platform.next || ((fn) => SET_TIMEOUT(fn, 0));
@@ -209,9 +204,9 @@ export default class Backburner {
     }
   }
 
-  public run(method: () => any);
-  public run(target: () => any | any | null, method?: () => any | string, ...args);
-  public run(target: any | null | undefined, method?: any, ...args: any[]);
+  public run(target: Function);
+  public run(target: Function | any | null, method?: Function | string, ...args);
+  public run(target: any | null | undefined, method?: Function, ...args: any[]);
   public run() {
     let [target, method, args] = parseArgs(...arguments);
     return this._run(target, method, args);
@@ -231,6 +226,9 @@ export default class Backburner {
     @param {any} args The method arguments
     @return method result
   */
+  public join(target: Function);
+  public join(target: Function | any | null, method?: Function | string, ...args);
+  public join(target: any | null | undefined, method?: Function, ...args: any[]);
   public join() {
     let [target, method, args] = parseArgs(...arguments);
     return this._join(target, method, args);
@@ -239,17 +237,16 @@ export default class Backburner {
   /**
    * @deprecated please use schedule instead.
    */
-  public defer(queueName: string, ...args);
-  public defer() {
-    return this.schedule(...arguments);
+  public defer(queueName, targetOrMethod, ..._args) {
+    return this.schedule(queueName, targetOrMethod, ..._args);
   }
 
   /**
    * Schedule the passed function to run inside the specified queue.
    */
-  public schedule(queueName: string, method: () => any);
+  public schedule(queueName: string, method: Function);
   public schedule<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
-  public schedule(queueName: string, target: any | null, method: any | (() => any), ...args);
+  public schedule(queueName: string, target: any, method: any | Function, ...args);
   public schedule(queueName, ..._args) {
     let [target, method, args] = parseArgs(..._args);
     let stack = this.DEBUG ? new Error() : undefined;
@@ -264,7 +261,7 @@ export default class Backburner {
     @param {Iterable} an iterable of functions to execute
     @return method result
   */
-  public scheduleIterable(queueName: string, iterable: () => any) {
+  public scheduleIterable(queueName: string, iterable: () => Iteratable) {
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, null, iteratorDrain, [iterable], false, stack);
   }
@@ -272,17 +269,16 @@ export default class Backburner {
   /**
    * @deprecated please use scheduleOnce instead.
    */
-  public deferOnce(queueName: string, ...args);
-  public deferOnce() {
-    return this.scheduleOnce(...arguments);
+  public deferOnce(queueName, targetOrMethod, ...args) {
+    return this.scheduleOnce(queueName, targetOrMethod, ...args);
   }
 
   /**
    * Schedule the passed function to run once inside the specified queue.
    */
-  public scheduleOnce(queueName: string, method: () => any);
+  public scheduleOnce(queueName: string, method: Function);
   public scheduleOnce<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
-  public scheduleOnce(queueName: string, target: any | null, method: any | (() => any), ...args);
+  public scheduleOnce(queueName: string, target: any | null, method: any | Function, ...args);
   public scheduleOnce(queueName, ..._args) {
     let [target, method, args] = parseArgs(..._args);
     let stack = this.DEBUG ? new Error() : undefined;
@@ -321,7 +317,7 @@ export default class Backburner {
         method = args.shift();
       } else if (methodOrTarget !== null && type === 'string' && methodOrWait in methodOrTarget) {
         target = args.shift();
-        method = target[args.shift()] as () => any;
+        method = target[args.shift()];
       } else if (isCoercableNumber(methodOrWait)) {
         method = args.shift();
         wait = parseInt(args.shift(), 10);
@@ -370,23 +366,23 @@ export default class Backburner {
     return this._setTimeout(fn, executeAt);
   }
 
-  public throttle<T>(target: T, methodName: keyof T, wait: number, immediate?: boolean): Timer;
-  public throttle<T>(target: T, methodName: keyof T, arg1: any, wait: number, immediate?: boolean): Timer;
-  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait: number, immediate?: boolean): Timer;
-  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait: number, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait?: number | string, immediate?: boolean): Timer;
 
   // with target, with immediate
-  public throttle(thisArg: any, method: () => void, wait: number, immediate?: boolean): Timer;
-  public throttle<A>(thisArg: any, method: (arg1: A) => void, arg1: A, wait: number, immediate?: boolean): Timer;
-  public throttle<A, B>(thisArg: any, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate?: boolean): Timer;
-  public throttle<A, B, C>(thisArg: any, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate?: boolean): Timer;
+  public throttle(thisArg: any | null, method: () => void, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A>(thisArg: any | null, method: (arg1: A) => void, arg1: A, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A, B>(thisArg: any | null, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A, B, C>(thisArg: any | null, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait?: number | string, immediate?: boolean): Timer;
 
   // without target, with immediate
-  public throttle(method: () => void, wait: number, immediate?: boolean): Timer;
-  public throttle<A>(method: (arg1: A) => void, arg1: A, wait: number, immediate?: boolean): Timer;
-  public throttle<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate?: boolean): Timer;
-  public throttle<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate?: boolean): Timer;
-  public throttle(targetOrThisArgOrMethod: object | (() => any), ...args): Timer {
+  public throttle(method: () => void, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A>(method: (arg1: A) => void, arg1: A, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait?: number | string, immediate?: boolean): Timer;
+  public throttle<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait?: number | string, immediate?: boolean): Timer;
+  public throttle(targetOrThisArgOrMethod: object | Function, ...args): Timer {
     let target;
     let method;
     let immediate;
@@ -404,7 +400,7 @@ export default class Backburner {
       immediate = args.pop();
       let type = typeof method;
       if (type === 'string') {
-        method = target[method] as () => any;
+        method = target[method];
       } else if (type !== 'function') {
         args.unshift(method);
         method = target;
@@ -446,23 +442,23 @@ export default class Backburner {
   }
 
   // with target, with method name, with optional immediate
-  public debounce<T>(target: T, methodName: keyof T, wait: number, immediate?: boolean): Timer;
-  public debounce<T>(target: T, methodName: keyof T, arg1: any, wait: number, immediate?: boolean): Timer;
-  public debounce<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait: number, immediate?: boolean): Timer;
-  public debounce<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait: number, immediate?: boolean): Timer;
+  public debounce<T>(target: T, methodName: keyof T, wait: number | string, immediate?: boolean): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, wait: number | string, immediate?: boolean): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait: number | string, immediate?: boolean): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait: number | string, immediate?: boolean): Timer;
 
   // with target, with optional immediate
-  public debounce(thisArg: any, method: () => void, wait: number, immediate?: boolean): Timer;
-  public debounce<A>(thisArg: any, method: (arg1: A) => void, arg1: A, wait: number, immediate?: boolean): Timer;
-  public debounce<A, B>(thisArg: any, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate?: boolean): Timer;
-  public debounce<A, B, C>(thisArg: any, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate?: boolean): Timer;
+  public debounce(thisArg: any | null, method: () => void, wait: number | string, immediate?: boolean): Timer;
+  public debounce<A>(thisArg: any | null, method: (arg1: A) => void, arg1: A, wait: number | string, immediate?: boolean): Timer;
+  public debounce<A, B>(thisArg: any | null, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number | string, immediate?: boolean): Timer;
+  public debounce<A, B, C>(thisArg: any | null, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number | string, immediate?: boolean): Timer;
 
   // without target, with optional immediate
-  public debounce(method: () => void, wait: number, immediate?: boolean): Timer;
-  public debounce<A>(method: (arg1: A) => void, arg1: A, wait: number, immediate?: boolean): Timer;
-  public debounce<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate?: boolean): Timer;
-  public debounce<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate?: boolean): Timer;
-  public debounce(targetOrThisArgOrMethod: object | (() => any), ...args): Timer {
+  public debounce(method: () => void, wait: number | string, immediate?: boolean): Timer;
+  public debounce<A>(method: (arg1: A) => void, arg1: A, wait: number | string, immediate?: boolean): Timer;
+  public debounce<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number | string, immediate?: boolean): Timer;
+  public debounce<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number | string, immediate?: boolean): Timer;
+  public debounce(targetOrThisArgOrMethod: object | Function, ...args): Timer {
     let target;
     let method;
     let immediate;
@@ -481,7 +477,7 @@ export default class Backburner {
 
       let type = typeof method;
       if (type === 'string') {
-        method = target[method] as () => any;
+        method = target[method];
       } else if (type !== 'function') {
         args.unshift(method);
         method = target;
@@ -542,7 +538,10 @@ export default class Backburner {
   }
 
   public hasTimers() {
-    return this._timers.length > 0 || this._debouncees.length > 0 || this._throttlers.length > 0 || this._autorun !== null;
+    return this._timers.length > 0 ||
+       this._debouncees.length > 0 ||
+       this._throttlers.length > 0 ||
+       this._autorun !== null;
   }
 
   public cancel(timer?) {

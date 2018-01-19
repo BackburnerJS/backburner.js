@@ -411,7 +411,7 @@ QUnit.test('debounce without a target, with args', function(assert) {
   let bb = new Backburner(['batman']);
   let calledCount = 0;
   let calledWith: string[] = [];
-  function debouncee(first: string) {
+  function debouncee(first) {
     calledCount++;
     calledWith.push(first);
   }
@@ -435,7 +435,7 @@ QUnit.test('debounce without a target, with args - can be canceled', function(as
   let bb = new Backburner(['batman']);
   let calledCount = 0;
   let calledWith: string[] = [];
-  function debouncee(first: string) {
+  function debouncee(first) {
     calledCount++;
     calledWith.push(first);
   }

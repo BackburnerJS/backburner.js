@@ -6,6 +6,7 @@ cache:
   directories:
     - node_modules
 script:
+  - npm run problems
   - npm run lint
   - npm test
 after_success:
