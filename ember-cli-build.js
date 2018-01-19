@@ -35,7 +35,7 @@ module.exports = function (app) {
         strictNullChecks: true,
         target: 'es2015'
       },
-      files: ['qunit/index.d.ts', 'lib/index.ts', 'tests/index.ts']
+      files: ['lib/index.ts', 'tests/index.ts']
     }
   });
 
