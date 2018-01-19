@@ -14,7 +14,7 @@ module.exports = function () {
   const src = new MergeTrees([
     new Funnel(path.dirname(require.resolve('@types/qunit/package')), {
       destDir: 'qunit',
-      include: [ 'index.d.ts' ]
+      include: ['index.d.ts']
     }),
     new Funnel(__dirname + '/lib', {
       destDir: 'lib'
@@ -44,13 +44,16 @@ module.exports = function () {
 
   const backburner = new Rollup(compiled, {
     rollup: {
-      dest: 'es6/backburner.js',
-      entry: 'lib/index.js',
+      input: 'lib/index.js',
+      output: {
+        file: 'es6/backburner.js',
+        format: 'es',
+        sourcemap: true
+      },
       format: 'es',
       plugins: [
         loadWithInlineMap()
-      ],
-      sourceMap: true
+      ]
     }
   });
 
@@ -58,37 +61,38 @@ module.exports = function () {
     backburner,
     new Rollup(compiled, {
       rollup: {
-        entry: 'lib/index.js',
+        input: 'lib/index.js',
         plugins: [
           loadWithInlineMap(),
           buble()
         ],
-        sourceMap: true,
-        targets: [{
-          dest: 'named-amd/backburner.js',
+        output: [{
+          file: 'named-amd/backburner.js',
           exports: 'named',
           format: 'amd',
           moduleId: 'backburner',
+          sourcemap: true
         }, {
-          dest: 'backburner.js',
+          file: 'backburner.js',
           format: 'cjs',
+          sourcemap: true
         }]
       }
     }),
     new Rollup(compiled, {
       annotation: 'named-amd/tests.js',
       rollup: {
-        entry: 'tests/index.js',
+        input: 'tests/index.js',
         external: ['backburner'],
         plugins: [
           loadWithInlineMap(),
           buble()
         ],
-        sourceMap: true,
-        targets: [{
-          dest: 'named-amd/tests.js',
+        output: [{
+          file: 'named-amd/tests.js',
           format: 'amd',
-          moduleId: 'backburner-tests'
+          moduleId: 'backburner-tests',
+          sourcemap: true
         }]
       }
     }),

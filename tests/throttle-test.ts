@@ -255,6 +255,226 @@ QUnit.test('throttler returns the appropriate timer to cancel if the old item st
 
 });
 
+QUnit.test('throttle without a target, without args', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  let calledWith = new Array();
+  function throttled(...args) {
+    calledCount++;
+    calledWith.push(args);
+  }
+
+  bb.throttle(throttled, 10);
+  bb.throttle(throttled, 10);
+  bb.throttle(throttled, 10);
+  assert.equal(calledCount, 1, 'throttle method was called immediately');
+  assert.deepEqual(calledWith, [ [] ], 'throttle method was called with the correct arguments');
+
+  setTimeout(() => {
+    bb.throttle(throttled, 10);
+    assert.equal(calledCount, 1, 'throttle method was not called again within the time window');
+  }, 0);
+
+  setTimeout(() => {
+    assert.equal(calledCount, 1, 'throttle method was was only called once');
+    done();
+  }, 20);
+});
+
+QUnit.test('throttle without a target, without args - can be canceled', function(assert) {
+  let bb = new Backburner(['batman']);
+
+  let fooCalledCount = 0;
+  let barCalledCount = 0;
+  function foo() {
+    fooCalledCount++;
+  }
+  function bar() {
+    barCalledCount++;
+  }
+
+  bb.throttle(foo, 10);
+  bb.throttle(foo, 10);
+  assert.equal(fooCalledCount, 1, 'foo was called immediately, then throttle');
+
+  bb.throttle(bar, 10);
+  let timer = bb.throttle(bar, 10);
+  assert.equal(barCalledCount, 1, 'bar was called immediately, then throttle');
+
+  bb.cancel(timer);
+  bb.throttle(bar, 10);
+  assert.equal(barCalledCount, 2, 'after canceling the prior throttle, bar was called again');
+});
+
+QUnit.test('throttle without a target, without args, not immediate', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  let calledWith = new Array();
+  function throttled(...args) {
+    calledCount++;
+    calledWith.push(args);
+  }
+
+  bb.throttle(throttled, 10, false);
+  bb.throttle(throttled, 10, false);
+  bb.throttle(throttled, 10, false);
+  assert.equal(calledCount, 0, 'throttle method was not called immediately');
+
+  setTimeout(() => {
+    assert.equal(calledCount, 0, 'throttle method was not called in next tick');
+    bb.throttle(throttled, 10, false);
+  }, 0);
+
+  setTimeout(() => {
+    assert.equal(calledCount, 1, 'throttle method was was only called once');
+    assert.deepEqual(calledWith, [ [] ], 'throttle method was called with the correct arguments');
+    done();
+  }, 20);
+});
+
+QUnit.test('throttle without a target, without args, not immediate - can be canceled', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+
+  let fooCalledCount = 0;
+  let barCalledCount = 0;
+  function foo() {
+    fooCalledCount++;
+  }
+  function bar() {
+    barCalledCount++;
+  }
+
+  bb.throttle(foo, 10, false);
+  bb.throttle(foo, 10, false);
+  assert.equal(fooCalledCount, 0, 'foo was not called immediately');
+
+  bb.throttle(bar, 10, false);
+  let timer = bb.throttle(bar, 10, false);
+  assert.equal(barCalledCount, 0, 'bar was not called immediately');
+
+  setTimeout(() => {
+    assert.equal(fooCalledCount, 0, 'foo was not called within the time window');
+    assert.equal(barCalledCount, 0, 'bar was not called within the time window');
+
+    bb.cancel(timer);
+  }, 0);
+
+  setTimeout(() => {
+    assert.equal(fooCalledCount, 1, 'foo ran');
+    assert.equal(barCalledCount, 0, 'bar was properly canceled');
+
+    bb.throttle(bar, 10, false);
+
+    setTimeout(() => {
+      assert.equal(barCalledCount, 1, 'bar was able to run after being canceled');
+      done();
+    }, 20);
+  }, 20);
+});
+
+QUnit.test('throttle without a target, with args', function(assert) {
+  let bb = new Backburner(['batman']);
+  let calledWith: string[] = [];
+  function throttled(first: string) {
+    calledWith.push(first);
+  }
+
+  let foo = { isFoo: true };
+  let bar = { isBar: true };
+  let baz = { isBaz: true };
+  bb.throttle(throttled, foo, 10);
+  bb.throttle(throttled, bar, 10);
+  bb.throttle(throttled, baz, 10);
+
+  assert.deepEqual(calledWith, [{ isFoo: true }], 'throttle method was only called once, with correct argument');
+});
+
+QUnit.test('throttle without a target, with args - can be canceled', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  let calledWith: string[] = [];
+  function throttled(first: string) {
+    calledCount++;
+    calledWith.push(first);
+  }
+
+  let foo = { isFoo: true };
+  let bar = { isBar: true };
+  let baz = { isBaz: true };
+  let qux = { isQux: true };
+  bb.throttle(throttled, foo, 10);
+  bb.throttle(throttled, bar, 10);
+  let timer = bb.throttle(throttled, baz, 10);
+
+  assert.deepEqual(calledWith, [{ isFoo: true }], 'throttle method was only called once, with correct argument');
+
+  setTimeout(() => {
+    bb.cancel(timer);
+    bb.throttle(throttled, qux, 10, true);
+    assert.deepEqual(calledWith, [{ isFoo: true }, { isQux: true }], 'throttle method was called again after canceling prior timer');
+  }, 0);
+
+  setTimeout(() => {
+    assert.deepEqual(calledWith, [{ isFoo: true }, { isQux: true }], 'throttle method was not called again');
+    done();
+  }, 20);
+});
+
+QUnit.test('throttle without a target, with args, not immediate', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledWith: string[] = [];
+  function throttler(first: string) {
+    calledWith.push(first);
+  }
+
+  let foo = { isFoo: true };
+  let bar = { isBar: true };
+  let baz = { isBaz: true };
+  bb.throttle(throttler, foo, 10, false);
+  bb.throttle(throttler, bar, 10, false);
+  bb.throttle(throttler, baz, 10, false);
+  assert.deepEqual(calledWith, [], 'throttler was not called immediately');
+
+  setTimeout(() => {
+    assert.deepEqual(calledWith, [{ isBaz: true }], 'debounce method was only called once, with correct argument');
+    done();
+  }, 20);
+});
+
+QUnit.test('throttle without a target, with args, not immediate - can be canceled', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  let calledWith: string[] = [];
+  function throttled(first: string) {
+    calledCount++;
+    calledWith.push(first);
+  }
+
+  let foo = { isFoo: true };
+  let bar = { isBar: true };
+  let baz = { isBaz: true };
+  bb.throttle(throttled, foo, 10, false);
+  bb.throttle(throttled, bar, 10, false);
+  let timer = bb.throttle(throttled, baz, 10, false);
+  assert.equal(calledCount, 0, 'throttle method was not called immediately');
+
+  setTimeout(() => {
+    assert.deepEqual(calledWith, [], 'throttle method has not been called on next tick');
+    bb.cancel(timer);
+  }, 0);
+
+  setTimeout(() => {
+    assert.deepEqual(calledWith, [], 'throttle method is not called when canceled');
+    done();
+  }, 20);
+});
+
 QUnit.test('onError', function(assert) {
   assert.expect(1);
 
@@ -275,7 +495,7 @@ QUnit.test('throttle + immediate joins existing run loop instances', function(as
   assert.expect(1);
 
   function onError(error) {
-    throw error;
+    assert.equal('test error', error.message);
   }
 
   let bb = new Backburner(['errors'], {
@@ -285,7 +505,7 @@ QUnit.test('throttle + immediate joins existing run loop instances', function(as
   bb.run(() => {
     let parentInstance = bb.currentInstance;
     bb.throttle(null, () => {
-      assert.equal(bb.currentInstance, parentInstance);
+     assert.equal(bb.currentInstance, parentInstance);
     }, 20, true);
   });
 });

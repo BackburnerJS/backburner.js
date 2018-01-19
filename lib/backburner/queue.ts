@@ -1,4 +1,5 @@
 import {
+  findItem,
   getOnError
 } from './utils';
 
@@ -11,7 +12,7 @@ export default class Queue {
   private globalOptions: any;
   private options: any;
   private _queueBeingFlushed: any[] = [];
-  private targetQueues = Object.create(null);
+  private targetQueues = new Map();
   private index = 0;
   private _queue: any[] = [];
 
@@ -21,32 +22,6 @@ export default class Queue {
     this.globalOptions = globalOptions;
   }
 
-  public push(target, method, args, stack) {
-    this._queue.push(target, method, args, stack);
-
-    return {
-      queue: this,
-      target,
-      method
-    };
-  }
-
-  public pushUnique(target, method, args, stack) {
-    let guid = this.guidForTarget(target);
-
-    if (guid) {
-      this.pushUniqueWithGuid(guid, target, method, args, stack);
-    } else {
-      this.pushUniqueWithoutGuid(target, method, args, stack);
-    }
-
-    return {
-      queue: this,
-      target,
-      method
-    };
-  }
-
   public flush(sync?) {
     let { before, after } = this.options;
     let target;
@@ -54,7 +29,7 @@ export default class Queue {
     let args;
     let errorRecordedForStack;
 
-    this.targetQueues = Object.create(null);
+    this.targetQueues.clear();
     if (this._queueBeingFlushed.length === 0) {
       this._queueBeingFlushed = this._queue;
       this._queue = [];
@@ -122,133 +97,81 @@ export default class Queue {
 
   public cancel({ target, method }) {
     let queue = this._queue;
-    let currentTarget;
-    let currentMethod;
-    let i;
-    let l;
-    let t;
+    let targetQueueMap = this.targetQueues.get(target);
 
-    let guid = this.guidForTarget(target);
-    let targetQueue = guid ? this.targetQueues[guid] : undefined;
-
-    if (targetQueue !== undefined) {
-      for (i = 0, l = targetQueue.length; i < l; i += 2) {
-        t = targetQueue[i];
-        if (t === method) {
-          targetQueue.splice(i, 1);
-        }
-      }
+    if (targetQueueMap !== undefined) {
+      targetQueueMap.delete(method);
     }
 
-    for (i = 0, l = queue.length; i < l; i += 4) {
-      currentTarget = queue[i];
-      currentMethod = queue[i + 1];
+    let index = findItem(target, method, queue);
 
-      if (currentTarget === target &&
-          currentMethod === method) {
-        queue.splice(i, 4);
-        return true;
-      }
+    if (index > -1) {
+      queue.splice(index, 4);
+      return true;
     }
 
     // if not found in current queue
     // could be in the queue that is being flushed
     queue = this._queueBeingFlushed;
 
-    for (i = 0, l = queue.length; i < l; i += 4) {
-      currentTarget = queue[i];
-      currentMethod = queue[i + 1];
-
-      if (currentTarget === target &&
-          currentMethod === method) {
-        // don't mess with array during flush
-        // just nullify the method
-        queue[i + 1] = null;
-        return true;
-      }
+    index = findItem(target, method, queue);
+    if (index > -1) {
+      queue[index + 1] = null;
+      return true;
     }
 
     return false;
   }
 
-  private guidForTarget(target) {
-    if (!target) { return; }
+  public push(target, method, args, stack) {
+    this._queue.push(target, method, args, stack);
 
-    let peekGuid = this.globalOptions.peekGuid;
-    if (peekGuid) {
-      return peekGuid(target);
-    }
-
-    let KEY = this.globalOptions.GUID_KEY;
-    if (KEY) {
-      return target[KEY];
-    }
+    return {
+      queue: this,
+      target,
+      method
+    };
   }
 
-  private pushUniqueWithoutGuid(target, method, args, stack) {
-    let queue = this._queue;
+  public pushUnique(target, method, args, stack) {
+    let localQueueMap = this.targetQueues.get(target);
 
-    for (let i = 0, l = queue.length; i < l; i += 4) {
-      let currentTarget = queue[i];
-      let currentMethod = queue[i + 1];
-
-      if (currentTarget === target && currentMethod === method) {
-        queue[i + 2] = args;  // replace args
-        queue[i + 3] = stack; // replace stack
-        return;
-      }
+    if (localQueueMap === undefined) {
+      localQueueMap = new Map();
+      this.targetQueues.set(target, localQueueMap);
     }
 
-    queue.push(target, method, args, stack);
-  }
-
-  private targetQueue(targetQueue, target, method, args, stack) {
-    let queue = this._queue;
-
-    for (let i = 0, l = targetQueue.length; i < l; i += 2) {
-      let currentMethod = targetQueue[i];
-
-      if (currentMethod === method) {
-        let currentIndex  = targetQueue[i + 1];
-        queue[currentIndex + 2] = args;  // replace args
-        queue[currentIndex + 3] = stack; // replace stack
-        return;
-      }
-    }
-
-    targetQueue.push(
-      method,
-      queue.push(target, method, args, stack) - 4
-    );
-  }
-
-  private pushUniqueWithGuid(guid, target, method, args, stack) {
-    let localQueue = this.targetQueues[guid];
-
-    if (localQueue !== undefined) {
-      this.targetQueue(localQueue, target, method, args, stack);
+    let index = localQueueMap.get(method);
+    if (index === undefined) {
+      let queueIndex = this._queue.push(target, method, args, stack) - 4;
+      localQueueMap.set(method, queueIndex);
     } else {
-      this.targetQueues[guid] = [
-        method,
-        this._queue.push(target, method, args, stack) - 4
-      ];
+      let queue = this._queue;
+      queue[index + 2] = args;  // replace args
+      queue[index + 3] = stack; // replace stack
     }
+
+    return {
+      queue: this,
+      target,
+      method
+    };
   }
 
   private invoke(target, method, args /*, onError, errorRecordedForStack */) {
-    if (args && args.length > 0) {
-      method.apply(target, args);
-    } else {
+    if (args === undefined) {
       method.call(target);
+    } else {
+      method.apply(target, args);
     }
   }
 
   private invokeWithOnError(target, method, args, onError, errorRecordedForStack) {
     try {
-      if (args && args.length > 0) {
-        method.apply(target, args);
-      } else {
+      if (args === undefined) {
         method.call(target);
+      } else {
+        method.apply(target, args);
       }
     } catch (error) {
       onError(error, errorRecordedForStack);

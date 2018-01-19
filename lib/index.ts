@@ -13,8 +13,37 @@ import iteratorDrain from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
+type Timer = any;
+
 const noop = function() {};
 const SET_TIMEOUT = setTimeout;
+
+function parseArgs() {
+  let length = arguments.length;
+  let method;
+  let target;
+  let args;
+
+  if (length === 1) {
+    method = arguments[0];
+    target = null;
+  } else {
+    target = arguments[0];
+    method = arguments[1];
+    if (isString(method)) {
+      method = target[method] as () => any;
+    }
+
+    if (length > 2) {
+      args = new Array(length - 2);
+      for (let i = 0, l = length - 2; i < l; i++) {
+        args[i] = arguments[i + 2];
+      }
+    }
+  }
+
+  return [target, method, args];
+}
 
 export default class Backburner {
   public static Queue = Queue;
@@ -184,42 +213,10 @@ export default class Backburner {
 
   public run(method: () => any);
   public run(target: () => any | any | null, method?: () => any | string, ...args);
-  public run(target: any | null | undefined, method?: any, ...args: any[]) {
-    let length = arguments.length;
-    let _method: () => any | string;
-    let _target: any | null | undefined;
-
-    if (length === 1) {
-      _method = target as () => any;
-      _target = null;
-    } else {
-      _method = method;
-      _target = target;
-
-      if (isString(_method)) {
-        _method = _target[_method] as () => any;
-      }
-    }
-
-    let onError = getOnError(this.options);
-
-    this.begin();
-
-    if (onError) {
-      try {
-        return _method.apply(_target, args);
-      } catch (error) {
-        onError(error);
-      } finally {
-        this.end();
-      }
-    } else {
-      try {
-        return _method.apply(_target, args);
-      } finally {
-        this.end();
-      }
-    }
+  public run(target: any | null | undefined, method?: any, ...args: any[]);
+  public run() {
+    let [target, method, args] = parseArgs(...arguments);
+    return this._run(target, method, args);
   }
 
   /*
@@ -236,46 +233,9 @@ export default class Backburner {
     @param {any} args The method arguments
     @return method result
   */
-  public join(...args);
   public join() {
-    if (this.currentInstance === null) {
-      return this.run(...arguments);
-    }
-
-    let length = arguments.length;
-    let method;
-    let target;
-    let args;
-
-    if (length === 1) {
-      method = arguments[0];
-      target = null;
-    } else {
-      target = arguments[0];
-      method = arguments[1];
-      if (isString(method)) {
-        method = target[method] as () => any;
-      }
-
-      if (length > 2) {
-        args = new Array(length - 2);
-        for (let i = 0, l = length - 2; i < l; i++) {
-          args[i] = arguments[i + 2];
-        }
-      }
-    }
-
-    let onError = getOnError(this.options);
-
-    if (onError) {
-      try {
-        return method.apply(target, args);
-      } catch (error) {
-        onError(error);
-      }
-    } else {
-      return method.apply(target, args);
-    }
+    let [target, method, args] = parseArgs(...arguments);
+    return this._join(target, method, args);
   }
 
   /**
@@ -291,31 +251,9 @@ export default class Backburner {
    */
   public schedule(queueName: string, method: () => any);
   public schedule<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
-  public schedule(queueName: string) {
-    let length = arguments.length;
-    let method;
-    let target;
-    let args;
-
-    if (length === 2) {
-      method = arguments[1];
-      target = null;
-    } else {
-      target = arguments[1];
-      method = arguments[2];
-
-      if (isString(method)) {
-        method = target[method] as () => any;
-      }
-
-      if (length > 3) {
-        args = new Array(length - 3);
-        for (let i = 3; i < length; i++) {
-          args[i - 3] = arguments[i];
-        }
-      }
-    }
-
+  public schedule(queueName: string, target: any | null, method: any | (() => any), ...args);
+  public schedule(queueName, ..._args) {
+    let [target, method, args] = parseArgs(..._args);
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, target, method, args, false, stack);
   }
@@ -346,31 +284,9 @@ export default class Backburner {
    */
   public scheduleOnce(queueName: string, method: () => any);
   public scheduleOnce<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
-  public scheduleOnce(queueName: string /* , target, method, args */) {
-    let length = arguments.length;
-    let method;
-    let target;
-    let args;
-
-    if (length === 2) {
-      method = arguments[1];
-      target = null;
-    } else {
-      target = arguments[1];
-      method = arguments[2];
-
-      if (isString(method)) {
-        method = target[method] as () => any;
-      }
-
-      if (length > 3) {
-        args = new Array(length - 3);
-        for (let i = 3; i < length; i++) {
-          args[i - 3] = arguments[i];
-        }
-      }
-    }
-
+  public scheduleOnce(queueName: string, target: any | null, method: any | (() => any), ...args);
+  public scheduleOnce(queueName, ..._args) {
+    let [target, method, args] = parseArgs(..._args);
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, target, method, args, true, stack);
   }
@@ -455,39 +371,74 @@ export default class Backburner {
     return this._setTimeout(fn, executeAt);
   }
 
-  public throttle(...args);
-  public throttle(target, method, ...args /*, ...args, wait, [immediate] */) {
-    let immediate = args.pop();
+  public throttle<T>(target: T, methodName: keyof T, wait: number, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, wait: number, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait: number, immediate?: boolean): Timer;
+  public throttle<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait: number, immediate?: boolean): Timer;
+
+  // with target, with immediate
+  public throttle(thisArg: any, method: () => void, wait: number, immediate?: boolean): Timer;
+  public throttle<A>(thisArg: any, method: (arg1: A) => void, arg1: A, wait: number, immediate?: boolean): Timer;
+  public throttle<A, B>(thisArg: any, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate?: boolean): Timer;
+  public throttle<A, B, C>(thisArg: any, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate?: boolean): Timer;
+
+  // without target, with immediate
+  public throttle(method: () => void, wait: number, immediate?: boolean): Timer;
+  public throttle<A>(method: (arg1: A) => void, arg1: A, wait: number, immediate?: boolean): Timer;
+  public throttle<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate?: boolean): Timer;
+  public throttle<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate?: boolean): Timer;
+  public throttle(targetOrThisArgOrMethod: object | (() => any), ...args): Timer {
+    let target;
+    let method;
+    let immediate;
     let isImmediate;
     let wait;
-    let index;
 
-    if (isCoercableNumber(immediate)) {
-      wait = immediate;
+    if (args.length === 1) {
+      method = targetOrThisArgOrMethod;
+      wait = args.pop();
+      target = null;
       isImmediate = true;
     } else {
-      wait = args.pop();
-      isImmediate = immediate === true;
+      target = targetOrThisArgOrMethod;
+      method = args.shift();
+      immediate = args.pop();
+
+      if (isString(method)) {
+        method = target[method] as () => any;
+      } else if (!isFunction(method)) {
+        args.unshift(method);
+        method = target;
+        target = null;
+      }
+
+      if (isCoercableNumber(immediate)) {
+        wait = immediate;
+        isImmediate = true;
+      } else {
+        wait = args.pop();
+        isImmediate = immediate === true;
+      }
     }
 
-    wait = parseInt(wait, 10);
-
-    index = findItem(target, method, this._throttlers);
+    let index = findItem(target, method, this._throttlers);
     if (index > -1) {
       this._throttlers[index + 2] = args;
       return this._throttlers[index + 3];
     } // throttled
 
+    wait = parseInt(wait, 10);
+
     let timer = this._platform.setTimeout(() => {
-      index = findTimer(timer, this._throttlers);
-      let [context, func, params] = this._throttlers.splice(index, 4);
+      let i = findTimer(timer, this._throttlers);
+      let [context, func, params] = this._throttlers.splice(i, 4);
       if (isImmediate === false) {
-        this.run(context, func, ...params);
+        this._run(context, func, params);
       }
     }, wait);
 
     if (isImmediate) {
-      this.join(target, method, ...args);
+      this._join(target, method, args);
     }
 
     this._throttlers.push(target, method, args, timer);
@@ -495,25 +446,61 @@ export default class Backburner {
     return timer;
   }
 
-  public debounce(...args);
-  public debounce(target, method, ...args /* , wait, [immediate] */) {
-    let immediate = args.pop();
+  // with target, with method name, with optional immediate
+  public debounce<T>(target: T, methodName: keyof T, wait: number, immediate?: boolean): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, wait: number, immediate?: boolean): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait: number, immediate?: boolean): Timer;
+  public debounce<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait: number, immediate?: boolean): Timer;
+
+  // with target, with optional immediate
+  public debounce(thisArg: any, method: () => void, wait: number, immediate?: boolean): Timer;
+  public debounce<A>(thisArg: any, method: (arg1: A) => void, arg1: A, wait: number, immediate?: boolean): Timer;
+  public debounce<A, B>(thisArg: any, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate?: boolean): Timer;
+  public debounce<A, B, C>(thisArg: any, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate?: boolean): Timer;
+
+  // without target, with optional immediate
+  public debounce(method: () => void, wait: number, immediate?: boolean): Timer;
+  public debounce<A>(method: (arg1: A) => void, arg1: A, wait: number, immediate?: boolean): Timer;
+  public debounce<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number, immediate?: boolean): Timer;
+  public debounce<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number, immediate?: boolean): Timer;
+  public debounce(targetOrThisArgOrMethod: object | (() => any), ...args): Timer {
+    let target;
+    let method;
+    let immediate;
     let isImmediate;
     let wait;
-    let index;
 
-    if (isCoercableNumber(immediate)) {
-      wait = immediate;
+    if (args.length === 1) {
+      method = targetOrThisArgOrMethod;
+      wait = args.pop();
+      target = null;
       isImmediate = false;
     } else {
-      wait = args.pop();
-      isImmediate = immediate === true;
+      target = targetOrThisArgOrMethod;
+      method = args.shift();
+      immediate = args.pop();
+
+      if (isString(method)) {
+        method = target[method] as () => any;
+      } else if (!isFunction(method)) {
+        args.unshift(method);
+        method = target;
+        target = null;
+      }
+
+      if (isCoercableNumber(immediate)) {
+        wait = immediate;
+        isImmediate = false;
+      } else {
+        wait = args.pop();
+        isImmediate = immediate === true;
+      }
     }
 
     wait = parseInt(wait, 10);
 
     // Remove debouncee
-    index = findItem(target, method, this._debouncees);
+    let index = findItem(target, method, this._debouncees);
     if (index > -1) {
       let timerId = this._debouncees[index + 3];
       this._platform.clearTimeout(timerId);
@@ -521,15 +508,15 @@ export default class Backburner {
     }
 
     let timer = this._platform.setTimeout(() => {
-      index = findTimer(timer, this._debouncees);
-      let [context, func, params] = this._debouncees.splice(index, 4);
+      let i = findTimer(timer, this._debouncees);
+      let [context, func, params] = this._debouncees.splice(i, 4);
       if (isImmediate === false) {
-        this.run(context, func, ...params);
+        this._run(context, func, params);
       }
     }, wait);
 
     if (isImmediate && index === -1) {
-      this.join(target, method, ...args);
+      this._join(target, method, args);
     }
 
     this._debouncees.push(target, method, args, timer);
@@ -575,6 +562,40 @@ export default class Backburner {
 
   public ensureInstance() {
     this._ensureInstance();
+  }
+
+  private _join(target, method, args) {
+    if (this.currentInstance === null) {
+      return this._run(target, method, args);
+    }
+
+    if (target === undefined && args === undefined) {
+      return method();
+    } else {
+      return method.apply(target, args);
+    }
+  }
+
+  private _run(target, method, args) {
+    let onError = getOnError(this.options);
+
+    this.begin();
+
+    if (onError) {
+      try {
+        return method.apply(target, args);
+      } catch (error) {
+        onError(error);
+      } finally {
+        this.end();
+      }
+    } else {
+      try {
+        return method.apply(target, args);
+      } finally {
+        this.end();
+      }
+    }
   }
 
   private _cancelAutorun() {

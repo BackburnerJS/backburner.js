@@ -82,19 +82,17 @@ QUnit.test('pushUnique: 1 target, 1 different methods called twice', function(as
   assert.deepEqual(target1fooWasCalled[0], ['b']);
 });
 
-QUnit.test('pushUnique: 2 different targets (GUID_KEY)', function(assert) {
-  let queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
+QUnit.test('pushUnique: 2 different targets', function(assert) {
+  let queue = new Queue('foo', {});
   let target1fooWasCalled: string[][] = [];
   let target2fooWasCalled: string[][] = [];
   let target1 = {
-    GUID_KEY: 'target1',
     foo: function() {
       target1fooWasCalled.push(slice.call(arguments));
     }
   };
 
   let target2 = {
-    GUID_KEY: 'target2',
     foo: function() {
       target2fooWasCalled.push(slice.call(arguments));
     }
@@ -114,12 +112,11 @@ QUnit.test('pushUnique: 2 different targets (GUID_KEY)', function(assert) {
   assert.deepEqual(target2fooWasCalled[0], ['b']);
 });
 
-QUnit.test('pushUnique: 1 target, 2 different methods (GUID_KEY)', function(assert) {
-  let queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
+QUnit.test('pushUnique: 1 target, 2 different methods', function(assert) {
+  let queue = new Queue('foo', {});
   let target1fooWasCalled: string[][] = [];
   let target1barWasCalled: string[][] = [];
   let target1 = {
-    GUID_KEY: 'target1',
     foo: function() {
       target1fooWasCalled.push(slice.call(arguments));
     },
@@ -142,11 +139,10 @@ QUnit.test('pushUnique: 1 target, 2 different methods (GUID_KEY)', function(asse
   assert.deepEqual(target1barWasCalled[0], ['b']);
 });
 
-QUnit.test('pushUnique: 1 target, 1 diffe`rent methods called twice (GUID_KEY)', function(assert) {
-  let queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
+QUnit.test('pushUnique: 1 target, 1 diffe`rent methods called twice', function(assert) {
+  let queue = new Queue('foo', {});
   let target1fooWasCalled: string[][] = [];
   let target1 = {
-    GUID_KEY: 'target1',
     foo: function() {
       target1fooWasCalled.push(slice.call(arguments));
     }
@@ -163,11 +159,10 @@ QUnit.test('pushUnique: 1 target, 1 diffe`rent methods called twice (GUID_KEY)',
   assert.deepEqual(target1fooWasCalled[0], ['b']);
 });
 
-QUnit.test('pushUnique: 1 target, 2 different methods, second one called twice (GUID_KEY)', function(assert) {
-  let queue = new Queue('foo', {}, { GUID_KEY: 'GUID_KEY' });
+QUnit.test('pushUnique: 1 target, 2 different methods, second one called twice', function(assert) {
+  let queue = new Queue('foo', {});
   let target1barWasCalled: string[][] = [];
   let target1 = {
-    GUID_KEY: 'target1',
     foo: function() {
     },
     bar: function() {
@@ -186,18 +181,8 @@ QUnit.test('pushUnique: 1 target, 2 different methods, second one called twice (
   assert.deepEqual(target1barWasCalled.length, 1, 'expected: target 1.bar to be called only once');
 });
 
-QUnit.test('pushUnique: 2 different targets (peekGuid)', function(assert) {
-  let guidIndexer = [];
-  let queue = new Queue('foo', {}, {
-    peekGuid(obj) {
-      let guid = guidIndexer.indexOf(obj);
-      if (guid === -1) {
-        return null;
-      }
-
-      return guid;
-    }
-  });
+QUnit.test('pushUnique: 2 different targets', function(assert) {
+  let queue = new Queue('foo', {});
 
   let target1fooWasCalled: string[][] = [];
   let target2fooWasCalled: string[][] = [];
@@ -206,15 +191,12 @@ QUnit.test('pushUnique: 2 different targets (peekGuid)', function(assert) {
       target1fooWasCalled.push(slice.call(arguments));
     }
   };
-  guidIndexer.push(target1);
 
   let target2 = {
     foo: function() {
       target2fooWasCalled.push(slice.call(arguments));
     }
   };
-  guidIndexer.push(target2);
-
   queue.pushUnique(target1, target1.foo, ['a']);
   queue.pushUnique(target2, target2.foo, ['b']);
 
@@ -229,19 +211,8 @@ QUnit.test('pushUnique: 2 different targets (peekGuid)', function(assert) {
   assert.deepEqual(target2fooWasCalled[0], ['b']);
 });
 
-QUnit.test('pushUnique: 1 target, 2 different methods (peekGuid)', function(assert) {
-  let guidIndexer = [];
-  let queue = new Queue('foo', {}, {
-    peekGuid(obj) {
-      let guid = guidIndexer.indexOf(obj);
-      if (guid === -1) {
-        return null;
-      }
-
-      return guid;
-    }
-
-  });
+QUnit.test('pushUnique: 1 target, 2 different methods', function(assert) {
+  let queue = new Queue('foo', {});
   let target1fooWasCalled: string[][] = [];
   let target1barWasCalled: string[][] = [];
   let target1 = {
@@ -252,7 +223,6 @@ QUnit.test('pushUnique: 1 target, 2 different methods (peekGuid)', function(asse
       target1barWasCalled.push(slice.call(arguments));
     }
   };
-  guidIndexer.push(target1);
 
   queue.pushUnique(target1, target1.foo, ['a']);
   queue.pushUnique(target1, target1.bar, ['b']);
@@ -268,26 +238,14 @@ QUnit.test('pushUnique: 1 target, 2 different methods (peekGuid)', function(asse
   assert.deepEqual(target1barWasCalled[0], ['b']);
 });
 
-QUnit.test('pushUnique: 1 target, 1 different methods called twice (peekGuid)', function(assert) {
-  let guidIndexer = [];
-  let queue = new Queue('foo', {}, {
-    peekGuid(obj) {
-      let guid = guidIndexer.indexOf(obj);
-      if (guid === -1) {
-        return null;
-      }
-
-      return guid;
-    }
-
-  });
+QUnit.test('pushUnique: 1 target, 1 different methods called twice', function(assert) {
+  let queue = new Queue('foo', {});
   let target1fooWasCalled: string[][] = [];
   let target1 = {
     foo: function() {
       target1fooWasCalled.push(slice.call(arguments));
     }
   };
-  guidIndexer.push(target1);
 
   queue.pushUnique(target1, target1.foo, ['a']);
   queue.pushUnique(target1, target1.foo, ['b']);
@@ -300,18 +258,8 @@ QUnit.test('pushUnique: 1 target, 1 different methods called twice (peekGuid)', 
   assert.deepEqual(target1fooWasCalled[0], ['b']);
 });
 
-QUnit.test('pushUnique: 1 target, 2 different methods, second one called twice (peekGuid)', function(assert) {
-  let guidIndexer = [];
-  let queue = new Queue('foo', {}, {
-    peekGuid(obj) {
-      let guid = guidIndexer.indexOf(obj);
-      if (guid === -1) {
-        return null;
-      }
-
-      return guid;
-    }
-  });
+QUnit.test('pushUnique: 1 target, 2 different methods, second one called twice', function(assert) {
+  let queue = new Queue('foo', {});
 
   let target1barWasCalled: string[][] = [];
   let target1 = {
@@ -321,7 +269,6 @@ QUnit.test('pushUnique: 1 target, 2 different methods, second one called twice (
       target1barWasCalled.push(slice.call(arguments));
     }
   };
-  guidIndexer.push(target1);
 
   queue.pushUnique(target1, target1.foo);
   queue.pushUnique(target1, target1.bar, ['a']);
@@ -331,5 +278,60 @@ QUnit.test('pushUnique: 1 target, 2 different methods, second one called twice (
 
   queue.flush();
 
-  assert.deepEqual(target1barWasCalled.length, 1, 'expected: target 1.bar to be called only once');
+  assert.equal(target1barWasCalled.length, 1, 'expected: target 1.bar to be called only once');
+});
+
+QUnit.test('can cancel property', function(assert) {
+  let queue = new Queue('foo', {});
+
+  let target1fooWasCalled: number = 0;
+  let target2fooWasCalled: number = 0;
+  let target1 = {
+    foo: function() {
+      target1fooWasCalled++;
+    }
+  };
+
+  let target2 = {
+    foo: function() {
+      target2fooWasCalled++;
+    }
+  };
+
+  let timer1 = queue.pushUnique(target1, target1.foo);
+  let timer2 = queue.pushUnique(target2, target2.foo);
+
+  queue.cancel(timer2);
+  queue.cancel(timer1);
+
+  queue.pushUnique(target1, target1.foo);
+  queue.pushUnique(target1, target1.foo);
+  queue.pushUnique(target2, target2.foo);
+  queue.pushUnique(target2, target2.foo);
+
+  queue.flush();
+
+  assert.equal(target1fooWasCalled, 1);
+  assert.equal(target2fooWasCalled, 1);
+});
+
+QUnit.test('pushUnique: 1 target, 1 method called twice, canceled 2 call', function(assert) {
+  let queue = new Queue('foo');
+  let invocationArgs: string[][] = [];
+  let target1 = {
+    foo: function() {
+      invocationArgs.push(...arguments);
+    }
+  };
+
+  queue.pushUnique(target1, target1.foo, ['a']);
+  let timer = queue.pushUnique(target1, target1.foo, ['b']);
+
+  assert.deepEqual(invocationArgs, [], 'precond - empty initially');
+
+  queue.cancel(timer);
+
+  queue.flush();
+
+  assert.deepEqual(invocationArgs, [], 'still has not been invoked');
 });

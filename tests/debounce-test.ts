@@ -304,6 +304,224 @@ QUnit.test('debounce that is immediate, and cancelled and called again happens i
 
 });
 
+QUnit.test('debounce without a target, without args', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  let calledWith = new Array();
+  function debouncee(...args) {
+    calledCount++;
+    calledWith.push(args);
+  }
+
+  bb.debounce(debouncee, 10);
+  bb.debounce(debouncee, 10);
+  bb.debounce(debouncee, 10);
+  assert.equal(calledCount, 0, 'debounced method was not called immediately');
+
+  setTimeout(() => {
+    assert.equal(calledCount, 0, 'debounced method was not called on next tick');
+  }, 0);
+
+  setTimeout(() => {
+    assert.equal(calledCount, 1, 'debounced method was was only called once');
+    assert.deepEqual(calledWith, [ [] ], 'debounce called once without arguments');
+    done();
+  }, 20);
+});
+
+QUnit.test('debounce without a target, without args - can be canceled', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  function debouncee() {
+    calledCount++;
+  }
+
+  bb.debounce(debouncee, 10);
+  bb.debounce(debouncee, 10);
+  let timer = bb.debounce(debouncee, 10);
+  assert.equal(calledCount, 0, 'debounced method was not called immediately');
+
+  setTimeout(() => {
+    bb.cancel(timer);
+    assert.equal(calledCount, 0, 'debounced method was not called on next tick');
+  }, 0);
+
+  setTimeout(() => {
+    assert.equal(calledCount, 0, 'debounced method was canceled properly');
+    done();
+  }, 20);
+});
+
+QUnit.test('debounce without a target, without args, immediate', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  let calledWith = new Array();
+  function debouncee(...args) {
+    calledCount++;
+    calledWith.push(args);
+  }
+
+  bb.debounce(debouncee, 10, true);
+  bb.debounce(debouncee, 10, true);
+  bb.debounce(debouncee, 10, true);
+  assert.equal(calledCount, 1, 'debounced method was called immediately');
+  assert.deepEqual(calledWith, [ [] ], 'debounce method was called with the correct arguments');
+
+  setTimeout(() => {
+    bb.debounce(debouncee, 10, true);
+    assert.equal(calledCount, 1, 'debounced method was not called again within the time window');
+  }, 0);
+
+  setTimeout(() => {
+    assert.equal(calledCount, 1, 'debounced method was was only called once');
+    done();
+  }, 20);
+});
+
+QUnit.test('debounce without a target, without args, immediate - can be canceled', function(assert) {
+  let bb = new Backburner(['batman']);
+
+  let fooCalledCount = 0;
+  let barCalledCount = 0;
+  function foo() {
+    fooCalledCount++;
+  }
+  function bar() {
+    barCalledCount++;
+  }
+
+  bb.debounce(foo, 10, true);
+  bb.debounce(foo, 10, true);
+  assert.equal(fooCalledCount, 1, 'foo was called immediately, then debounced');
+
+  bb.debounce(bar, 10, true);
+  let timer = bb.debounce(bar, 10, true);
+  assert.equal(barCalledCount, 1, 'bar was called immediately, then debounced');
+
+  bb.cancel(timer);
+  bb.debounce(bar, 10, true);
+  assert.equal(barCalledCount, 2, 'after canceling the prior debounce, bar was called again');
+});
+
+QUnit.test('debounce without a target, with args', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  let calledWith: string[] = [];
+  function debouncee(first: string) {
+    calledCount++;
+    calledWith.push(first);
+  }
+
+  let foo = { isFoo: true };
+  let bar = { isBar: true };
+  let baz = { isBaz: true };
+  bb.debounce(debouncee, foo, 10);
+  bb.debounce(debouncee, bar, 10);
+  bb.debounce(debouncee, baz, 10);
+  assert.equal(calledCount, 0, 'debounced method was not called immediately');
+
+  setTimeout(() => {
+    assert.deepEqual(calledWith, [{ isBaz: true }], 'debounce method was only called once, with correct argument');
+    done();
+  }, 20);
+});
+
+QUnit.test('debounce without a target, with args - can be canceled', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  let calledWith: string[] = [];
+  function debouncee(first: string) {
+    calledCount++;
+    calledWith.push(first);
+  }
+
+  let foo = { isFoo: true };
+  let bar = { isBar: true };
+  let baz = { isBaz: true };
+  bb.debounce(debouncee, foo, 10);
+  bb.debounce(debouncee, bar, 10);
+  let timer = bb.debounce(debouncee, baz, 10);
+  assert.equal(calledCount, 0, 'debounced method was not called immediately');
+
+  setTimeout(() => {
+    assert.deepEqual(calledWith, [], 'debounce method has not been called on next tick');
+    bb.cancel(timer);
+  }, 0);
+
+  setTimeout(() => {
+    assert.deepEqual(calledWith, [], 'debounce method is not called when canceled');
+    done();
+  }, 20);
+});
+
+QUnit.test('debounce without a target, with args, immediate', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  let calledWith = new Array();
+  function debouncee(first) {
+    calledCount++;
+    calledWith.push(first);
+  }
+
+  let foo = { isFoo: true };
+  let bar = { isBar: true };
+  let baz = { isBaz: true };
+  let qux = { isQux: true };
+  bb.debounce(debouncee, foo, 10, true);
+  bb.debounce(debouncee, bar, 10, true);
+  bb.debounce(debouncee, baz, 10, true);
+
+  assert.deepEqual(calledWith, [{ isFoo: true }], 'debounce method was only called once, with correct argument');
+
+  setTimeout(() => {
+    bb.debounce(debouncee, qux, 10, true);
+    assert.deepEqual(calledWith, [{ isFoo: true }], 'debounce method was only called once, with correct argument');
+  }, 0);
+
+  setTimeout(() => {
+    assert.deepEqual(calledWith, [{ isFoo: true }], 'debounce method was only called once, with correct argument');
+    done();
+  }, 20);
+});
+
+QUnit.test('debounce without a target, with args, immediate - can be canceled', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['batman']);
+  let calledCount = 0;
+  let calledWith: string[] = [];
+  function debouncee(first) {
+    calledCount++;
+    calledWith.push(first);
+  }
+
+  let foo = { isFoo: true };
+  let bar = { isBar: true };
+  let baz = { isBaz: true };
+  let qux = { isQux: true };
+  bb.debounce(debouncee, foo, 10, true);
+  bb.debounce(debouncee, bar, 10, true);
+  let timer = bb.debounce(debouncee, baz, 10, true);
+
+  assert.deepEqual(calledWith, [{ isFoo: true }], 'debounce method was only called once, with correct argument');
+
+  setTimeout(() => {
+    bb.cancel(timer);
+    bb.debounce(debouncee, qux, 10, true);
+    assert.deepEqual(calledWith, [{ isFoo: true }, { isQux: true }], 'debounce method was called again after canceling prior timer');
+  }, 0);
+
+  setTimeout(() => {
+    assert.deepEqual(calledWith, [{ isFoo: true }, { isQux: true }], 'debounce method was not called again');
+    done();
+  }, 20);
+});
+
 QUnit.test('onError', function(assert) {
   assert.expect(1);
 
