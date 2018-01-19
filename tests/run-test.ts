@@ -19,7 +19,7 @@ QUnit.test('when passed a target and method', function(assert) {
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
-  bb.run({zomg: 'hi'}, () => {
+  bb.run({zomg: 'hi'}, function() {
     assert.equal(this.zomg, 'hi', 'the target was properly set');
     functionWasCalled = true;
   });
@@ -33,7 +33,7 @@ QUnit.test('when passed a target, method, and arguments', function(assert) {
   let bb = new Backburner(['one']);
   let functionWasCalled = false;
 
-  bb.run({zomg: 'hi'}, (a, b, c) => {
+  bb.run({zomg: 'hi'}, function(a, b, c) {
     assert.equal(this.zomg, 'hi', 'the target was properly set');
     assert.equal(a, 1, 'the first arguments was passed in');
     assert.equal(b, 2, 'the second arguments was passed in');
