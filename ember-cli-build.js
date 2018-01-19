@@ -10,7 +10,7 @@ const fs = require('fs');
 
 const SOURCE_MAPPING_DATA_URL = '//# sourceMap' + 'pingURL=data:application/json;base64,';
 
-module.exports = function () {
+module.exports = function (app) {
   const src = new MergeTrees([
     new Funnel(path.dirname(require.resolve('@types/qunit/package')), {
       destDir: 'qunit',
@@ -25,6 +25,7 @@ module.exports = function () {
   ]);
 
   const compiled = typescript(src, {
+    throwOnError: process.env.EMBER_ENV === 'production',
     tsconfig: {
       compilerOptions: {
         baseUrl: '.',
