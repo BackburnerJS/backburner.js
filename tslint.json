@@ -12,7 +12,8 @@
     "no-string-literal": false,
     "prefer-const": false,
     "max-line-length": [false],
-    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"]
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+    "ban-types": {}
   },
   "jsRules": {
     "quotemark": [true, "single", "avoid-escape"],
