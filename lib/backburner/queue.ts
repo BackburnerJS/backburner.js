@@ -22,6 +22,17 @@ export default class Queue {
     this.globalOptions = globalOptions;
   }
 
+  public stackFor(index) {
+    if (index < this._queue.length) {
+      let entry = this._queue[index * 3 + 4];
+      if (entry) {
+        return entry.stack;
+      } else {
+        return null;
+      }
+    }
+  }
+
   public flush(sync?) {
     let { before, after } = this.options;
     let target;

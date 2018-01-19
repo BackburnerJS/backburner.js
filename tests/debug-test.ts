@@ -6,8 +6,11 @@ QUnit.test('DEBUG flag enables stack tagging', function(assert) {
   let bb = new Backburner(['one']);
 
   bb.schedule('one', () => {});
+  if (!bb.currentInstance) {
+    throw new Error('bb has no instance');
+  }
 
-  assert.ok(bb.currentInstance && !bb.currentInstance.queues.one._queue[3], 'No stack is recorded');
+  assert.ok(bb.currentInstance && !bb.currentInstance.queues.one.stackFor(0), 'No stack is recorded');
 
   bb.DEBUG = true;
 
@@ -15,7 +18,7 @@ QUnit.test('DEBUG flag enables stack tagging', function(assert) {
 
   if (new Error().stack) { // workaround for CLI runner :(
     assert.expect(4);
-    let stack = bb.currentInstance && bb.currentInstance.queues.one._queue[7].stack;
+    let stack = bb.currentInstance && bb.currentInstance.queues.one.stackFor(1);
     assert.ok(typeof stack === 'string', 'A stack is recorded');
 
     let onError = function(error, errorRecordedForStack) {
