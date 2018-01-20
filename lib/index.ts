@@ -660,7 +660,7 @@ export default class Backburner {
         let method = timers[i + 3];
         let args = timers[i + 4];
         let stack = this.DEBUG ? new Error() : undefined;
-        this.currentInstance.schedule(defaultQueue, target, method, args, false, stack);
+        this.currentInstance!.schedule(defaultQueue, target, method, args, false, stack);
       } else {
         break;
       }
