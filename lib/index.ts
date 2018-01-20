@@ -300,30 +300,12 @@ export default class Backburner {
     let method;
     let target;
     let methodOrTarget;
-    let methodOrWait;
     let methodOrArgs;
 
     if (length === 0) {
       return;
     } else if (length === 1) {
       method = args.shift();
-    } else if (length === 2) {
-      methodOrTarget = args[0];
-      methodOrWait = args[1];
-
-      let type = typeof methodOrWait;
-      if (type === 'function') {
-        target = args.shift();
-        method = args.shift();
-      } else if (methodOrTarget !== null && type === 'string' && methodOrWait in methodOrTarget) {
-        target = args.shift();
-        method = target[args.shift()];
-      } else if (isCoercableNumber(methodOrWait)) {
-        method = args.shift();
-        wait = parseInt(args.shift(), 10);
-      } else {
-        method = args.shift();
-      }
     } else {
       let last = args[args.length - 1];
 
