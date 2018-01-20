@@ -28,7 +28,7 @@
     "broccoli-rollup": "^2.0.0",
     "broccoli-typescript-compiler": "^2.1.1",
     "do-you-even-bench": "^1.0.2",
-    "ember-cli": "^2.18.0",
+    "ember-cli": "^3.0.0-beta.2",
     "ember-cli-inject-live-reload": "1.7.0",
     "glob": "^7.1.1",
     "loader.js": "^4.4.1",
