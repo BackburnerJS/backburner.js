@@ -571,18 +571,19 @@ export default class Backburner {
   }
 
   private _setTimeout(target, method, args, wait) {
+    let stack = this.DEBUG ? new Error() : undefined;
     let executeAt = this._platform.now() + wait;
     let id = (UUID++) + '';
 
     if (this._timers.length === 0) {
-      this._timers.push(executeAt, id, target, method, args);
+      this._timers.push(executeAt, id, target, method, args, stack);
       this._installTimerTimeout();
       return id;
     }
 
     // find position to insert
     let i = searchTimer(executeAt, this._timers);
-    this._timers.splice(i, 0, executeAt, id, target, method, args);
+    this._timers.splice(i, 0, executeAt, id, target, method, args, stack);
 
     // we should be the new earliest timer if i == 0
     if (i === 0) {
@@ -593,10 +594,10 @@ export default class Backburner {
   }
 
   private _cancelLaterTimer(timer) {
-    for (let i = 1; i < this._timers.length; i += 5) {
+    for (let i = 1; i < this._timers.length; i += 6) {
       if (this._timers[i] === timer) {
         i = i - 1;
-        this._timers.splice(i, 5);
+        this._timers.splice(i, 6);
         if (i === 0) {
           this._reinstallTimerTimeout();
         }
@@ -653,13 +654,13 @@ export default class Backburner {
     let defaultQueue = this.options.defaultQueue;
     let n = this._platform.now();
 
-    for (; i < l; i += 5) {
+    for (; i < l; i += 6) {
       let executeAt = timers[i];
       if (executeAt <= n) {
         let target = timers[i + 2];
         let method = timers[i + 3];
         let args = timers[i + 4];
-        let stack = this.DEBUG ? new Error() : undefined;
+        let stack = timers[i + 5];
         this.currentInstance!.schedule(defaultQueue, target, method, args, false, stack);
       } else {
         break;

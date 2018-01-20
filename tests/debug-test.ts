@@ -2,7 +2,7 @@ import Backburner from 'backburner';
 
 QUnit.module('tests/debug');
 
-QUnit.test('DEBUG flag enables stack tagging', function(assert) {
+QUnit.test('schedule - DEBUG flag enables stack tagging', function(assert) {
   let bb = new Backburner(['one']);
 
   bb.schedule('one', () => {});
@@ -26,7 +26,7 @@ QUnit.test('DEBUG flag enables stack tagging', function(assert) {
       assert.ok(errorRecordedForStack.stack, 'stack is recorded');
     };
 
-    bb = new Backburner(['errors'], {onError: onError});
+    bb = new Backburner(['errors'], { onError });
     bb.DEBUG = true;
 
     bb.run(() => {
@@ -36,3 +36,36 @@ QUnit.test('DEBUG flag enables stack tagging', function(assert) {
     });
   }
 });
+
+QUnit.test('later - DEBUG flag off does not capture stack', function(assert) {
+  let done = assert.async();
+  let onError = function(error, errorRecordedForStack) {
+    assert.strictEqual(errorRecordedForStack, undefined, 'errorRecordedForStack is not passed to error function when DEBUG is not set');
+    done();
+  };
+  let bb = new Backburner(['one'], { onError });
+
+  bb.later(() => {
+    throw new Error('message!');
+  });
+});
+
+if (new Error().stack) { // workaround for CLI runner :(
+  QUnit.test('later - DEBUG flag on captures stack', function(assert) {
+    assert.expect(3);
+
+    let done = assert.async();
+    let onError = function(error, errorRecordedForStack) {
+      assert.ok(errorRecordedForStack, 'errorRecordedForStack passed to error function');
+      assert.ok(errorRecordedForStack.stack, 'stack is recorded');
+      assert.ok(errorRecordedForStack.stack.indexOf('later') > -1, 'stack includes `later` invocation');
+      done();
+    };
+    let bb = new Backburner(['one'], { onError });
+    bb.DEBUG = true;
+
+    bb.later(() => {
+      throw new Error('message!');
+    });
+  });
+}
