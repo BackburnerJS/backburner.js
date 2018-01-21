@@ -43,6 +43,26 @@ function parseArgs() {
   return [target, method, args];
 }
 
+interface IPlatform {
+  setTimeout(fn: Function, ms: number): number;
+  clearTimeout(id: number): void;
+  next(fn: Function): number;
+  clearNext(id: any): void;
+  now(): number;
+}
+
+function extracPlatform(_platform: IPlatform = {} as IPlatform): IPlatform {
+  let platform = Object.create(null) as IPlatform;
+
+  platform.setTimeout = _platform.setTimeout || ((fn, ms) => setTimeout(fn, ms));
+  platform.clearTimeout = _platform.clearTimeout || ((id) => clearTimeout(id));
+  platform.next = _platform.next || ((fn) => SET_TIMEOUT(fn, 0));
+  platform.clearNext = _platform.clearNext || platform.clearTimeout;
+  platform.now = _platform.now || (() => Date.now());
+
+  return platform;
+}
+
 let UUID = 0;
 
 export default class Backburner {
@@ -58,6 +78,7 @@ export default class Backburner {
   private _onEnd: (currentInstance: DeferredActionQueues, nextInstance: DeferredActionQueues | null) => void;
   private queueNames: string[];
   private instanceStack: DeferredActionQueues[] = [];
+  private _timers: any[] = [];
   private _debouncees: any[] = [];
   private _throttlers: any[] = [];
   private _eventCallbacks: {
@@ -69,14 +90,7 @@ export default class Backburner {
   };
 
   private _timerTimeoutId: number | null = null;
-  private _timers: any[] = [];
-  private _platform: {
-    setTimeout(fn: Function, ms: number): number;
-    clearTimeout(id: number): void;
-    next(fn: Function): number;
-    clearNext(id: any): void;
-    now(): number;
-  };
+  private _platform: IPlatform;
 
   private _boundRunExpiredTimers: () => void;
 
@@ -93,16 +107,7 @@ export default class Backburner {
     this._onBegin = this.options.onBegin || noop;
     this._onEnd = this.options.onEnd || noop;
 
-    let _platform = this.options._platform || {};
-    let platform = Object.create(null);
-
-    platform.setTimeout = _platform.setTimeout || ((fn, ms) => setTimeout(fn, ms));
-    platform.clearTimeout = _platform.clearTimeout || ((id) => clearTimeout(id));
-    platform.next = _platform.next || ((fn) => SET_TIMEOUT(fn, 0));
-    platform.clearNext = _platform.clearNext || platform.clearTimeout;
-    platform.now = _platform.now || (() => Date.now());
-
-    this._platform = platform;
+    this._platform = extracPlatform(this.options._platform);
 
     this._boundRunExpiredTimers = () => {
       this._runExpiredTimers();
