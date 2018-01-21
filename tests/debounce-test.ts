@@ -538,3 +538,26 @@ QUnit.test('onError', function(assert) {
 
   bb.debounce(null, () => { throw new Error('QUnit.test error'); }, 20);
 });
+
+QUnit.test('debounce within a debounce can be canceled GH#183', function(assert) {
+  assert.expect(3);
+
+  let done = assert.async();
+  let bb = new Backburner(['zomg']);
+
+  let steps: string[] = [];
+  let foo = () => {
+    assert.ok(true, 'foo called');
+    return bb.debounce(bar, 10);
+  };
+
+  let bar = () => {
+    assert.ok(true, 'bar called');
+    let timer = foo();
+    bb.cancel(timer);
+
+    setTimeout(done, 10);
+  };
+
+  foo();
+});
