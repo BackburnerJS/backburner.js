@@ -362,3 +362,15 @@ QUnit.test('NaN timeout doesn\'t hang other timeouts', function(assert) {
     done();
   }, 20);
 });
+
+QUnit.test('when [callback, string] args passed', function(assert) {
+  assert.expect(1);
+  let done = assert.async();
+
+  let bb = new Backburner(['one']);
+
+  bb.later(function(name) {
+    assert.equal(name, 'batman');
+    done();
+  }, 'batman', 0);
+});

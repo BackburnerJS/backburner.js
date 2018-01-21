@@ -316,3 +316,19 @@ QUnit.test('onError', function(assert) {
     });
   });
 });
+
+QUnit.test('when [queueName, callback, string] args passed', function(assert) {
+  assert.expect(2);
+
+  let bb = new Backburner(['one']);
+  let functionWasCalled = false;
+
+  bb.run(() => {
+    bb.scheduleOnce('one', function(name) {
+      assert.equal(name, 'batman');
+      functionWasCalled = true;
+    }, 'batman', 100);
+  });
+
+  assert.ok(functionWasCalled, 'function was called');
+});
