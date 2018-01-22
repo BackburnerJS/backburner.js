@@ -78,7 +78,7 @@ module.exports = function (app) {
         }]
       }
     }),
-    new Funnel(path.dirname(require.resolve('qunitjs')), {
+    new Funnel(path.dirname(require.resolve('qunit')), {
       annotation: 'tests/qunit.{js,css}',
       destDir: 'tests',
       files: ['qunit.css', 'qunit.js']

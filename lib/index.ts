@@ -158,9 +158,7 @@ export default class Backburner {
 
     this._platform = platform;
 
-    this._boundRunExpiredTimers = () => {
-      this._runExpiredTimers();
-    };
+    this._boundRunExpiredTimers = this._runExpiredTimers.bind(this);
 
     this._boundAutorunEnd = () => {
       autorunsCompletedCount++;
@@ -586,9 +584,10 @@ export default class Backburner {
 
   public cancel(timer?) {
     cancelCount++;
-    if (!timer) { return false; }
+                
+    if (timer === undefined || timer === null) { return false; }
+                
     let timerType = typeof timer;
-
     if (timerType === 'number') { // we're cancelling a throttle or debounce
       return this._cancelItem(timer, this._throttlers) || this._cancelItem(timer, this._debouncees);
     } else if (timerType === 'string') { // we're cancelling a setTimeout
@@ -653,18 +652,16 @@ export default class Backburner {
     if (this._timers.length === 0) {
       this._timers.push(executeAt, id, target, method, args, stack);
       this._installTimerTimeout();
-      return id;
+    } else {
+      // find position to insert
+      let i = searchTimer(executeAt, this._timers);
+      this._timers.splice(i, 0, executeAt, id, target, method, args, stack);
+
+      // we should be the new earliest timer if i == 0
+      if (i === 0) {
+        this._reinstallTimerTimeout();
+      }
     }
-
-    // find position to insert
-    let i = searchTimer(executeAt, this._timers);
-    this._timers.splice(i, 0, executeAt, id, target, method, args, stack);
-
-    // we should be the new earliest timer if i == 0
-    if (i === 0) {
-      this._reinstallTimerTimeout();
-    }
-
     return id;
   }
 
@@ -716,10 +713,11 @@ export default class Backburner {
 
   private _runExpiredTimers() {
     this._timerTimeoutId = null;
-    if (this._timers.length === 0) { return; }
-    this.begin();
-    this._scheduleExpiredTimers();
-    this.end();
+    if (this._timers.length > 0) {
+      this.begin();
+      this._scheduleExpiredTimers();
+      this.end();
+    }
   }
 
   private _scheduleExpiredTimers() {
@@ -731,15 +729,13 @@ export default class Backburner {
 
     for (; i < l; i += 6) {
       let executeAt = timers[i];
-      if (executeAt <= n) {
-        let target = timers[i + 2];
-        let method = timers[i + 3];
-        let args = timers[i + 4];
-        let stack = timers[i + 5];
-        this.currentInstance!.schedule(defaultQueue, target, method, args, false, stack);
-      } else {
-        break;
-      }
+      if (executeAt > n) { break; }
+
+      let target = timers[i + 2];
+      let method = timers[i + 3];
+      let args = timers[i + 4];
+      let stack = timers[i + 5];
+      this.currentInstance!.schedule(defaultQueue, target, method, args, false, stack);
     }
 
     timers.splice(0, i);
