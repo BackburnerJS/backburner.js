@@ -545,7 +545,6 @@ QUnit.test('debounce within a debounce can be canceled GH#183', function(assert)
   let done = assert.async();
   let bb = new Backburner(['zomg']);
 
-  let steps: string[] = [];
   let foo = () => {
     assert.ok(true, 'foo called');
     return bb.debounce(bar, 10);
