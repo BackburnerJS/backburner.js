@@ -45,6 +45,28 @@ function parseArgs() {
 
 let UUID = 0;
 
+let beginCount = 0;
+let endCount = 0;
+let beginEventCount = 0;
+let endEventCount = 0;
+let runCount = 0;
+let joinCount = 0;
+let deferCount = 0;
+let scheduleCount = 0;
+let scheduleIterableCount = 0;
+let deferOnceCount = 0;
+let scheduleOnceCount = 0;
+let setTimeoutCount = 0;
+let laterCount = 0;
+let throttleCount = 0;
+let debounceCount = 0;
+let cancelTimersCount = 0;
+let cancelCount = 0;
+let autorunsCreatedCount = 0;
+let autorunsCompletedCount = 0;
+let deferredActionQueuesCreatedCount = 0;
+let nestedDeferredActionQueuesCreated = 0;
+
 export default class Backburner {
   public static Queue = Queue;
 
@@ -53,6 +75,38 @@ export default class Backburner {
   public currentInstance: DeferredActionQueues | null = null;
 
   public options: any;
+
+  public get counters() {
+    return {
+      begin: beginCount,
+      end: endCount,
+      events: {
+        begin: beginEventCount,
+        end: endEventCount,
+      },
+      autoruns: {
+        created: autorunsCreatedCount,
+        completed: autorunsCompletedCount,
+      },
+      run: runCount,
+      join: joinCount,
+      defer: deferCount,
+      schedule: scheduleCount,
+      scheduleIterable: scheduleIterableCount,
+      deferOnce: deferOnceCount,
+      scheduleOnce: scheduleOnceCount,
+      setTimeout: setTimeoutCount,
+      later: laterCount,
+      throttle: throttleCount,
+      debounce: debounceCount,
+      cancelTimers: cancelTimersCount,
+      cancel: cancelCount,
+      loops: {
+        total: deferredActionQueuesCreatedCount,
+        nested: nestedDeferredActionQueuesCreated,
+      },
+    };
+  }
 
   private _onBegin: (currentInstance: DeferredActionQueues, previousInstance: DeferredActionQueues | null) => void;
   private _onEnd: (currentInstance: DeferredActionQueues, nextInstance: DeferredActionQueues | null) => void;
@@ -109,6 +163,7 @@ export default class Backburner {
     };
 
     this._boundAutorunEnd = () => {
+      autorunsCompletedCount++;
       this._autorun = null;
       this.end();
     };
@@ -119,6 +174,7 @@ export default class Backburner {
     @return instantiated class DeferredActionQueues
   */
   public begin(): DeferredActionQueues {
+    beginCount++;
     let options = this.options;
     let previousInstance = this.currentInstance;
     let current;
@@ -128,9 +184,12 @@ export default class Backburner {
       this._cancelAutorun();
     } else {
       if (previousInstance !== null) {
+        nestedDeferredActionQueuesCreated++;
         this.instanceStack.push(previousInstance);
       }
+      deferredActionQueuesCreatedCount++;
       current = this.currentInstance = new DeferredActionQueues(this.queueNames, options);
+      beginEventCount++;
       this._trigger('begin', current, previousInstance);
     }
 
@@ -140,6 +199,7 @@ export default class Backburner {
   }
 
   public end() {
+    endCount++;
     let currentInstance = this.currentInstance;
     let nextInstance: DeferredActionQueues | null  = null;
 
@@ -158,6 +218,7 @@ export default class Backburner {
         finallyAlreadyCalled = true;
 
         if (result === QUEUE_STATE.Pause) {
+          autorunsCreatedCount++;
           const next = this._platform.next;
           this._autorun = next(this._boundAutorunEnd);
         } else {
@@ -167,6 +228,7 @@ export default class Backburner {
             nextInstance = this.instanceStack.pop() as DeferredActionQueues;
             this.currentInstance = nextInstance;
           }
+          endEventCount++;
           this._trigger('end', currentInstance, nextInstance);
           this._onEnd(currentInstance, nextInstance);
         }
@@ -210,6 +272,7 @@ export default class Backburner {
   public run(target: Function | any | null, method?: Function | string, ...args);
   public run(target: any | null | undefined, method?: Function, ...args: any[]);
   public run() {
+    runCount++;
     let [target, method, args] = parseArgs(...arguments);
     return this._run(target, method, args);
   }
@@ -232,6 +295,7 @@ export default class Backburner {
   public join(target: Function | any | null, method?: Function | string, ...args);
   public join(target: any | null | undefined, method?: Function, ...args: any[]);
   public join() {
+    joinCount++;
     let [target, method, args] = parseArgs(...arguments);
     return this._join(target, method, args);
   }
@@ -240,6 +304,7 @@ export default class Backburner {
    * @deprecated please use schedule instead.
    */
   public defer(queueName, targetOrMethod, ..._args) {
+    deferCount++;
     return this.schedule(queueName, targetOrMethod, ..._args);
   }
 
@@ -250,6 +315,7 @@ export default class Backburner {
   public schedule<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
   public schedule(queueName: string, target: any, method: any | Function, ...args);
   public schedule(queueName, ..._args) {
+    scheduleCount++;
     let [target, method, args] = parseArgs(..._args);
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, target, method, args, false, stack);
@@ -264,6 +330,7 @@ export default class Backburner {
     @return method result
   */
   public scheduleIterable(queueName: string, iterable: () => Iteratable) {
+    scheduleIterableCount++;
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, null, iteratorDrain, [iterable], false, stack);
   }
@@ -272,6 +339,7 @@ export default class Backburner {
    * @deprecated please use scheduleOnce instead.
    */
   public deferOnce(queueName, targetOrMethod, ...args) {
+    deferOnceCount++;
     return this.scheduleOnce(queueName, targetOrMethod, ...args);
   }
 
@@ -282,6 +350,7 @@ export default class Backburner {
   public scheduleOnce<T, U extends keyof T>(queueName: string, target: T, method: U, ...args);
   public scheduleOnce(queueName: string, target: any | null, method: any | Function, ...args);
   public scheduleOnce(queueName, ..._args) {
+    scheduleOnceCount++;
     let [target, method, args] = parseArgs(..._args);
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, target, method, args, true, stack);
@@ -292,10 +361,12 @@ export default class Backburner {
    */
   public setTimeout(...args);
   public setTimeout() {
+    setTimeoutCount++;
     return this.later(...arguments);
   }
 
   public later(...args) {
+    laterCount++;
     let length = args.length;
 
     let wait = 0;
@@ -349,6 +420,7 @@ export default class Backburner {
   public throttle<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait?: number | string, immediate?: boolean): Timer;
   public throttle<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait?: number | string, immediate?: boolean): Timer;
   public throttle(targetOrThisArgOrMethod: object | Function, ...args): Timer {
+    throttleCount++;
     let target;
     let method;
     let immediate;
@@ -425,6 +497,7 @@ export default class Backburner {
   public debounce<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number | string, immediate?: boolean): Timer;
   public debounce<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number | string, immediate?: boolean): Timer;
   public debounce(targetOrThisArgOrMethod: object | Function, ...args): Timer {
+    debounceCount++;
     let target;
     let method;
     let immediate;
@@ -487,6 +560,7 @@ export default class Backburner {
   }
 
   public cancelTimers() {
+    cancelTimersCount++;
     for (let i = 3; i < this._throttlers.length; i += 4) {
       this._platform.clearTimeout(this._throttlers[i]);
     }
@@ -511,6 +585,7 @@ export default class Backburner {
   }
 
   public cancel(timer?) {
+    cancelCount++;
     if (!timer) { return false; }
     let timerType = typeof timer;
 
@@ -693,6 +768,7 @@ export default class Backburner {
   private _ensureInstance(): DeferredActionQueues {
     let currentInstance = this.currentInstance;
     if (currentInstance === null) {
+      autorunsCreatedCount++;
       currentInstance = this.begin();
       const next = this._platform.next;
       this._autorun = next(this._boundAutorunEnd);
