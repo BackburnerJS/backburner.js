@@ -1,15 +1,14 @@
+import searchTimer from './backburner/binary-search';
+import DeferredActionQueues from './backburner/deferred-action-queues';
+import Evented from './backburner/evented';
+import iteratorDrain, { Iteratable } from './backburner/iterator-drain';
+import Queue, { QUEUE_STATE } from './backburner/queue';
 import {
   findItem,
   findTimer,
   getOnError,
   isCoercableNumber
 } from './backburner/utils';
-
-import searchTimer from './backburner/binary-search';
-import DeferredActionQueues from './backburner/deferred-action-queues';
-import iteratorDrain, { Iteratable } from './backburner/iterator-drain';
-
-import Queue, { QUEUE_STATE } from './backburner/queue';
 
 type Timer = any;
 
@@ -45,7 +44,7 @@ function parseArgs() {
 
 let UUID = 0;
 
-export default class Backburner {
+export default class Backburner extends Evented {
   public static Queue = Queue;
 
   public DEBUG = false;
@@ -60,13 +59,6 @@ export default class Backburner {
   private instanceStack: DeferredActionQueues[] = [];
   private _debouncees: any[] = [];
   private _throttlers: any[] = [];
-  private _eventCallbacks: {
-    end: Function[];
-    begin: Function[];
-  } = {
-    end: [],
-    begin: []
-  };
 
   private _timerTimeoutId: number | null = null;
   private _timers: any[] = [];
@@ -83,7 +75,8 @@ export default class Backburner {
   private _autorun: number | null = null;
   private _boundAutorunEnd: () => void;
 
-  constructor(queueNames: string[], options: any = {} ) {
+  constructor(queueNames: string[], options: any = {}) {
+    super();
     this.queueNames = queueNames;
     this.options = options;
     if (!this.options.defaultQueue) {
@@ -169,38 +162,6 @@ export default class Backburner {
           this._onEnd(currentInstance, nextInstance);
         }
       }
-    }
-  }
-
-  public on(eventName, callback) {
-    if (typeof callback !== 'function') {
-      throw new TypeError(`Callback must be a function`);
-    }
-    let callbacks = this._eventCallbacks[eventName];
-    if (callbacks !== undefined) {
-      callbacks.push(callback);
-    } else {
-      throw new TypeError(`Cannot on() event ${eventName} because it does not exist`);
-    }
-  }
-
-  public off(eventName, callback) {
-    let callbacks = this._eventCallbacks[eventName];
-    if (!eventName || callbacks === undefined) {
-      throw new TypeError(`Cannot off() event ${eventName} because it does not exist`);
-    }
-    let callbackFound = false;
-    if (callback) {
-      for (let i = 0; i < callbacks.length; i++) {
-        if (callbacks[i] === callback) {
-          callbackFound = true;
-          callbacks.splice(i, 1);
-          i--;
-        }
-      }
-    }
-    if (!callbackFound) {
-      throw new TypeError(`Cannot off() callback that does not exist`);
     }
   }
 
@@ -612,27 +573,6 @@ export default class Backburner {
       return true;
     }
     return false;
-  }
-
-  /**
-   Trigger an event. Supports up to two arguments. Designed around
-   triggering transition events from one run loop instance to the
-   next, which requires an argument for the first instance and then
-   an argument for the next instance.
-
-   @private
-   @method _trigger
-   @param {String} eventName
-   @param {any} arg1
-   @param {any} arg2
-   */
-  private _trigger<T, U>(eventName: string, arg1: T, arg2: U) {
-    let callbacks = this._eventCallbacks[eventName];
-    if (callbacks !== undefined) {
-      for (let i = 0; i < callbacks.length; i++) {
-        callbacks[i](arg1, arg2);
-      }
-    }
   }
 
   private _runExpiredTimers() {
