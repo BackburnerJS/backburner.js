@@ -584,9 +584,9 @@ export default class Backburner {
 
   public cancel(timer?) {
     cancelCount++;
-                
+
     if (timer === undefined || timer === null) { return false; }
-                
+
     let timerType = typeof timer;
     if (timerType === 'number') { // we're cancelling a throttle or debounce
       return this._cancelItem(timer, this._throttlers) || this._cancelItem(timer, this._debouncees);
