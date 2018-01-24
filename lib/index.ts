@@ -23,6 +23,9 @@ type Timer = string | number;
 
 const noop = function() {};
 
+const SET_TIMEOUT = setTimeout;
+const DISABLE_SCHEDULE = {};
+
 function parseArgs(...args: any[]);
 function parseArgs() {
   let length = arguments.length;
@@ -448,21 +451,22 @@ export default class Backburner {
     let [target, method, args, wait, isImmediate = true] = parseDebounceArgs(...arguments);
 
     let index = findTimerItem(target, method, this._timers);
-    if (index > -1) {
-      let timerId = this._timers[index + 1];
-      this._timers[index + 4] = args;
-      return timerId;
+    let timerId;
+    if (index === -1) {
+      wait = parseInt(wait, 10);
+      timerId = this._later(target, method, isImmediate ? DISABLE_SCHEDULE : args, wait);
+
+      if (isImmediate) {
+        this._join(target, method, args);
+      }
+    } else {
+      timerId = this._timers[index + 1];
+      if (this._timers[index + 4] !== DISABLE_SCHEDULE) {
+        this._timers[index + 4] = args;
+      }
     }
 
-    wait = parseInt(wait, 10);
-
-    let timer = this._later(target, method, args, wait, isImmediate);
-
-    if (isImmediate) {
-      this._join(target, method, args);
-    }
-
-    return timer;
+    return timerId;
   }
 
   // with target, with method name, with optional immediate
@@ -486,22 +490,28 @@ export default class Backburner {
     debounceCount++;
     let [target, method, args, wait, isImmediate = false] = parseDebounceArgs(...arguments);
 
-    // Remove debouncee
     let index = findTimerItem(target, method, this._timers);
-    if (index > -1) {
-      this._timers.splice(index, 7);
+    let timerId;
+    if (index === -1) {
+      timerId = this._later(target, method, isImmediate ? DISABLE_SCHEDULE : args, wait);
+      if (isImmediate) {
+        this._join(target, method, args);
+      }
+    } else {
+      let executeAt = this._platform.now() + wait || this._timers[index];
+      this._timers[index] = executeAt;
+
+      if (this._timers[index + 4] !== DISABLE_SCHEDULE) {
+        this._timers[index + 4] = args;
+      }
+
+      timerId = this._timers[index + 1];
       if (index === 0) {
         this._reinstallTimerTimeout();
       }
     }
 
-    let timer = this._later(target, method, args, wait, isImmediate);
-
-    if (isImmediate && index === -1) {
-      this._join(target, method, args);
-    }
-
-    return timer;
+    return timerId;
   }
 
   public cancelTimers() {
@@ -614,12 +624,12 @@ export default class Backburner {
     let id = UUID++;
 
     if (this._timers.length === 0) {
-      this._timers.push(executeAt, id, target, method, args, isImmediate, stack);
+      this._timers.push(executeAt, id, target, method, args, stack);
       this._installTimerTimeout();
     } else {
       // find position to insert
       let i = searchTimer(executeAt, this._timers);
-      this._timers.splice(i, 0, executeAt, id, target, method, args, isImmediate, stack);
+      this._timers.splice(i, 0, executeAt, id, target, method, args, stack);
 
       // we should be the new earliest timer if i == 0
       if (i === 0) {
@@ -630,10 +640,10 @@ export default class Backburner {
   }
 
   private _cancelLaterTimer(timer) {
-    for (let i = 1; i < this._timers.length; i += 7) {
+    for (let i = 1; i < this._timers.length; i += 6) {
       if (this._timers[i] === timer) {
         i = i - 1;
-        this._timers.splice(i, 7);
+        this._timers.splice(i, 6);
         if (i === 0) {
           this._reinstallTimerTimeout();
         }
@@ -680,15 +690,14 @@ export default class Backburner {
     let defaultQueue = this._defaultQueue;
     let n = this._platform.now();
 
-    for (; i < l; i += 7) {
+    for (; i < l; i += 6) {
       let executeAt = timers[i];
       if (executeAt > n) { break; }
-      let isImmediate = timers[i + 5];
-      if (isImmediate === false) {
+      let args = timers[i + 4];
+      if (args !== DISABLE_SCHEDULE) {
         let target = timers[i + 2];
         let method = timers[i + 3];
-        let args = timers[i + 4];
-        let stack = timers[i + 6];
+        let stack = timers[i + 5];
         this.currentInstance!.schedule(defaultQueue, target, method, args, false, stack);
       }
     }

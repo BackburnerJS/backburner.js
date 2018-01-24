@@ -25,7 +25,7 @@ export function findItem(target, method, collection) {
 export function findTimerItem(target, method, collection) {
   let index = -1;
 
-  for (let i = 2, l = collection.length; i < l; i += 7) {
+  for (let i = 2, l = collection.length; i < l; i += 6) {
     if (collection[i] === target && collection[i + 1] === method) {
       index = i - 2;
       break;
