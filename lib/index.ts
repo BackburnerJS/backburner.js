@@ -18,29 +18,88 @@ const SET_TIMEOUT = setTimeout;
 
 function parseArgs() {
   let length = arguments.length;
+
+  let args;
   let method;
   let target;
-  let args;
 
-  if (length === 1) {
-    method = arguments[0];
+  if (length === 0) {
+  } else if (length === 1) {
     target = null;
+    method = arguments[0];
   } else {
-    target = arguments[0];
-    method = arguments[1];
-    if (typeof method === 'string') {
-      method = target[method];
+    let argsIndex = 2;
+    let methodOrTarget = arguments[0];
+    let methodOrArgs = arguments[1];
+    let type = typeof methodOrArgs;
+    if (type === 'function') {
+      target = methodOrTarget;
+      method = methodOrArgs;
+    } else if (methodOrTarget !== null && type === 'string' && methodOrArgs in methodOrTarget) {
+      target = methodOrTarget;
+      method = target[methodOrArgs];
+    } else if (typeof methodOrTarget === 'function') {
+      argsIndex = 1;
+      target = null;
+      method = methodOrTarget;
     }
 
-    if (length > 2) {
-      args = new Array(length - 2);
-      for (let i = 0, l = length - 2; i < l; i++) {
-        args[i] = arguments[i + 2];
+    if (length > argsIndex) {
+      let len = length - argsIndex;
+      args = new Array(len);
+      for (let i = 0; i < len; i++) {
+        args[i] = arguments[i + argsIndex];
       }
     }
   }
 
   return [target, method, args];
+}
+
+function parseTimerArgs() {
+  let [target, method, args] = parseArgs(...arguments);
+  let wait = 0;
+  let length = args !== undefined ? args.length : 0;
+
+  if (length > 0) {
+    let last = args[length - 1];
+    if (isCoercableNumber(last)) {
+      wait = parseInt(args.pop(), 10);
+    }
+  }
+
+  return [target, method, args, wait];
+}
+
+function parseDebounceArgs() {
+  let target;
+  let method;
+  let isImmediate;
+  let args;
+  let wait;
+
+  if (arguments.length === 2) {
+    method = arguments[0];
+    wait = arguments[1];
+    target = null;
+  } else {
+    [target, method, args] = parseArgs(...arguments);
+
+    if (args === undefined) {
+      wait = 0;
+    } else {
+      wait = args.pop();
+
+      if (!isCoercableNumber(wait)) {
+        isImmediate = wait === true;
+        wait = args.pop();
+      }
+    }
+  }
+
+  wait = parseInt(wait, 10);
+
+  return [target, method, args, wait, isImmediate];
 }
 
 let UUID = 0;
@@ -363,41 +422,10 @@ export default class Backburner {
     return this.later(...arguments);
   }
 
-  public later(...args) {
+  public later(...args);
+  public later() {
     laterCount++;
-    let length = args.length;
-
-    let wait = 0;
-    let method;
-    let target;
-    let methodOrTarget;
-    let methodOrArgs;
-
-    if (length === 0) {
-      return;
-    } else if (length === 1) {
-      method = args.shift();
-    } else {
-      let last = args[args.length - 1];
-
-      if (isCoercableNumber(last)) {
-        wait = parseInt(args.pop(), 10);
-      }
-
-      methodOrTarget = args[0];
-      methodOrArgs = args[1];
-      let type = typeof methodOrArgs;
-      if (type === 'function') {
-        target = args.shift();
-        method = args.shift();
-      } else if (methodOrTarget !== null && type === 'string' && methodOrArgs in methodOrTarget) {
-        target = args.shift();
-        method = target[args.shift()];
-      } else {
-        method = args.shift();
-      }
-    }
-
+    let [target, method, args, wait] = parseTimerArgs(...arguments);
     return this._setTimeout(target, method, args, wait);
   }
 
@@ -417,48 +445,15 @@ export default class Backburner {
   public throttle<A>(method: (arg1: A) => void, arg1: A, wait?: number | string, immediate?: boolean): Timer;
   public throttle<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait?: number | string, immediate?: boolean): Timer;
   public throttle<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait?: number | string, immediate?: boolean): Timer;
-  public throttle(targetOrThisArgOrMethod: object | Function, ...args): Timer {
+  public throttle(): Timer {
     throttleCount++;
-    let target;
-    let method;
-    let immediate;
-    let isImmediate;
-    let wait;
-
-    if (args.length === 1) {
-      method = targetOrThisArgOrMethod;
-      wait = args.pop();
-      target = null;
-      isImmediate = true;
-    } else {
-      target = targetOrThisArgOrMethod;
-      method = args.shift();
-      immediate = args.pop();
-      let type = typeof method;
-      if (type === 'string') {
-        method = target[method];
-      } else if (type !== 'function') {
-        args.unshift(method);
-        method = target;
-        target = null;
-      }
-
-      if (isCoercableNumber(immediate)) {
-        wait = immediate;
-        isImmediate = true;
-      } else {
-        wait = args.pop();
-        isImmediate = immediate === true;
-      }
-    }
+    let [target, method, args, wait, isImmediate = true] = parseDebounceArgs(...arguments);
 
     let index = findItem(target, method, this._throttlers);
     if (index > -1) {
       this._throttlers[index + 2] = args;
       return this._throttlers[index + 3];
     } // throttled
-
-    wait = parseInt(wait, 10);
 
     let timer = this._platform.setTimeout(() => {
       let i = findTimer(timer, this._throttlers);
@@ -494,43 +489,9 @@ export default class Backburner {
   public debounce<A>(method: (arg1: A) => void, arg1: A, wait: number | string, immediate?: boolean): Timer;
   public debounce<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait: number | string, immediate?: boolean): Timer;
   public debounce<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait: number | string, immediate?: boolean): Timer;
-  public debounce(targetOrThisArgOrMethod: object | Function, ...args): Timer {
+  public debounce(): Timer {
     debounceCount++;
-    let target;
-    let method;
-    let immediate;
-    let isImmediate;
-    let wait;
-
-    if (args.length === 1) {
-      method = targetOrThisArgOrMethod;
-      wait = args.pop();
-      target = null;
-      isImmediate = false;
-    } else {
-      target = targetOrThisArgOrMethod;
-      method = args.shift();
-      immediate = args.pop();
-
-      let type = typeof method;
-      if (type === 'string') {
-        method = target[method];
-      } else if (type !== 'function') {
-        args.unshift(method);
-        method = target;
-        target = null;
-      }
-
-      if (isCoercableNumber(immediate)) {
-        wait = immediate;
-        isImmediate = false;
-      } else {
-        wait = args.pop();
-        isImmediate = immediate === true;
-      }
-    }
-
-    wait = parseInt(wait, 10);
+    let [target, method, args, wait, isImmediate = false] = parseDebounceArgs(...arguments);
 
     // Remove debouncee
     let index = findItem(target, method, this._debouncees);

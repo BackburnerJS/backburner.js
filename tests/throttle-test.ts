@@ -509,3 +509,19 @@ QUnit.test('throttle + immediate joins existing run loop instances', function(as
     }, 20, true);
   });
 });
+
+QUnit.test('when [callback, string] args passed', function(assert) {
+  assert.expect(2);
+
+  let bb = new Backburner(['one']);
+  let functionWasCalled = false;
+
+  bb.run(() => {
+    bb.throttle(function(name) {
+      assert.equal(name, 'batman');
+      functionWasCalled = true;
+    }, 'batman', 200);
+  });
+
+  assert.ok(functionWasCalled, 'function was called');
+});

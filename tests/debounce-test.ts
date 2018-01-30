@@ -560,3 +560,19 @@ QUnit.test('debounce within a debounce can be canceled GH#183', function(assert)
 
   foo();
 });
+
+QUnit.test('when [callback, string] args passed', function(assert) {
+  assert.expect(2);
+
+  let bb = new Backburner(['one']);
+  let functionWasCalled = false;
+
+  bb.run(() => {
+    bb.debounce(function(name) {
+      assert.equal(name, 'batman');
+      functionWasCalled = true;
+    }, 'batman', 100, true);
+  });
+
+  assert.ok(functionWasCalled, 'function was called');
+});

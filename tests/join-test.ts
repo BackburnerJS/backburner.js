@@ -199,3 +199,17 @@ QUnit.test('onError which does rethrow is invoked (only once) when joining an ex
     });
   }, /test error/);
 });
+
+QUnit.test('when [callback, string] args passed', function(assert) {
+  assert.expect(2);
+
+  let bb = new Backburner(['one']);
+  let functionWasCalled = false;
+
+  bb.join(function(name) {
+    assert.equal(name, 'batman');
+    functionWasCalled = true;
+  }, 'batman');
+
+  assert.ok(functionWasCalled, 'function was called');
+});

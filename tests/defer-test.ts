@@ -36,6 +36,22 @@ QUnit.test('when passed a target and method', function(assert) {
   assert.ok(functionWasCalled, 'function was called');
 });
 
+QUnit.test('when [queueName, callback, string] args passed', function(assert) {
+  assert.expect(2);
+
+  let bb = new Backburner(['one']);
+  let functionWasCalled = false;
+
+  bb.run(() => {
+    bb.schedule('one', function(name) {
+      assert.equal(name, 'batman');
+      functionWasCalled = true;
+    }, 'batman');
+  });
+
+  assert.ok(functionWasCalled, 'function was called');
+});
+
 QUnit.test('when passed a target and method name', function(assert) {
   assert.expect(2);
 
