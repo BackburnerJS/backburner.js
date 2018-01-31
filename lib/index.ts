@@ -24,7 +24,7 @@ type Timer = string | number;
 const noop = function() {};
 
 const SET_TIMEOUT = setTimeout;
-const DISABLE_SCHEDULE = {};
+const DISABLE_SCHEDULE = Object.freeze([]);
 
 function parseArgs(...args: any[]);
 function parseArgs() {
@@ -453,7 +453,6 @@ export default class Backburner {
     let index = findTimerItem(target, method, this._timers);
     let timerId;
     if (index === -1) {
-      wait = parseInt(wait, 10);
       timerId = this._later(target, method, isImmediate ? DISABLE_SCHEDULE : args, wait);
 
       if (isImmediate) {
@@ -461,8 +460,9 @@ export default class Backburner {
       }
     } else {
       timerId = this._timers[index + 1];
-      if (this._timers[index + 4] !== DISABLE_SCHEDULE) {
-        this._timers[index + 4] = args;
+      let argIndex = index + 4;
+      if (this._timers[argIndex] !== DISABLE_SCHEDULE) {
+        this._timers[argIndex] = args;
       }
     }
 
@@ -491,6 +491,7 @@ export default class Backburner {
     let [target, method, args, wait, isImmediate = false] = parseDebounceArgs(...arguments);
 
     let index = findTimerItem(target, method, this._timers);
+
     let timerId;
     if (index === -1) {
       timerId = this._later(target, method, isImmediate ? DISABLE_SCHEDULE : args, wait);
@@ -501,11 +502,12 @@ export default class Backburner {
       let executeAt = this._platform.now() + wait || this._timers[index];
       this._timers[index] = executeAt;
 
-      if (this._timers[index + 4] !== DISABLE_SCHEDULE) {
-        this._timers[index + 4] = args;
+      let argIndex = index + 4;
+      if (this._timers[argIndex] !== DISABLE_SCHEDULE) {
+        this._timers[argIndex] = args;
       }
-
       timerId = this._timers[index + 1];
+
       if (index === 0) {
         this._reinstallTimerTimeout();
       }
@@ -618,7 +620,7 @@ export default class Backburner {
     }
   }
 
-  private _later(target, method, args, wait, isImmediate = false) {
+  private _later(target, method, args, wait) {
     let stack = this.DEBUG ? new Error() : undefined;
     let executeAt = this._platform.now() + wait;
     let id = UUID++;
@@ -642,8 +644,7 @@ export default class Backburner {
   private _cancelLaterTimer(timer) {
     for (let i = 1; i < this._timers.length; i += 6) {
       if (this._timers[i] === timer) {
-        i = i - 1;
-        this._timers.splice(i, 6);
+        this._timers.splice(i - 1, 6);
         if (i === 0) {
           this._reinstallTimerTimeout();
         }
