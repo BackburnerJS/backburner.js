@@ -23,21 +23,21 @@ QUnit.test('debounce', function(assert) {
   // let's schedule `debouncee` to run in 10ms
   setTimeout(() => {
     assert.equal(step++, 1);
-    assert.ok(!wasCalled);
+    assert.ok(!wasCalled, '@10ms, should not yet have been called');
     bb.debounce(null, debouncee, 40);
   }, 10);
 
   // let's schedule `debouncee` to run again in 30ms
   setTimeout(() => {
     assert.equal(step++, 2);
-    assert.ok(!wasCalled);
+    assert.ok(!wasCalled, '@ 30ms, should not yet have been called');
     bb.debounce(null, debouncee, 40);
   }, 30);
 
   // let's schedule `debouncee` to run yet again in 60ms
   setTimeout(() => {
     assert.equal(step++, 3);
-    assert.ok(!wasCalled);
+    assert.ok(!wasCalled, '@ 60ms, should not yet have been called');
     bb.debounce(null, debouncee, 40);
   }, 60);
 
@@ -45,7 +45,7 @@ QUnit.test('debounce', function(assert) {
   // 10ms after `debouncee` has been called the last time
   setTimeout(() => {
     assert.equal(step++, 4);
-    assert.ok(wasCalled);
+    assert.ok(wasCalled, '@ 110ms should have been called');
   }, 110);
 
   // great, we've made it this far, there's one more thing

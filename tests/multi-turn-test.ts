@@ -1,30 +1,25 @@
-import Backburner from 'backburner';
+import Backburner, { buildPlatform } from 'backburner';
 
 QUnit.module('tests/multi-turn');
 
 const queue: any[] = [];
-const platform = {
-  flushSync() {
-    let current = queue.slice();
-    queue.length = 0;
-    current.forEach((task) => task());
-  },
-
-  // TDB actually implement
-  next(cb) {
-    queue.push(cb);
-  }
-};
+let platform;
+function buildFakePlatform(flush) {
+  platform = buildPlatform(flush);
+  platform.flushSync = function() {
+    flush();
+  };
+  return platform;
+}
 
 QUnit.test('basic', function(assert) {
   let bb = new Backburner(['zomg'], {
-
     // This is just a place holder for now, but somehow the system needs to
     // know to when to stop
     mustYield() {
       return true; // yield after each step, for now.
     },
-    _platform: platform
+    _buildPlatform: buildFakePlatform
   });
 
   let order = -1;
@@ -88,7 +83,7 @@ QUnit.test('properly cancel items which are added during flush', function(assert
       return true; // yield after each step, for now.
     },
 
-    _platform: platform
+    _buildPlatform: buildFakePlatform
   });
 
   let fooCalled = 0;

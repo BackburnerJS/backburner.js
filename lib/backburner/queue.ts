@@ -33,7 +33,7 @@ export default class Queue {
     }
   }
 
-  public flush(sync?) {
+  public flush(sync?: Boolean) {
     let { before, after } = this.options;
     let target;
     let method;

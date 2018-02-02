@@ -48,7 +48,7 @@ export default class DeferredActionQueues {
     @method flush
     DeferredActionQueues.flush() calls Queue.flush()
   */
-  public flush() {
+  public flush(fromAutorun = false) {
     let queue;
     let queueName;
     let numberOfQueues = this.queueNames.length;
@@ -59,6 +59,9 @@ export default class DeferredActionQueues {
 
       if (queue.hasWork() === false) {
         this.queueNameIndex++;
+        if (fromAutorun) {
+          return QUEUE_STATE.Pause;
+        }
       } else {
         if (queue.flush(false /* async */) === QUEUE_STATE.Pause) {
           return QUEUE_STATE.Pause;
