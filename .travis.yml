@@ -14,6 +14,9 @@ env:
 
 cache: yarn
 
+install:
+  - yarn --no-lockfile
+
 script:
   - yarn problems
   - yarn lint
