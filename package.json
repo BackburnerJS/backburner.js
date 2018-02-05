@@ -35,6 +35,5 @@
     "qunit": "^2.5.0",
     "rollup-plugin-buble": "^0.18.0",
     "tslint": "^5.9.1"
-  },
-  "readmeFilename": "README.md"
+  }
 }
