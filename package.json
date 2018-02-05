@@ -2,6 +2,8 @@
   "name": "backburner.js",
   "version": "2.2.0",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
+  "license": "MIT",
+  "author": "Erik Bryn",
   "main": "dist/backburner.js",
   "jsnext:main": "dist/backburner.js",
   "repository": {
@@ -9,18 +11,15 @@
     "url": "https://github.com/BackburnerJS/backburner.js.git"
   },
   "scripts": {
-    "prepublish": "npm run build",
+    "bench": "ember build && node ./bench/index.js",
     "build": "ember build --environment=production",
-    "test": "ember test",
-    "test:server": "ember test --server",
-    "serve": "ember serve",
     "lint": "tslint --project tsconfig.json",
     "problems": "tsc -p tsconfig.json --noEmit",
-    "bench": "ember build && node ./bench/index.js"
+    "prepublish": "npm run build",
+    "serve": "ember serve",
+    "test": "ember test",
+    "test:server": "ember test --server"
   },
-  "author": "Erik Bryn",
-  "license": "MIT",
-  "readmeFilename": "README.md",
   "devDependencies": {
     "@types/qunit": "^2.0.31",
     "broccoli-funnel": "^2.0.1",
