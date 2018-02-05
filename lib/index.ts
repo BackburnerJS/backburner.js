@@ -20,7 +20,7 @@ import iteratorDrain, { Iterable } from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
-type Timer = any;
+type Timer = string | number;
 
 const noop = function() {};
 
@@ -407,11 +407,27 @@ export default class Backburner {
     return this.later(...arguments);
   }
 
-  public later(...args);
+  public later<T>(...args: any[]): Timer; // fixes `this.later(...arguments)` usage in `setTimeout`
+  public later<T>(target: T, methodName: keyof T, wait?: number | string): Timer;
+  public later<T>(target: T, methodName: keyof T, arg1: any, wait?: number | string): Timer;
+  public later<T>(target: T, methodName: keyof T, arg1: any, arg2: any, wait?: number | string): Timer;
+  public later<T>(target: T, methodName: keyof T, arg1: any, arg2: any, arg3: any, wait?: number | string): Timer;
+
+  // with target, with optional immediate
+  public later(thisArg: any | null, method: () => void, wait?: number | string): Timer;
+  public later<A>(thisArg: any | null, method: (arg1: A) => void, arg1: A, wait?: number | string): Timer;
+  public later<A, B>(thisArg: any | null, method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait?: number | string): Timer;
+  public later<A, B, C>(thisArg: any | null, method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait?: number | string): Timer;
+
+  // without target, with optional immediate
+  public later(method: () => void, wait?: number | string): Timer;
+  public later<A>(method: (arg1: A) => void, arg1: A, wait?: number | string): Timer;
+  public later<A, B>(method: (arg1: A, arg2: B) => void, arg1: A, arg2: B, wait?: number | string): Timer;
+  public later<A, B, C>(method: (arg1: A, arg2: B, arg3: C) => void, arg1: A, arg2: B, arg3: C, wait?: number | string): Timer;
   public later() {
     laterCount++;
     let [target, method, args, wait] = parseTimerArgs(...arguments);
-    return this._setTimeout(target, method, args, wait);
+    return this._later(target, method, args, wait);
   }
 
   public throttle<T>(target: T, methodName: keyof T, wait?: number | string, immediate?: boolean): Timer;
@@ -624,7 +640,7 @@ export default class Backburner {
     }
   }
 
-  private _setTimeout(target, method, args, wait) {
+  private _later(target, method, args, wait) {
     let stack = this.DEBUG ? new Error() : undefined;
     let executeAt = this._platform.now() + wait;
     let id = (UUID++) + '';
