@@ -16,7 +16,7 @@ import {
 
 import searchTimer from './backburner/binary-search';
 import DeferredActionQueues from './backburner/deferred-action-queues';
-import iteratorDrain, { Iteratable } from './backburner/iterator-drain';
+import iteratorDrain, { Iterable } from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
@@ -368,7 +368,7 @@ export default class Backburner {
     @param {Iterable} an iterable of functions to execute
     @return method result
   */
-  public scheduleIterable(queueName: string, iterable: () => Iteratable) {
+  public scheduleIterable(queueName: string, iterable: () => Iterable) {
     scheduleIterableCount++;
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, null, iteratorDrain, [iterable], false, stack);
