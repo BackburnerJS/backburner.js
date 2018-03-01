@@ -24,6 +24,7 @@ type Timer = any;
 
 const noop = function() {};
 
+function parseArgs(...args: any[]);
 function parseArgs() {
   let length = arguments.length;
 
@@ -64,6 +65,7 @@ function parseArgs() {
   return [target, method, args];
 }
 
+function parseTimerArgs(...args: any[]);
 function parseTimerArgs() {
   let [target, method, args] = parseArgs(...arguments);
   let wait = 0;
@@ -79,6 +81,7 @@ function parseTimerArgs() {
   return [target, method, args, wait];
 }
 
+function parseDebounceArgs(...args: any[]);
 function parseDebounceArgs() {
   let target;
   let method;
@@ -342,9 +345,9 @@ export default class Backburner {
   /**
    * @deprecated please use schedule instead.
    */
-  public defer(queueName, targetOrMethod, ..._args) {
+  public defer(queueName, target, method, ...args) {
     deferCount++;
-    return this.schedule(queueName, targetOrMethod, ..._args);
+    return this.schedule(queueName, target, method, ...args);
   }
 
   /**
@@ -377,9 +380,9 @@ export default class Backburner {
   /**
    * @deprecated please use scheduleOnce instead.
    */
-  public deferOnce(queueName, targetOrMethod, ...args) {
+  public deferOnce(queueName, target, method, ...args) {
     deferOnceCount++;
-    return this.scheduleOnce(queueName, targetOrMethod, ...args);
+    return this.scheduleOnce(queueName, target, method, ...args);
   }
 
   /**
