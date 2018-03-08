@@ -59,7 +59,7 @@ export default class DeferredActionQueues {
 
       if (queue.hasWork() === false) {
         this.queueNameIndex++;
-        if (fromAutorun) {
+        if (fromAutorun && this.queueNameIndex < numberOfQueues) {
           return QUEUE_STATE.Pause;
         }
       } else {
