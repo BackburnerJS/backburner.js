@@ -96,3 +96,31 @@ QUnit.test('can be canceled (private API)', function(assert) {
 
   setTimeout(done, 10);
 });
+
+QUnit.test('autorun interleaved with microtasks do not get dropped [GH#332]', function(assert) {
+  let done = assert.async();
+  let actual: string[] = [];
+  let bb = new Backburner(['actions', 'render']);
+
+  bb.schedule('render', function() {
+    actual.push('first');
+
+    Promise.resolve().then(() => {
+      actual.push('second');
+
+      return Promise.resolve().then(() => {
+        actual.push('third');
+
+        bb.schedule('actions', () => {
+          actual.push('fourth');
+        });
+      });
+    });
+  });
+
+  setTimeout(function() {
+    assert.deepEqual(actual, ['first', 'second', 'third', 'fourth']);
+
+    done();
+  });
+});
