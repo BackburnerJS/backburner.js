@@ -49,7 +49,7 @@ QUnit.test('debounce', function(assert) {
   }, 110);
 
   // great, we've made it this far, there's one more thing
-  // we need to QUnit.test. we want to make sure we can call `debounce`
+  // we need to test. we want to make sure we can call `debounce`
   // again with the same target/method after it has executed
 
   // at the 120ms mark, let's schedule another call to `debounce`
