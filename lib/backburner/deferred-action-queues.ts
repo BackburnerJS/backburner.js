@@ -37,6 +37,8 @@ export default class DeferredActionQueues {
       throw new Error(`You attempted to schedule an action in a queue (${queueName}) for a method that doesn\'t exist`);
     }
 
+    this.queueNameIndex = 0;
+
     if (onceFlag) {
       return queue.pushUnique(target, method, args, stack);
     } else {
@@ -66,7 +68,6 @@ export default class DeferredActionQueues {
         if (queue.flush(false /* async */) === QUEUE_STATE.Pause) {
           return QUEUE_STATE.Pause;
         }
-        this.queueNameIndex = 0; // only reset to first queue if non-pause break
       }
     }
   }

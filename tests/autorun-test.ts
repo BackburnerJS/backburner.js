@@ -104,22 +104,28 @@ QUnit.test('autorun interleaved with microtasks do not get dropped [GH#332]', fu
 
   bb.schedule('render', function() {
     actual.push('first');
+    bb.schedule('actions', () => {
+      actual.push('action1');
+    });
 
     Promise.resolve().then(() => {
       actual.push('second');
+      bb.schedule('actions', () => {
+        actual.push('action2');
+      });
 
       return Promise.resolve().then(() => {
         actual.push('third');
 
         bb.schedule('actions', () => {
-          actual.push('fourth');
+          actual.push('action3');
         });
       });
     });
   });
 
   setTimeout(function() {
-    assert.deepEqual(actual, ['first', 'second', 'third', 'fourth']);
+    assert.deepEqual(actual, ['first', 'action1', 'second', 'action2', 'third', 'action3']);
 
     done();
   });
