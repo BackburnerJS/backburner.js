@@ -1,4 +1,4 @@
-var Backburner = require('../../dist/backburner');
+var Backburner = require('../../dist/backburner').default;
 
 function sharedSetup() {
   var backburner = new this.Backburner(["sync", "actions", "routerTransitions", "render", "afterRender", "destroy", "rsvpAfter"]);
