@@ -18,6 +18,7 @@ script:
   - yarn problems
   - yarn lint
   - yarn test
+  - yarn bench
 
 after_success:
   - yarn build
