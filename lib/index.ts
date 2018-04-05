@@ -770,12 +770,14 @@ export default class Backburner {
     let resolve;
 
     new Promise((_resolve) => resolve = _resolve)
-    .then(method.bind(target, ...args))
+    .then(() => method.apply(target, args))
     .catch((err) => {
       let onError = getOnError(this.options);
 
       if (onError) {
         onError.call(null, err, stackError);
+      } else {
+        throw err;
       }
     });
 
