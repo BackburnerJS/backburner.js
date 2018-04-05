@@ -359,8 +359,13 @@ export default class Backburner {
   public schedule(queueName, ..._args) {
     scheduleCount++;
     let [target, method, args] = parseArgs(..._args);
-    let stack = this.DEBUG ? new Error() : undefined;
-    return this._ensureInstance().schedule(queueName, target, method, args, false, stack);
+
+    if (this.DEBUG) {
+      let stackError = new Error();
+      return this._ensureInstance().schedule(queueName, null, this._asyncExecute(target, method, args, stackError), null, false, stackError);
+    } else {
+      return this._ensureInstance().schedule(queueName, target, method, args, false, undefined);
+    }
   }
 
   /*
@@ -427,7 +432,11 @@ export default class Backburner {
   public later() {
     laterCount++;
     let [target, method, args, wait] = parseTimerArgs(...arguments);
-    return this._later(target, method, args, wait);
+    if (this.DEBUG) {
+      return this._later(null, this._asyncExecute(target, method, args, new Error()), null, wait);
+    } else {
+      return this._later(target, method, args, wait);
+    }
   }
 
   public throttle<T>(target: T, methodName: keyof T, wait?: number | string, immediate?: boolean): Timer;
@@ -755,6 +764,22 @@ export default class Backburner {
     let n = this._platform.now();
     let wait = Math.max(0, minExpiresAt - n);
     this._timerTimeoutId = this._platform.setTimeout(this._boundRunExpiredTimers, wait);
+  }
+
+  private _asyncExecute(target, method, args, stackError) {
+    let resolve;
+
+    new Promise((_resolve) => resolve = _resolve)
+    .then(method.bind(target, ...args))
+    .catch((err) => {
+      let onError = getOnError(this.options);
+
+      if (onError) {
+        onError.call(null, err, stackError);
+      }
+    });
+
+    return resolve;
   }
 
   private _ensureInstance(): DeferredActionQueues {

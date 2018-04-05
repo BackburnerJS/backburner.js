@@ -18,12 +18,14 @@ QUnit.test('schedule - DEBUG flag enables stack tagging', function(assert) {
 
   if (new Error().stack) { // workaround for CLI runner :(
     assert.expect(4);
+    let done = assert.async();
     let stack = bb.currentInstance && bb.currentInstance.queues.one.stackFor(1);
     assert.ok(typeof stack === 'string', 'A stack is recorded');
 
     let onError = function(error, errorRecordedForStack) {
       assert.ok(errorRecordedForStack, 'errorRecordedForStack passed to error function');
       assert.ok(errorRecordedForStack.stack, 'stack is recorded');
+      done();
     };
 
     bb = new Backburner(['errors'], { onError });
