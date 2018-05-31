@@ -6,6 +6,7 @@
   "author": "Erik Bryn",
   "main": "dist/backburner.js",
   "jsnext:main": "dist/backburner.js",
+  "typings": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/BackburnerJS/backburner.js.git"

@@ -3,6 +3,10 @@ import {
   getOnError
 } from './utils';
 
+import {
+  IQueueItem
+} from './interfaces';
+
 export const enum QUEUE_STATE {
   Pause = 1
 }
@@ -134,7 +138,7 @@ export default class Queue {
     return false;
   }
 
-  public push(target, method, args, stack) {
+  public push(target, method, args, stack): IQueueItem {
     this._queue.push(target, method, args, stack);
 
     return {
@@ -144,7 +148,7 @@ export default class Queue {
     };
   }
 
-  public pushUnique(target, method, args, stack) {
+  public pushUnique(target, method, args, stack): IQueueItem {
     let localQueueMap = this.targetQueues.get(target);
 
     if (localQueueMap === undefined) {
