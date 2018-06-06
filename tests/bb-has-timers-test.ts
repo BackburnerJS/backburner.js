@@ -17,6 +17,7 @@ QUnit.test('hasTimers', function(assert) {
     assert.ok(bb.hasTimers(), 'hasTimers checks timers');
 
     bb.cancel(timer);
+
     assert.ok(!bb.hasTimers(), 'Timers are cleared');
 
     timer = bb.debounce(target, 'fn', 200);
