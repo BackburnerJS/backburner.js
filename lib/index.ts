@@ -10,7 +10,8 @@ import {
 import {
   findTimerItem,
   getOnError,
-  isCoercableNumber
+  isCoercableNumber,
+  TIMERS_OFFSET
 } from './backburner/utils';
 
 import searchTimer from './backburner/binary-search';
@@ -642,9 +643,9 @@ export default class Backburner {
   }
 
   private _cancelLaterTimer(timer) {
-    for (let i = 1; i < this._timers.length; i += 6) {
+    for (let i = 1; i < this._timers.length; i += TIMERS_OFFSET) {
       if (this._timers[i] === timer) {
-        this._timers.splice(i - 1, 6);
+        this._timers.splice(i - 1, TIMERS_OFFSET);
         if (i === 0) {
           this._reinstallTimerTimeout();
         }
@@ -691,7 +692,7 @@ export default class Backburner {
     let defaultQueue = this._defaultQueue;
     let n = this._platform.now();
 
-    for (; i < l; i += 6) {
+    for (; i < l; i += TIMERS_OFFSET) {
       let executeAt = timers[i];
       if (executeAt > n) { break; }
       let args = timers[i + 4];

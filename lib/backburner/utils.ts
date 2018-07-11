@@ -1,5 +1,7 @@
 const NUMBER = /\d+/;
 
+export const TIMERS_OFFSET = 6;
+
 export function isCoercableNumber(suspect) {
   let type = typeof suspect;
   return type === 'number' && suspect === suspect || type === 'string' && NUMBER.test(suspect);
