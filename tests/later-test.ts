@@ -4,7 +4,7 @@ import Backburner from 'backburner';
 const originalDateNow = Date.now;
 const originalDateValueOf = Date.prototype.valueOf;
 
-QUnit.module('tests/set-timeout-test', {
+QUnit.module('tests/later', {
   afterEach() {
     Date.now = originalDateNow;
     Date.prototype.valueOf = originalDateValueOf;
