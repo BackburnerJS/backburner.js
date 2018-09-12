@@ -7,6 +7,13 @@ export const enum QUEUE_STATE {
   Pause = 1
 }
 
+export interface IQueueItem {
+  method: string;
+  target: Object;
+  args: Array<Object>;
+  stack: string | undefined;
+}
+
 export default class Queue {
   private name: string;
   private globalOptions: any;
@@ -167,6 +174,30 @@ export default class Queue {
       target,
       method
     };
+  }
+
+  public _getDebugInfo(debugEnabled: boolean): Array<IQueueItem> | undefined {
+    if (debugEnabled) {
+      let queueItems: any[] = this._queue;
+      let debugInfo: Array<IQueueItem> = new Array<IQueueItem>();
+
+      for (let i = 0; i < queueItems.length; i += 4) {
+        let maybeStack: Error | undefined = queueItems[i + 3];
+
+        let queueItem = {
+          target: queueItems[i],
+          method: queueItems[i + 1],
+          args: queueItems[i + 2],
+          stack: typeof maybeStack !== 'undefined' ? maybeStack.stack : ''
+        }
+
+        debugInfo.push(queueItem);
+      }
+
+      return debugInfo;
+    }
+
+    return undefined;
   }
 
   private invoke(target, method, args /*, onError, errorRecordedForStack */) {

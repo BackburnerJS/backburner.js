@@ -546,6 +546,18 @@ export default class Backburner {
     this._ensureInstance();
   }
 
+  public getDebugInfo() {
+    if (this.DEBUG) {
+      return {
+        counters: this.counters,
+        instanceStack: [this.currentInstance, ...this.instanceStack]
+          .map((deferredActionQueue) => deferredActionQueue && deferredActionQueue._getDebugInfo(this.DEBUG))
+      };
+    }
+
+    return undefined;
+  }
+
   private _end(fromAutorun: boolean) {
     let currentInstance = this.currentInstance;
     let nextInstance: DeferredActionQueues | null  = null;

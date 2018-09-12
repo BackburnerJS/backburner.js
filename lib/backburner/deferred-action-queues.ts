@@ -1,4 +1,8 @@
-import Queue, { QUEUE_STATE } from './queue';
+import Queue, { QUEUE_STATE, IQueueItem } from './queue';
+
+export interface IDict {
+  [key: string]: Array<IQueueItem> | undefined
+}
 
 export default class DeferredActionQueues {
   public queues: { [name: string]: Queue } = {};
@@ -70,5 +74,27 @@ export default class DeferredActionQueues {
         }
       }
     }
+  }
+
+  public _getDebugInfo(debugEnabled: boolean): IDict | undefined {
+    if (debugEnabled) {
+      let debugInfo: IDict = {};
+      let queue: Queue;
+      let queueName: string;
+      let numberOfQueues: number = this.queueNames.length;
+      let i: number = 0;
+
+      while (i < numberOfQueues) {
+        queueName = this.queueNames[i];
+        queue = this.queues[queueName];
+
+        debugInfo[queueName] = queue._getDebugInfo(debugEnabled);
+        i++;
+      }
+
+      return debugInfo;
+    }
+
+    return;
   }
 }
