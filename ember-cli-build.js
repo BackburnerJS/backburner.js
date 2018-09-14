@@ -20,78 +20,100 @@ module.exports = function (app) {
     })
   ]);
 
+  const qunit = new Funnel(path.dirname(require.resolve('qunit')), {
+    annotation: 'tests/qunit.{js,css}',
+    destDir: 'tests',
+    files: ['qunit.css', 'qunit.js']
+  });
+
+  const loader = new Funnel(path.dirname(require.resolve('loader.js')), {
+    annotation: 'tests/loader.js',
+    destDir: 'tests',
+    files: ['loader.js']
+  });
+
+  const tests = new Funnel(__dirname + '/tests', {
+    destDir: 'tests',
+    files: ['index.html']
+  });
+
   const compiled = typescript(src, {
     throwOnError: process.env.EMBER_ENV === 'production',
   });
 
+  const compiledDeclarations = typescript('lib', {
+    tsconfig: {
+      compilerOptions: {
+        "declaration": true,
+      }
+    }
+  });
+
   const backburner = new Rollup(compiled, {
+    annotation: 'backburner.js',
     rollup: {
       input: 'lib/index.js',
-      output: {
+      output: [{
         file: 'es6/backburner.js',
         format: 'es',
-        sourcemap: true
-      },
-      format: 'es',
+        sourcemap: true,
+        exports: 'named'
+      }],
       plugins: [
         loadWithInlineMap()
       ]
     }
   });
 
+  const amdNamed = new Rollup(compiled, {
+    rollup: {
+      input: 'lib/index.js',
+      output: [{
+        file: 'named-amd/backburner.js',
+        exports: 'named',
+        format: 'amd',
+        amd: { id: 'backburner' },
+        sourcemap: true
+      }, {
+        file: 'backburner.js',
+        format: 'cjs',
+        sourcemap: true,
+        exports: 'named'
+      }],
+      plugins: [
+        loadWithInlineMap(),
+        buble()
+      ]
+    }
+  });
+
+  const amdTests = new Rollup(compiled, {
+    annotation: 'named-amd/tests.js',
+    rollup: {
+      input: 'tests/index.js',
+      external: ['backburner'],
+      output: [{
+        file: 'named-amd/tests.js',
+        format: 'amd',
+        amd: { id: 'backburner-tests' },
+        sourcemap: true,
+        exports: 'named'
+      }],
+      plugins: [
+        loadWithInlineMap(),
+        buble()
+      ]
+    }
+  });
+
   return new MergeTrees([
     backburner,
-    new Rollup(compiled, {
-      rollup: {
-        input: 'lib/index.js',
-        plugins: [
-          loadWithInlineMap(),
-          buble()
-        ],
-        output: [{
-          file: 'named-amd/backburner.js',
-          exports: 'named',
-          format: 'amd',
-          amd: { id: 'backburner' },
-          sourcemap: true
-        }, {
-          file: 'backburner.js',
-          format: 'cjs',
-          sourcemap: true
-        }]
-      }
-    }),
-    new Rollup(compiled, {
-      annotation: 'named-amd/tests.js',
-      rollup: {
-        input: 'tests/index.js',
-        external: ['backburner'],
-        plugins: [
-          loadWithInlineMap(),
-          buble()
-        ],
-        output: [{
-          file: 'named-amd/tests.js',
-          format: 'amd',
-          amd: { id: 'backburner-tests' },
-          sourcemap: true
-        }]
-      }
-    }),
-    new Funnel(path.dirname(require.resolve('qunit')), {
-      annotation: 'tests/qunit.{js,css}',
-      destDir: 'tests',
-      files: ['qunit.css', 'qunit.js']
-    }),
-    new Funnel(path.dirname(require.resolve('loader.js')), {
-      annotation: 'tests/loader.js',
-      destDir: 'tests',
-      files: ['loader.js']
-    }),
-    new Funnel(__dirname + '/tests', {
-      destDir: 'tests',
-      files: ['index.html']
-    })
+    compiledDeclarations,
+    amdNamed,
+    amdTests,
+    qunit,
+    loader,
+    tests
   ], {
     annotation: 'dist'
   });

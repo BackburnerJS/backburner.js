@@ -1,3 +1,4 @@
+import { IQueueItem } from './interfaces';
 import Queue, { QUEUE_STATE } from './queue';
 
 export default class DeferredActionQueues {
@@ -25,7 +26,7 @@ export default class DeferredActionQueues {
     @param {Any} stack
     @return queue
   */
-  public schedule(queueName: string, target: any, method: any, args: any, onceFlag: boolean, stack: any) {
+  public schedule(queueName: string, target: any, method: any, args: any, onceFlag: boolean, stack: any): IQueueItem {
     let queues = this.queues;
     let queue = queues[queueName];
 

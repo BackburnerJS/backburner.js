@@ -18,9 +18,8 @@ import searchTimer from './backburner/binary-search';
 import DeferredActionQueues from './backburner/deferred-action-queues';
 import iteratorDrain, { Iterable } from './backburner/iterator-drain';
 
+import { IQueueItem, Timer } from './backburner/interfaces';
 import Queue, { QUEUE_STATE } from './backburner/queue';
-
-type Timer = string | number;
 
 const noop = function() {};
 
@@ -372,7 +371,7 @@ export default class Backburner {
     @param {Iterable} an iterable of functions to execute
     @return method result
   */
-  public scheduleIterable(queueName: string, iterable: () => Iterable) {
+  public scheduleIterable(queueName: string, iterable: () => Iterable): IQueueItem {
     scheduleIterableCount++;
     let stack = this.DEBUG ? new Error() : undefined;
     return this._ensureInstance().schedule(queueName, null, iteratorDrain, [iterable], false, stack);
