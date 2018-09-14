@@ -182,13 +182,13 @@ export default class Queue {
       let debugInfo: Array<IQueueItem> = new Array<IQueueItem>();
 
       for (let i = 0; i < queueItems.length; i += 4) {
-        let maybeStack: Error | undefined = queueItems[i + 3];
+        let maybeError: Error | undefined = queueItems[i + 3];
 
         let queueItem = {
           target: queueItems[i],
           method: queueItems[i + 1],
           args: queueItems[i + 2],
-          stack: typeof maybeStack !== 'undefined' ? maybeStack.stack : ''
+          stack: maybeError !== undefined ? maybeError.stack : ''
         }
 
         debugInfo.push(queueItem);
