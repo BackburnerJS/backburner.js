@@ -1,7 +1,7 @@
-import Queue, { QUEUE_STATE, IQueueItem } from './queue';
+import Queue, { IQueueItem , QUEUE_STATE} from './queue';
 
 export interface IDict {
-  [key: string]: Array<IQueueItem> | undefined
+  [key: string]: IQueueItem[] | undefined;
 }
 
 export default class DeferredActionQueues {

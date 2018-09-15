@@ -1,5 +1,5 @@
 import Backburner from 'backburner';
-import MockStableError, { pushStackTrace, overrideError } from './utils/mock-stable-error';
+import MockStableError, { overrideError, pushStackTrace } from './utils/mock-stable-error';
 
 QUnit.module('tests/defer-debug-info', {
   beforeEach: function() {
@@ -43,7 +43,7 @@ QUnit.test('_getDebugInfo returns debugInfo when DEBUG = true', function(assert)
     debugInfo = bb.currentInstance && bb.currentInstance._getDebugInfo(bb.DEBUG);
 
     assert.deepEqual(debugInfo, {
-      'render': [
+      render: [
         {
           target: null,
           method,
@@ -51,7 +51,7 @@ QUnit.test('_getDebugInfo returns debugInfo when DEBUG = true', function(assert)
           stack: renderStack
         }
       ],
-      'afterRender': [
+      afterRender: [
         {
           target: null,
           method,
@@ -62,4 +62,3 @@ QUnit.test('_getDebugInfo returns debugInfo when DEBUG = true', function(assert)
     });
   });
 });
-

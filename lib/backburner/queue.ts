@@ -10,7 +10,7 @@ export const enum QUEUE_STATE {
 export interface IQueueItem {
   method: string;
   target: Object;
-  args: Array<Object>;
+  args: Object[];
   stack: string | undefined;
 }
 
@@ -176,10 +176,10 @@ export default class Queue {
     };
   }
 
-  public _getDebugInfo(debugEnabled: boolean): Array<IQueueItem> | undefined {
+  public _getDebugInfo(debugEnabled: boolean): IQueueItem[] | undefined {
     if (debugEnabled) {
       let queueItems: any[] = this._queue;
-      let debugInfo: Array<IQueueItem> = new Array<IQueueItem>();
+      let debugInfo: IQueueItem[] = [];
 
       for (let i = 0; i < queueItems.length; i += 4) {
         let maybeError: Error | undefined = queueItems[i + 3];
@@ -189,7 +189,7 @@ export default class Queue {
           method: queueItems[i + 1],
           args: queueItems[i + 2],
           stack: maybeError !== undefined ? maybeError.stack : ''
-        }
+        };
 
         debugInfo.push(queueItem);
       }

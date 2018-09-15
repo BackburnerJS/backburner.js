@@ -2,7 +2,7 @@
 const ERROR = Error;
 // @ts-ignore - Skip preventing overriding the readonly Error object
 Error = ERROR;
-let stack: Array<string> = [];
+let stack: string[] = [];
 
 export function pushStackTrace(stackLine: string) {
   stack.push(stackLine);
