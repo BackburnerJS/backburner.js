@@ -10,13 +10,15 @@ export function pushStackTrace(stackLine: string) {
   return stackLine;
 }
 
-export function clearStackTraces() {
-  stacks = [];
-}
-
-export function overrideError(_Error = ERROR) {
+export function overrideError(_Error) {
   // @ts-ignore
   Error = _Error;
+}
+
+export function resetError() {
+  // @ts-ignore
+  Error = ERROR;
+  stacks = [];
 }
 
 export default class MockStableError {

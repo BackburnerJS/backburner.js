@@ -1,5 +1,5 @@
 import Backburner from 'backburner';
-import MockStableError, { overrideError, pushStackTrace, clearStackTraces } from './utils/mock-stable-error';
+import MockStableError, { overrideError, resetError, pushStackTrace } from './utils/mock-stable-error';
 
 QUnit.module('tests/debug-info', {
   beforeEach: function() {
@@ -8,8 +8,7 @@ QUnit.module('tests/debug-info', {
   },
 
   afterEach: function() {
-    overrideError();
-    clearStackTraces();
+    resetError();
   }
 });
 
@@ -35,8 +34,8 @@ QUnit.test('getDebugInfo returns debugInfo when DEBUG = true', function(assert) 
   let method = () => {};
   let arg1 = 1;
   let arg2 = 2;
-  let oneStack = pushStackTrace('One stack');
   let twoStack = pushStackTrace('Two stack');
+  let oneStack = pushStackTrace('One stack');
   let bb = new Backburner(['one', 'two']);
 
   bb.DEBUG = true;
@@ -46,6 +45,8 @@ QUnit.test('getDebugInfo returns debugInfo when DEBUG = true', function(assert) 
     bb.schedule('two', target2, method, arg1, arg2);
 
     debugInfo = bb.currentInstance && bb.getDebugInfo();
+
+    resetError();
 
     assert.deepEqual(debugInfo.instanceStack,
     [
@@ -94,6 +95,8 @@ QUnit.test('getDebugInfo returns debugInfo when DEBUG = true in nested run', fun
       bb.schedule('four', method);
 
       debugInfo = bb.currentInstance && bb.getDebugInfo();
+
+      resetError();
 
       assert.deepEqual(debugInfo.instanceStack,
         [
