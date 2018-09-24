@@ -188,7 +188,7 @@ export default class Queue {
           target: queueItems[i],
           method: queueItems[i + 1],
           args: queueItems[i + 2],
-          stack: maybeError !== undefined ? maybeError.stack : ''
+          stack: maybeError !== undefined && maybeError.stack ? maybeError.stack : ''
         };
 
         debugInfo.push(queueItem);

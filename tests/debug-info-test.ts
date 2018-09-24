@@ -1,5 +1,5 @@
 import Backburner from 'backburner';
-import MockStableError, { overrideError, pushStackTrace } from './utils/mock-stable-error';
+import MockStableError, { overrideError, pushStackTrace, clearStackTraces } from './utils/mock-stable-error';
 
 QUnit.module('tests/debug-info', {
   beforeEach: function() {
@@ -9,6 +9,7 @@ QUnit.module('tests/debug-info', {
 
   afterEach: function() {
     overrideError();
+    clearStackTraces();
   }
 });
 
@@ -29,16 +30,20 @@ QUnit.test('getDebugInfo returns debugInfo when DEBUG = true', function(assert) 
   assert.expect(1);
 
   let debugInfo;
+  let target1 = { one: true };
+  let target2 = { two: true };
   let method = () => {};
-  let twoStack = pushStackTrace('Two stack');
+  let arg1 = 1;
+  let arg2 = 2;
   let oneStack = pushStackTrace('One stack');
+  let twoStack = pushStackTrace('Two stack');
   let bb = new Backburner(['one', 'two']);
 
   bb.DEBUG = true;
 
   bb.run(function() {
-    bb.schedule('one', method);
-    bb.schedule('two', method);
+    bb.schedule('one', target1, method, arg1);
+    bb.schedule('two', target2, method, arg1, arg2);
 
     debugInfo = bb.currentInstance && bb.getDebugInfo();
 
@@ -47,22 +52,93 @@ QUnit.test('getDebugInfo returns debugInfo when DEBUG = true', function(assert) 
       {
         one: [
           {
-            args: undefined,
+            args: [arg1],
             method,
             stack: oneStack,
-            target: null
+            target: target1
           }
         ],
         two: [
           {
-            args: undefined,
+            args: [arg1, arg2],
             method,
             stack: twoStack,
-            target: null
+            target: target2
           }
         ]
       }
     ]
     , 'debugInfo is output');
   });
+});
+
+QUnit.test('getDebugInfo returns debugInfo when DEBUG = true in nested run', function(assert) {
+  assert.expect(1);
+
+  let debugInfo;
+  let method = () => {};
+  let twoStack = pushStackTrace('Two stack');
+  let oneStack = pushStackTrace('One stack');
+  let fourStack = pushStackTrace('Four stack');
+  let threeStack = pushStackTrace('Three stack');
+  let bb = new Backburner(['one', 'two', 'three', 'four']);
+
+  bb.DEBUG = true;
+
+  bb.run(function() {
+    bb.schedule('one', method);
+    bb.schedule('two', method);
+
+    bb.run(function() {
+      bb.schedule('three', method);
+      bb.schedule('four', method);
+
+      debugInfo = bb.currentInstance && bb.getDebugInfo();
+
+      assert.deepEqual(debugInfo.instanceStack,
+        [
+          {
+            four: [
+              {
+                "args": undefined,
+                method,
+                "stack": fourStack,
+                "target": null
+              }
+            ],
+            one: [],
+            three: [
+              {
+                "args": undefined,
+                method,
+                "stack": threeStack,
+                "target": null
+              }
+            ],
+            two: []
+          },
+          {
+            four: [],
+            one: [
+              {
+                "args": undefined,
+                method,
+                "stack": oneStack,
+                "target": null
+              }
+            ],
+            three: [],
+            two: [
+              {
+                "args": undefined,
+                method,
+                "stack": twoStack,
+                "target": null
+              }
+            ]
+          }
+        ]
+      , 'debugInfo is output');
+      });
+    });
 });

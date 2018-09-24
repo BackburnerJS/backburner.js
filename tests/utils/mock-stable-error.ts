@@ -2,12 +2,16 @@
 const ERROR = Error;
 // @ts-ignore - Skip preventing overriding the readonly Error object
 Error = ERROR;
-let stack: string[] = [];
+let stacks: string[] = [];
 
 export function pushStackTrace(stackLine: string) {
-  stack.push(stackLine);
+  stacks.push(stackLine);
 
   return stackLine;
+}
+
+export function clearStackTraces() {
+  stacks = [];
 }
 
 export function overrideError(_Error = ERROR) {
@@ -19,6 +23,6 @@ export default class MockStableError {
   constructor(public message: string) {}
 
   get stack(): string {
-    return stack.pop() || '';
+    return stacks.pop() || '';
   }
 }

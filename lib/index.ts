@@ -546,6 +546,13 @@ export default class Backburner {
     this._ensureInstance();
   }
 
+  /**
+   * Returns debug information related to the current instance of Backburner
+   *
+   * @method getDebugInfo
+   * @returns {Object | undefined} Will return and Object containing debug information if
+   * the DEBUG flag is set to true on the current instance of Backburner, else undefined.
+   */
   public getDebugInfo() {
     if (this.DEBUG) {
       return {

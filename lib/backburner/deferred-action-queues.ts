@@ -1,6 +1,6 @@
 import Queue, { IQueueItem , QUEUE_STATE} from './queue';
 
-export interface IDict {
+export interface IDebugInfo {
   [key: string]: IQueueItem[] | undefined;
 }
 
@@ -19,16 +19,16 @@ export default class DeferredActionQueues {
     }, this.queues);
   }
 
-  /*
-    @method schedule
-    @param {String} queueName
-    @param {Any} target
-    @param {Any} method
-    @param {Any} args
-    @param {Boolean} onceFlag
-    @param {Any} stack
-    @return queue
-  */
+  /**
+   * @method schedule
+   * @param {String} queueName
+   * @param {Any} target
+   * @param {Any} method
+   * @param {Any} args
+   * @param {Boolean} onceFlag
+   * @param {Any} stack
+   * @return queue
+   */
   public schedule(queueName: string, target: any, method: any, args: any, onceFlag: boolean, stack: any) {
     let queues = this.queues;
     let queue = queues[queueName];
@@ -50,10 +50,12 @@ export default class DeferredActionQueues {
     }
   }
 
-  /*
-    @method flush
-    DeferredActionQueues.flush() calls Queue.flush()
-  */
+  /**
+   * DeferredActionQueues.flush() calls Queue.flush()
+   *
+   * @method flush
+   * @param {Boolean} fromAutorun
+   */
   public flush(fromAutorun = false) {
     let queue;
     let queueName;
@@ -76,9 +78,16 @@ export default class DeferredActionQueues {
     }
   }
 
-  public _getDebugInfo(debugEnabled: boolean): IDict | undefined {
+  /**
+   * Returns debug information for the current queues.
+   *
+   * @method _getDebugInfo
+   * @param {Boolean} debugEnabled
+   * @returns {IDebugInfo | undefined}
+   */
+  public _getDebugInfo(debugEnabled: boolean): IDebugInfo | undefined {
     if (debugEnabled) {
-      let debugInfo: IDict = {};
+      let debugInfo: IDebugInfo = {};
       let queue: Queue;
       let queueName: string;
       let numberOfQueues: number = this.queueNames.length;
