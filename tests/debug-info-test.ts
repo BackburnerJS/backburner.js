@@ -1,5 +1,9 @@
 import Backburner from 'backburner';
-import MockStableError, { overrideError, resetError, pushStackTrace } from './utils/mock-stable-error';
+import MockStableError, {
+  overrideError,
+  pushStackTrace,
+  resetError,
+} from './utils/mock-stable-error';
 
 QUnit.module('tests/debug-info', {
   beforeEach: function() {
@@ -25,7 +29,55 @@ QUnit.test('getDebugInfo returns undefined when DEBUG = false', function(assert)
   });
 });
 
-QUnit.test('getDebugInfo returns debugInfo when DEBUG = true', function(assert) {
+QUnit.test('getDebugInfo returns debugInfo using later when DEBUG = true', function(assert) {
+  assert.expect(1);
+
+  let debugInfo;
+  let target1 = { one: true };
+  let target2 = { two: true };
+  let method = () => {};
+  let arg1 = 1;
+  let arg2 = 2;
+  let twoStack = pushStackTrace('Two stack');
+  let oneStack = pushStackTrace('One stack');
+  let bb = new Backburner(['one']);
+
+  bb.DEBUG = true;
+
+  bb.run(function() {
+    bb.later(target1, method, arg1);
+    bb.later(target2, method, arg1, arg2);
+
+    debugInfo = bb.currentInstance && bb.getDebugInfo();
+
+    resetError();
+
+    assert.deepEqual(debugInfo.instanceStack,
+    [
+      {
+        one: [
+          {
+            args: [arg1],
+            method,
+            stack: oneStack,
+            target: target1
+          }
+        ],
+        two: [
+          {
+            args: [arg1, arg2],
+            method,
+            stack: twoStack,
+            target: target2
+          }
+        ]
+      }
+    ]
+    , 'debugInfo is output');
+  });
+});
+
+QUnit.test('getDebugInfo returns debugInfo using when DEBUG = true', function(assert) {
   assert.expect(1);
 
   let debugInfo;
@@ -103,19 +155,19 @@ QUnit.test('getDebugInfo returns debugInfo when DEBUG = true in nested run', fun
           {
             four: [
               {
-                "args": undefined,
+                args: undefined,
                 method,
-                "stack": fourStack,
-                "target": null
+                stack: fourStack,
+                target: null
               }
             ],
             one: [],
             three: [
               {
-                "args": undefined,
+                args: undefined,
                 method,
-                "stack": threeStack,
-                "target": null
+                stack: threeStack,
+                target: null
               }
             ],
             two: []
@@ -124,19 +176,19 @@ QUnit.test('getDebugInfo returns debugInfo when DEBUG = true in nested run', fun
             four: [],
             one: [
               {
-                "args": undefined,
+                args: undefined,
                 method,
-                "stack": oneStack,
-                "target": null
+                stack: oneStack,
+                target: null
               }
             ],
             three: [],
             two: [
               {
-                "args": undefined,
+                args: undefined,
                 method,
-                "stack": twoStack,
-                "target": null
+                stack: twoStack,
+                target: null
               }
             ]
           }

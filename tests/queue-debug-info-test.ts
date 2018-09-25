@@ -1,5 +1,9 @@
 import Backburner from 'backburner';
-import MockStableError, { overrideError, resetError, pushStackTrace } from './utils/mock-stable-error';
+import MockStableError, {
+  overrideError,
+  pushStackTrace,
+  resetError,
+} from './utils/mock-stable-error';
 
 QUnit.module('tests/queue-debug-info', {
   beforeEach: function() {
