@@ -20,7 +20,6 @@ import DeferredActionQueues from './backburner/deferred-action-queues';
 import iteratorDrain, { Iterable } from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
-import { IQueueItem } from './backburner/interfaces';
 
 type Timer = string | number;
 

@@ -1,9 +1,9 @@
+import { IQueueItem } from './interfaces';
 import {
   findItem,
   getOnError,
   getQueueItems
 } from './utils';
-import { IQueueItem } from './interfaces';
 
 export const enum QUEUE_STATE {
   Pause = 1

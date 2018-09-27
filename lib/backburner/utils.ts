@@ -1,4 +1,4 @@
-import { IQueueItem } from "./interfaces";
+import { IQueueItem } from './interfaces';
 
 type MaybeError = Error | undefined;
 

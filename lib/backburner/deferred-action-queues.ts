@@ -1,5 +1,5 @@
-import Queue, { QUEUE_STATE} from './queue';
 import { IQueueItem } from './interfaces';
+import Queue, { QUEUE_STATE } from './queue';
 
 export interface IDebugInfo {
   [key: string]: IQueueItem[] | undefined;
