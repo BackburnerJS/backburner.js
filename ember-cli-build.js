@@ -3,6 +3,8 @@
 const MergeTrees = require('broccoli-merge-trees');
 const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
+const resolve = require('rollup-plugin-node-resolve');
+const commonjs = require('rollup-plugin-commonjs');
 const path = require('path');
 const typescript = require('broccoli-typescript-compiler').default;
 const buble = require('rollup-plugin-buble');
@@ -67,6 +69,9 @@ module.exports = function (app) {
         input: 'tests/index.js',
         external: ['backburner'],
         plugins: [
+          // just used to resolve lolex, which has a malformed `modules` entry point
+          resolve({ module: false, main: true }),
+          commonjs(),
           loadWithInlineMap(),
           buble()
         ],

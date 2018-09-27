@@ -35,7 +35,7 @@ export function buildPlatform(flush: () => void): IPlatform {
 
   return {
     setTimeout(fn, ms) {
-      return SET_TIMEOUT(fn, ms);
+      return setTimeout(fn, ms);
     },
 
     clearTimeout(timerId: number) {

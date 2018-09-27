@@ -1,13 +1,18 @@
 /* tslint:disable:no-shadowed-variable*/
 import Backburner from 'backburner';
+import lolex from 'lolex';
 
 const originalDateNow = Date.now;
 const originalDateValueOf = Date.prototype.valueOf;
 
+let fakeClock;
 QUnit.module('tests/set-timeout-test', {
   afterEach() {
     Date.now = originalDateNow;
     Date.prototype.valueOf = originalDateValueOf;
+    if (fakeClock) {
+      fakeClock.uninstall();
+    }
   }
 });
 
@@ -76,6 +81,9 @@ QUnit.module('later arguments / arity', {
   },
   afterEach() {
     bb = undefined;
+    if (fakeClock) {
+      fakeClock.uninstall();
+    }
   }
 });
 
@@ -373,4 +381,22 @@ QUnit.test('when [callback, string] args passed', function(assert) {
     assert.equal(name, 'batman');
     done();
   }, 'batman', 0);
+});
+
+QUnit.test('can be ran "early" with fake timers GH#351', function(assert) {
+  assert.expect(1);
+  let done = assert.async();
+
+  let bb = new Backburner(['one']);
+
+  fakeClock = lolex.install();
+
+  let startTime = originalDateNow();
+  bb.later(function(name) {
+    let endTime = originalDateNow();
+    assert.ok(endTime - startTime < 100, 'did not wait for 5s to run timer');
+    done();
+  }, 5000);
+
+  fakeClock.tick(5001);
 });
