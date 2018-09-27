@@ -1,18 +1,15 @@
 import {
   findItem,
-  getOnError
+  getOnError,
+  getQueueItems
 } from './utils';
+import { IQueueItem } from './interfaces';
 
 export const enum QUEUE_STATE {
   Pause = 1
 }
 
-export interface IQueueItem {
-  method: string;
-  target: Object;
-  args: Object[];
-  stack: string | undefined;
-}
+const QUEUE_ITEM_LENGTH = 4;
 
 export default class Queue {
   private name: string;
@@ -31,7 +28,7 @@ export default class Queue {
 
   public stackFor(index) {
     if (index < this._queue.length) {
-      let entry = this._queue[index * 3 + 4];
+      let entry = this._queue[index * 3 + QUEUE_ITEM_LENGTH];
       if (entry) {
         return entry.stack;
       } else {
@@ -63,8 +60,8 @@ export default class Queue {
       let onError = getOnError(this.globalOptions);
       invoke = onError ? this.invokeWithOnError : this.invoke;
 
-      for (let i = this.index; i < queueItems.length; i += 4) {
-        this.index += 4;
+      for (let i = this.index; i < queueItems.length; i += QUEUE_ITEM_LENGTH) {
+        this.index += QUEUE_ITEM_LENGTH;
 
         method                = queueItems[i + 1];
         // method could have been nullified / canceled during flush
@@ -124,7 +121,7 @@ export default class Queue {
     let index = findItem(target, method, queue);
 
     if (index > -1) {
-      queue.splice(index, 4);
+      queue.splice(index, QUEUE_ITEM_LENGTH);
       return true;
     }
 
@@ -161,7 +158,7 @@ export default class Queue {
 
     let index = localQueueMap.get(method);
     if (index === undefined) {
-      let queueIndex = this._queue.push(target, method, args, stack) - 4;
+      let queueIndex = this._queue.push(target, method, args, stack) - QUEUE_ITEM_LENGTH;
       localQueueMap.set(method, queueIndex);
     } else {
       let queue = this._queue;
@@ -178,21 +175,7 @@ export default class Queue {
 
   public _getDebugInfo(debugEnabled: boolean): IQueueItem[] | undefined {
     if (debugEnabled) {
-      let queueItems: any[] = this._queue;
-      let debugInfo: IQueueItem[] = [];
-
-      for (let i = 0; i < queueItems.length; i += 4) {
-        let maybeError: Error | undefined = queueItems[i + 3];
-
-        let queueItem = {
-          target: queueItems[i],
-          method: queueItems[i + 1],
-          args: queueItems[i + 2],
-          stack: maybeError !== undefined && 'stack' in maybeError ? maybeError.stack : ''
-        };
-
-        debugInfo.push(queueItem);
-      }
+      let debugInfo: IQueueItem[] = getQueueItems(this._queue, QUEUE_ITEM_LENGTH);
 
       return debugInfo;
     }

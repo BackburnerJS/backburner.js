@@ -10,6 +10,7 @@ import {
 import {
   findTimerItem,
   getOnError,
+  getQueueItems,
   isCoercableNumber,
   TIMERS_OFFSET
 } from './backburner/utils';
@@ -19,6 +20,7 @@ import DeferredActionQueues from './backburner/deferred-action-queues';
 import iteratorDrain, { Iterable } from './backburner/iterator-drain';
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
+import { IQueueItem } from './backburner/interfaces';
 
 type Timer = string | number;
 
@@ -557,6 +559,7 @@ export default class Backburner {
     if (this.DEBUG) {
       return {
         counters: this.counters,
+        timers: getQueueItems(this._timers, TIMERS_OFFSET, 2),
         instanceStack: [this.currentInstance, ...this.instanceStack]
           .map((deferredActionQueue) => deferredActionQueue && deferredActionQueue._getDebugInfo(this.DEBUG))
       };

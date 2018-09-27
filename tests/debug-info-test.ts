@@ -45,32 +45,26 @@ QUnit.test('getDebugInfo returns debugInfo using later when DEBUG = true', funct
   bb.DEBUG = true;
 
   bb.run(function() {
-    bb.later(target1, method, arg1);
-    bb.later(target2, method, arg1, arg2);
+    bb.later(target1, method, arg1, 1000);
+    bb.later(target2, method, arg1, arg2, 1000);
 
     debugInfo = bb.currentInstance && bb.getDebugInfo();
 
     resetError();
 
-    assert.deepEqual(debugInfo.instanceStack,
+    assert.deepEqual(debugInfo.timers,
     [
       {
-        one: [
-          {
-            args: [arg1],
-            method,
-            stack: oneStack,
-            target: target1
-          }
-        ],
-        two: [
-          {
-            args: [arg1, arg2],
-            method,
-            stack: twoStack,
-            target: target2
-          }
-        ]
+        args: [arg1],
+        method,
+        stack: oneStack,
+        target: target1
+      },
+      {
+        args: [arg1, arg2],
+        method,
+        stack: twoStack,
+        target: target2
       }
     ]
     , 'debugInfo is output');
