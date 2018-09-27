@@ -4,7 +4,7 @@ type MaybeError = Error | undefined;
 
 const NUMBER = /\d+/;
 
-enum QueueItemPosition {
+const enum QueueItemPosition {
   target,
   method,
   args,
