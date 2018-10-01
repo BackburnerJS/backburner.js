@@ -1,6 +1,17 @@
 import Backburner from 'backburner';
+import lolex from 'lolex';
 
-QUnit.module('tests/autorun');
+// used to ensure tests for fake timers can reliably use native setTimeout
+const SET_TIMEOUT = setTimeout;
+let fakeClock;
+
+QUnit.module('tests/autorun', {
+  afterEach() {
+    if (fakeClock) {
+      fakeClock.uninstall();
+    }
+  }
+});
 
 QUnit.test('autorun', function(assert) {
   let done = assert.async();
@@ -129,4 +140,25 @@ QUnit.test('autorun interleaved with microtasks do not get dropped [GH#332]', fu
 
     done();
   });
+});
+
+QUnit.test('autorun functions even when using fake timers', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['zomg']);
+  let step = 0;
+
+  assert.ok(!bb.currentInstance, 'The DeferredActionQueues object is lazily instaniated');
+  assert.equal(step++, 0);
+
+  fakeClock = lolex.install();
+  bb.schedule('zomg', null, () => {
+    assert.equal(step++, 2);
+    SET_TIMEOUT(() => {
+      assert.ok(!bb.hasTimers(), 'The all timers are cleared');
+      done();
+    });
+  });
+
+  assert.ok(bb.currentInstance, 'The DeferredActionQueues object exists');
+  assert.equal(step++, 1);
 });

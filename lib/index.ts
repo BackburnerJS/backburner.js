@@ -24,7 +24,6 @@ type Timer = string | number;
 
 const noop = function() {};
 
-const SET_TIMEOUT = setTimeout;
 const DISABLE_SCHEDULE = Object.freeze([]);
 
 function parseArgs(...args: any[]);

@@ -1,6 +1,16 @@
 import Backburner from 'backburner';
+import lolex from 'lolex';
 
-QUnit.module('tests/debounce');
+const DATE_NOW = Date.now;
+let fakeClock;
+
+QUnit.module('tests/debounce', {
+  afterEach() {
+    if (fakeClock) {
+      fakeClock.uninstall();
+    }
+  }
+});
 
 QUnit.test('debounce', function(assert) {
   assert.expect(14);
@@ -575,4 +585,21 @@ QUnit.test('when [callback, string] args passed', function(assert) {
   });
 
   assert.ok(functionWasCalled, 'function was called');
+});
+
+QUnit.test('can be ran "early" with fake timers GH#351', function(assert) {
+  assert.expect(1);
+  let done = assert.async();
+
+  let bb = new Backburner(['one']);
+  fakeClock = lolex.install();
+
+  let startTime = DATE_NOW();
+  bb.debounce(() => {
+    let endTime = DATE_NOW();
+    assert.ok(endTime - startTime < 100, 'executed in less than 5000ms');
+    done();
+  }, 5000);
+
+  fakeClock.tick(5001);
 });
