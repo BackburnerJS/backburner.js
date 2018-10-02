@@ -71,6 +71,90 @@ QUnit.test('getDebugInfo returns debugInfo using later when DEBUG = true', funct
   });
 });
 
+QUnit.test('getDebugInfo returns debugInfo using throttle when DEBUG = true', function(assert) {
+  assert.expect(1);
+
+  let debugInfo;
+  let target1 = { one: true };
+  let target2 = { two: true };
+  let method = () => {};
+  let arg1 = 1;
+  let arg2 = 2;
+  let twoStack = pushStackTrace('Two stack');
+  let oneStack = pushStackTrace('One stack');
+  let bb = new Backburner(['one']);
+
+  bb.DEBUG = true;
+
+  bb.run(function() {
+    bb.throttle(target1, method, arg1, 1000, false);
+    bb.throttle(target2, method, arg1, arg2, 1000, false);
+
+    debugInfo = bb.currentInstance && bb.getDebugInfo();
+
+    resetError();
+
+    assert.deepEqual(debugInfo.timers,
+    [
+      {
+        args: [arg1],
+        method,
+        stack: oneStack,
+        target: target1
+      },
+      {
+        args: [arg1, arg2],
+        method,
+        stack: twoStack,
+        target: target2
+      }
+    ]
+    , 'debugInfo is output');
+  });
+});
+
+QUnit.test('getDebugInfo returns debugInfo using debounce when DEBUG = true', function(assert) {
+  assert.expect(1);
+
+  let debugInfo;
+  let target1 = { one: true };
+  let target2 = { two: true };
+  let method = () => {};
+  let arg1 = 1;
+  let arg2 = 2;
+  let twoStack = pushStackTrace('Two stack');
+  let oneStack = pushStackTrace('One stack');
+  let bb = new Backburner(['one']);
+
+  bb.DEBUG = true;
+
+  bb.run(function() {
+    bb.debounce(target1, method, arg1, 1000);
+    bb.debounce(target2, method, arg1, arg2, 1000);
+
+    debugInfo = bb.currentInstance && bb.getDebugInfo();
+
+    resetError();
+
+    assert.deepEqual(debugInfo.timers,
+    [
+      {
+        args: [arg1],
+        method,
+        stack: oneStack,
+        target: target1
+      },
+      {
+        args: [arg1, arg2],
+        method,
+        stack: twoStack,
+        target: target2
+      }
+    ]
+    , 'debugInfo is output');
+  });
+});
+
 QUnit.test('getDebugInfo returns debugInfo using when DEBUG = true', function(assert) {
   assert.expect(1);
 
