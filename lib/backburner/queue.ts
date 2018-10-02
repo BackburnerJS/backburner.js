@@ -1,11 +1,15 @@
+import { IQueueItem } from './interfaces';
 import {
   findItem,
-  getOnError
+  getOnError,
+  getQueueItems
 } from './utils';
 
 export const enum QUEUE_STATE {
   Pause = 1
 }
+
+const QUEUE_ITEM_LENGTH = 4;
 
 export default class Queue {
   private name: string;
@@ -24,7 +28,7 @@ export default class Queue {
 
   public stackFor(index) {
     if (index < this._queue.length) {
-      let entry = this._queue[index * 3 + 4];
+      let entry = this._queue[index * 3 + QUEUE_ITEM_LENGTH];
       if (entry) {
         return entry.stack;
       } else {
@@ -56,8 +60,8 @@ export default class Queue {
       let onError = getOnError(this.globalOptions);
       invoke = onError ? this.invokeWithOnError : this.invoke;
 
-      for (let i = this.index; i < queueItems.length; i += 4) {
-        this.index += 4;
+      for (let i = this.index; i < queueItems.length; i += QUEUE_ITEM_LENGTH) {
+        this.index += QUEUE_ITEM_LENGTH;
 
         method                = queueItems[i + 1];
         // method could have been nullified / canceled during flush
@@ -117,7 +121,7 @@ export default class Queue {
     let index = findItem(target, method, queue);
 
     if (index > -1) {
-      queue.splice(index, 4);
+      queue.splice(index, QUEUE_ITEM_LENGTH);
       return true;
     }
 
@@ -154,7 +158,7 @@ export default class Queue {
 
     let index = localQueueMap.get(method);
     if (index === undefined) {
-      let queueIndex = this._queue.push(target, method, args, stack) - 4;
+      let queueIndex = this._queue.push(target, method, args, stack) - QUEUE_ITEM_LENGTH;
       localQueueMap.set(method, queueIndex);
     } else {
       let queue = this._queue;
@@ -167,6 +171,16 @@ export default class Queue {
       target,
       method
     };
+  }
+
+  public _getDebugInfo(debugEnabled: boolean): IQueueItem[] | undefined {
+    if (debugEnabled) {
+      let debugInfo: IQueueItem[] = getQueueItems(this._queue, QUEUE_ITEM_LENGTH);
+
+      return debugInfo;
+    }
+
+    return undefined;
   }
 
   private invoke(target, method, args /*, onError, errorRecordedForStack */) {

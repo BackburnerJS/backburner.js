@@ -1,4 +1,15 @@
+import { IQueueItem } from './interfaces';
+
+type MaybeError = Error | undefined;
+
 const NUMBER = /\d+/;
+
+const enum QueueItemPosition {
+  target,
+  method,
+  args,
+  stack
+}
 
 export const TIMERS_OFFSET = 6;
 
@@ -35,4 +46,22 @@ export function findTimerItem(target, method, collection) {
   }
 
   return index;
+}
+
+export function getQueueItems(items: any[], queueItemLength: number, queueItemPositionOffset: number = 0): IQueueItem[] {
+  let queueItems: IQueueItem[] = [];
+
+  for (let i = 0; i < items.length; i += queueItemLength) {
+    let maybeError: MaybeError = items[i + QueueItemPosition.stack + queueItemPositionOffset];
+    let queueItem = {
+      target: items[i + QueueItemPosition.target + queueItemPositionOffset],
+      method: items[i + QueueItemPosition.method + queueItemPositionOffset],
+      args: items[i + QueueItemPosition.args + queueItemPositionOffset],
+      stack: maybeError !== undefined && 'stack' in maybeError ? maybeError.stack : ''
+    };
+
+    queueItems.push(queueItem);
+  }
+
+  return queueItems;
 }

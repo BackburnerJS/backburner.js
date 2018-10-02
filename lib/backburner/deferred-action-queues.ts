@@ -1,4 +1,9 @@
+import { IQueueItem } from './interfaces';
 import Queue, { QUEUE_STATE } from './queue';
+
+export interface IDebugInfo {
+  [key: string]: IQueueItem[] | undefined;
+}
 
 export default class DeferredActionQueues {
   public queues: { [name: string]: Queue } = {};
@@ -15,16 +20,16 @@ export default class DeferredActionQueues {
     }, this.queues);
   }
 
-  /*
-    @method schedule
-    @param {String} queueName
-    @param {Any} target
-    @param {Any} method
-    @param {Any} args
-    @param {Boolean} onceFlag
-    @param {Any} stack
-    @return queue
-  */
+  /**
+   * @method schedule
+   * @param {String} queueName
+   * @param {Any} target
+   * @param {Any} method
+   * @param {Any} args
+   * @param {Boolean} onceFlag
+   * @param {Any} stack
+   * @return queue
+   */
   public schedule(queueName: string, target: any, method: any, args: any, onceFlag: boolean, stack: any) {
     let queues = this.queues;
     let queue = queues[queueName];
@@ -46,10 +51,12 @@ export default class DeferredActionQueues {
     }
   }
 
-  /*
-    @method flush
-    DeferredActionQueues.flush() calls Queue.flush()
-  */
+  /**
+   * DeferredActionQueues.flush() calls Queue.flush()
+   *
+   * @method flush
+   * @param {Boolean} fromAutorun
+   */
   public flush(fromAutorun = false) {
     let queue;
     let queueName;
@@ -70,5 +77,34 @@ export default class DeferredActionQueues {
         }
       }
     }
+  }
+
+  /**
+   * Returns debug information for the current queues.
+   *
+   * @method _getDebugInfo
+   * @param {Boolean} debugEnabled
+   * @returns {IDebugInfo | undefined}
+   */
+  public _getDebugInfo(debugEnabled: boolean): IDebugInfo | undefined {
+    if (debugEnabled) {
+      let debugInfo: IDebugInfo = {};
+      let queue: Queue;
+      let queueName: string;
+      let numberOfQueues: number = this.queueNames.length;
+      let i: number = 0;
+
+      while (i < numberOfQueues) {
+        queueName = this.queueNames[i];
+        queue = this.queues[queueName];
+
+        debugInfo[queueName] = queue._getDebugInfo(debugEnabled);
+        i++;
+      }
+
+      return debugInfo;
+    }
+
+    return;
   }
 }
