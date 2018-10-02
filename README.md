@@ -12,40 +12,33 @@ A priority queue that will efficiently batch, order, reorder and process work; d
 
 ### Constructor
 
-`new Backburner()` - instantiate a Backburner instance with an array of queue names
+|  Constructor | Description  |
+|---|---|
+| `new Backburner()` | instantiate a Backburner instance with an array of queue names |
 
 ### Instance methods
 
-`Backburner#run` - execute the passed function and flush any deferred actions
-
-`Backburner#defer` - defer the passed function to run inside the specified queue
-
-`Backburner#deferOnce` - defer the passed function to run inside the specified queue, only execute it once
-
-`Backburner#setTimeout` - execute the passed function in a specified amount of time
-
-`Backburner#debounce` - execute the passed function in a specified amount of time, reset timer upon additional calls
-
-`Backburner#throttle` - rate-limit the passed function for a specified amount of time
-
-`Backburner#cancel` - cancel a `deferOnce`, `setTimeout`, `debounce` or `throttle`
-
-`Backburner#on` - Add an event callback. Supports the following events:
-
-* `begin` - Fires whenever the runloop begins. Callbacks are passed the current instance and the previous instance.
-* `end` - Fires whenever the runloop ends. Callbacks are passed the current instance and the next instance.
-
-`Backburner#off` - Removes an event callback
-
-`Backburner#join` - Join the passed method with an existing queue and execute immediately, if there isn't one use `Backburner#run`.
+| Method  | Description  |
+|---|---|
+| `Backburner#run` | execute the passed function and flush any deferred actions |
+| `Backburner#defer` | defer the passed function to run inside the specified queue |
+| `Backburner#deferOnce` | defer the passed function to run inside the specified queue, only execute it once |
+| `Backburner#setTimeout` | execute the passed function in a specified amount of time |
+| `Backburner#debounce` | execute the passed function in a specified amount of time, reset timer upon additional calls |
+| `Backburner#throttle` | rate-limit the passed function for a specified amount of time |
+| `Backburner#cancel` | cancel a `deferOnce`, `setTimeout`, `debounce` or `throttle` |
+| `Backburner#on` | Add an event callback. Supports the following events: <br><ul><li>`begin` - Fires whenever the runloop begins. Callbacks are passed the current instance and the previous instance.</li><li>`end` - Fires whenever the runloop ends. Callbacks are passed the current instance and the next instance.</li></ul> |
+| `Backburner#off` | Removes an event callback |
+| `Backburner#join` | Join the passed method with an existing queue and execute immediately, if there isn't one use `Backburner#run` |
+| `Backburner#getDebugInfo` | Returns debug information for counters, timers and queues, which includes surfacing the stack trace information for the respective calls |
 
 #### Alias
 
-`Backburner#schedule` - same as `defer`
-
-`Backburner#scheduleOnce` - same as `deferOnce`
-
-`Backburner#later` - same as `setTimeout`
+| Alias  | Description  |
+|---|---|
+| `Backburner#schedule` | same as `defer` |
+| `Backburner#scheduleOnce` | same as `deferOnce` |
+| `Backburner#later` | same as `setTimeout` |
 
 ## Example usage
 
