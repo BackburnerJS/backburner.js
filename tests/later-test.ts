@@ -74,6 +74,34 @@ QUnit.test('later should rely on stubbed `Date.now`', function(assert) {
   }, 1);
 });
 
+QUnit.test('later shedules timers correctly after time travel', function(assert) {
+  assert.expect(2);
+
+  let bb = new Backburner(['one']);
+  let done = assert.async();
+  let start = originalDateNow();
+  let now = start;
+
+  Date.now = () => now;
+
+  let called1At = 0;
+  let called2At = 0;
+
+  bb.later(() => called1At = originalDateNow(), 1000);
+
+  now += 1000;
+
+  bb.later(() => called2At = originalDateNow(), 10);
+
+  now += 10;
+
+  setTimeout(() => {
+    assert.ok(called1At !== 0, 'timeout 1 was called');
+    assert.ok(called2At !== 0, 'timeout 2 was called');
+    done();
+  }, 20);
+});
+
 let bb;
 QUnit.module('later arguments / arity', {
   beforeEach() {

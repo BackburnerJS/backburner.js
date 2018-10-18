@@ -654,10 +654,8 @@ export default class Backburner {
       let i = searchTimer(executeAt, this._timers);
       this._timers.splice(i, 0, executeAt, id, target, method, args, stack);
 
-      // we should be the new earliest timer if i == 0
-      if (i === 0) {
-        this._reinstallTimerTimeout();
-      }
+      // always reinstall since it could be out of sync
+      this._reinstallTimerTimeout();
     }
     return id;
   }
