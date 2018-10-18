@@ -1,6 +1,6 @@
 {
   "name": "backburner.js",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
   "license": "MIT",
   "author": "Erik Bryn",
