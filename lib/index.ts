@@ -490,8 +490,8 @@ export default class Backburner {
   public debounce(): Timer {
     debounceCount++;
     let [target, method, args, wait, isImmediate = false] = parseDebounceArgs(...arguments);
-
-    let index = findTimerItem(target, method, this._timers);
+    let _timers = this._timers;
+    let index = findTimerItem(target, method, _timers);
 
     let timerId;
     if (index === -1) {
@@ -500,14 +500,24 @@ export default class Backburner {
         this._join(target, method, args);
       }
     } else {
-      let executeAt = this._platform.now() + wait || this._timers[index];
-      this._timers[index] = executeAt;
+      let executeAt = this._platform.now() + wait || _timers[index];
 
       let argIndex = index + 4;
-      if (this._timers[argIndex] !== DISABLE_SCHEDULE) {
-        this._timers[argIndex] = args;
+      if (_timers[argIndex] === DISABLE_SCHEDULE) {
+        args = DISABLE_SCHEDULE;
       }
-      timerId = this._timers[index + 1];
+
+      timerId = _timers[index + 1];
+      let i = searchTimer(executeAt, _timers);
+
+      if ((index + TIMERS_OFFSET) === i) {
+        _timers[index] = executeAt;
+        _timers[argIndex] = args;
+      } else {
+        let stack = this._timers[index + 5];
+        this._timers.splice(i, 0, executeAt, timerId, target, method, args, stack);
+        this._timers.splice(index, TIMERS_OFFSET);
+      }
 
       if (index === 0) {
         this._reinstallTimerTimeout();
