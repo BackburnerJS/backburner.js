@@ -452,3 +452,21 @@ QUnit.test('debounce called before later', function(assert) {
   });
 
  });
+
+QUnit.test('boundRunExpiredTimers is called once when first timer canceled', function(assert) {
+  let done = assert.async(1);
+
+  let bb = new Backburner(['one']);
+
+  let timer = bb.later(function() {}, 500);
+  bb.cancel(timer);
+
+  let boundRunExpiredTimers = bb['_boundRunExpiredTimers'];
+  bb['_boundRunExpiredTimers'] = function() {
+    assert.ok(true);
+    done();
+    return boundRunExpiredTimers.apply(bb, arguments);
+  };
+
+  bb.later(function() {}, 800);
+});
