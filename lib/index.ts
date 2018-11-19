@@ -500,7 +500,7 @@ export default class Backburner {
         this._join(target, method, args);
       }
     } else {
-      let executeAt = this._platform.now() + wait || this._timers[index];
+      let executeAt = this._platform.now() + wait;
       this._timers[index] = executeAt;
 
       let argIndex = index + 4;
