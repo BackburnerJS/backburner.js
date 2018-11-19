@@ -428,3 +428,27 @@ QUnit.test('can be ran "early" with fake timers GH#351', function(assert) {
 
   fakeClock.tick(5001);
 });
+
+QUnit.test('debounce called before later', function(assert) {
+  assert.expect(1);
+
+  let done = assert.async(1);
+  let bb = new Backburner(['one']);
+  let func = function() {};
+
+  bb.run(() => {
+    bb.debounce(func, 1000);
+    setTimeout(function() {
+      bb.debounce(func, 1000);
+    }, 50);
+
+    let before = Date.now();
+
+    bb.later(function() {
+      let diff = Date.now() - before;
+      assert.ok(diff < 1010, '.later called with too much delay');
+      done();
+    }, 1000);
+  });
+
+ });
