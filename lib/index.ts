@@ -500,7 +500,7 @@ export default class Backburner {
         this._join(target, method, args);
       }
     } else {
-      let executeAt = this._platform.now() + wait || _timers[index];
+      let executeAt = this._platform.now() + wait;
 
       let argIndex = index + 4;
       if (_timers[argIndex] === DISABLE_SCHEDULE) {
