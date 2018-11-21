@@ -674,7 +674,7 @@ export default class Backburner {
     for (let i = 1; i < this._timers.length; i += TIMERS_OFFSET) {
       if (this._timers[i] === timer) {
         this._timers.splice(i - 1, TIMERS_OFFSET);
-        if (i === 0) {
+        if (i === 1) {
           this._reinstallTimerTimeout();
         }
         return true;
