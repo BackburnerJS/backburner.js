@@ -211,6 +211,7 @@ export default class Backburner {
   private _boundRunExpiredTimers: () => void;
 
   private _autorun: number | null = null;
+  private _autorunStack: Error | undefined;
   private _boundAutorunEnd: () => void;
   private _defaultQueue: string;
 
@@ -566,6 +567,7 @@ export default class Backburner {
   public getDebugInfo() {
     if (this.DEBUG) {
       return {
+        autorun: this._autorunStack,
         counters: this.counters,
         timers: getQueueItems(this._timers, TIMERS_OFFSET, 2),
         instanceStack: [this.currentInstance, ...this.instanceStack]
@@ -758,6 +760,7 @@ export default class Backburner {
   private _ensureInstance(): DeferredActionQueues {
     let currentInstance = this.currentInstance;
     if (currentInstance === null) {
+      this._autorunStack = this.DEBUG ? new Error() : undefined;
       currentInstance = this.begin();
       this._scheduleAutorun();
     }
