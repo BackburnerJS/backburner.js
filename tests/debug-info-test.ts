@@ -23,7 +23,7 @@ QUnit.test('getDebugInfo returns undefined when DEBUG = false', function(assert)
   let bb = new Backburner(['one']);
 
   bb.run(function() {
-    debugInfo = bb.currentInstance && bb.getDebugInfo();
+    debugInfo = bb.getDebugInfo();
 
     assert.equal(debugInfo, undefined, 'DebugInfo is undefined when DEBUG = false');
   });
@@ -48,7 +48,7 @@ QUnit.test('getDebugInfo returns debugInfo using later when DEBUG = true', funct
     bb.later(target1, method, arg1, 1000);
     bb.later(target2, method, arg1, arg2, 1000);
 
-    debugInfo = bb.currentInstance && bb.getDebugInfo();
+    debugInfo = bb.getDebugInfo();
 
     resetError();
 
@@ -90,7 +90,7 @@ QUnit.test('getDebugInfo returns debugInfo using throttle when DEBUG = true', fu
     bb.throttle(target1, method, arg1, 1000, false);
     bb.throttle(target2, method, arg1, arg2, 1000, false);
 
-    debugInfo = bb.currentInstance && bb.getDebugInfo();
+    debugInfo = bb.getDebugInfo();
 
     resetError();
 
@@ -132,7 +132,7 @@ QUnit.test('getDebugInfo returns debugInfo using debounce when DEBUG = true', fu
     bb.debounce(target1, method, arg1, 1000);
     bb.debounce(target2, method, arg1, arg2, 1000);
 
-    debugInfo = bb.currentInstance && bb.getDebugInfo();
+    debugInfo = bb.getDebugInfo();
 
     resetError();
 
@@ -174,7 +174,7 @@ QUnit.test('getDebugInfo returns debugInfo using when DEBUG = true', function(as
     bb.schedule('one', target1, method, arg1);
     bb.schedule('two', target2, method, arg1, arg2);
 
-    debugInfo = bb.currentInstance && bb.getDebugInfo();
+    debugInfo = bb.getDebugInfo();
 
     resetError();
 
@@ -224,7 +224,7 @@ QUnit.test('getDebugInfo returns debugInfo when DEBUG = true in nested run', fun
       bb.schedule('three', method);
       bb.schedule('four', method);
 
-      debugInfo = bb.currentInstance && bb.getDebugInfo();
+      debugInfo = bb.getDebugInfo();
 
       resetError();
 
@@ -274,4 +274,22 @@ QUnit.test('getDebugInfo returns debugInfo when DEBUG = true in nested run', fun
       , 'debugInfo is output');
       });
     });
+});
+
+QUnit.test('autorun', function(assert) {
+  let done = assert.async();
+  let bb = new Backburner(['one']);
+  let autorunStack = pushStackTrace('Autorun stack');
+  pushStackTrace('Schedule stack');
+
+  bb.DEBUG = true;
+
+  bb.schedule('one', null, () => {
+    setTimeout(() => {
+      assert.equal(bb.getDebugInfo()!.autorun, null);
+      done();
+    });
+  });
+
+  assert.equal(bb.getDebugInfo()!.autorun!.stack, autorunStack);
 });
