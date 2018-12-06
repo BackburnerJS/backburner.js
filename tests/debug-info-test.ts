@@ -286,12 +286,10 @@ QUnit.test('autorun', function(assert) {
 
   bb.schedule('one', null, () => {
     setTimeout(() => {
-      let debugInfo = bb.getDebugInfo();
-      assert.equal(debugInfo!.autorun, null);
+      assert.equal(bb.getDebugInfo()!.autorun, null);
       done();
     });
   });
 
-  let debugInfo = bb.getDebugInfo();
-  assert.equal(debugInfo!.autorun!.stack, autorunStack);
+  assert.equal(bb.getDebugInfo()!.autorun!.stack, autorunStack);
 });
