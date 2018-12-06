@@ -5,10 +5,6 @@ import MockStableError, {
   resetError,
 } from './utils/mock-stable-error';
 
-function getDebugInfo(bb) {
-  return bb.currentInstance && bb.getDebugInfo();
-}
-
 QUnit.module('tests/debug-info', {
   beforeEach: function() {
     // @ts-ignore
@@ -27,7 +23,7 @@ QUnit.test('getDebugInfo returns undefined when DEBUG = false', function(assert)
   let bb = new Backburner(['one']);
 
   bb.run(function() {
-    debugInfo = getDebugInfo(bb);
+    debugInfo = bb.getDebugInfo();
 
     assert.equal(debugInfo, undefined, 'DebugInfo is undefined when DEBUG = false');
   });
@@ -52,7 +48,7 @@ QUnit.test('getDebugInfo returns debugInfo using later when DEBUG = true', funct
     bb.later(target1, method, arg1, 1000);
     bb.later(target2, method, arg1, arg2, 1000);
 
-    debugInfo = getDebugInfo(bb);
+    debugInfo = bb.getDebugInfo();
 
     resetError();
 
@@ -94,7 +90,7 @@ QUnit.test('getDebugInfo returns debugInfo using throttle when DEBUG = true', fu
     bb.throttle(target1, method, arg1, 1000, false);
     bb.throttle(target2, method, arg1, arg2, 1000, false);
 
-    debugInfo = getDebugInfo(bb);
+    debugInfo = bb.getDebugInfo();
 
     resetError();
 
@@ -136,7 +132,7 @@ QUnit.test('getDebugInfo returns debugInfo using debounce when DEBUG = true', fu
     bb.debounce(target1, method, arg1, 1000);
     bb.debounce(target2, method, arg1, arg2, 1000);
 
-    debugInfo = getDebugInfo(bb);
+    debugInfo = bb.getDebugInfo();
 
     resetError();
 
@@ -178,7 +174,7 @@ QUnit.test('getDebugInfo returns debugInfo using when DEBUG = true', function(as
     bb.schedule('one', target1, method, arg1);
     bb.schedule('two', target2, method, arg1, arg2);
 
-    debugInfo = getDebugInfo(bb);
+    debugInfo = bb.getDebugInfo();
 
     resetError();
 
@@ -228,7 +224,7 @@ QUnit.test('getDebugInfo returns debugInfo when DEBUG = true in nested run', fun
       bb.schedule('three', method);
       bb.schedule('four', method);
 
-      debugInfo = getDebugInfo(bb);
+      debugInfo = bb.getDebugInfo();
 
       resetError();
 
@@ -284,16 +280,18 @@ QUnit.test('autorun', function(assert) {
   let done = assert.async();
   let bb = new Backburner(['one']);
   let autorunStack = pushStackTrace('Autorun stack');
+  pushStackTrace('Schedule stack');
 
   bb.DEBUG = true;
 
-  assert.equal(getDebugInfo(bb), undefined);
-
   bb.schedule('one', null, () => {
-    assert.equal(getDebugInfo(bb).autorun.stack, autorunStack);
     setTimeout(() => {
-      assert.equal(getDebugInfo(bb), undefined);
+      let debugInfo = bb.getDebugInfo();
+      assert.equal(debugInfo!.autorun, null);
       done();
     });
   });
+
+  let debugInfo = bb.getDebugInfo();
+  assert.equal(debugInfo!.autorun!.stack, autorunStack);
 });

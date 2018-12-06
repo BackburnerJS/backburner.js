@@ -211,7 +211,7 @@ export default class Backburner {
   private _boundRunExpiredTimers: () => void;
 
   private _autorun: number | null = null;
-  private _autorunStack: Error | undefined;
+  private _autorunStack: Error | undefined | null = null;
   private _boundAutorunEnd: () => void;
   private _defaultQueue: string;
 
@@ -237,6 +237,7 @@ export default class Backburner {
 
       this._autorun = null;
       this._end(true /* fromAutorun */);
+      this._autorunStack = null;
     };
 
     let builder = this.options._buildPlatform || buildPlatform;
@@ -650,6 +651,7 @@ export default class Backburner {
     if (this._autorun !== null) {
       this._platform.clearNext(this._autorun);
       this._autorun = null;
+      this._autorunStack = null;
     }
   }
 
