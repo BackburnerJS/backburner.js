@@ -236,8 +236,8 @@ export default class Backburner {
       if (this._autorun === null) { return; }
 
       this._autorun = null;
-      this._end(true /* fromAutorun */);
       this._autorunStack = null;
+      this._end(true /* fromAutorun */);
     };
 
     let builder = this.options._buildPlatform || buildPlatform;
