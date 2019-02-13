@@ -1,5 +1,6 @@
 import './autorun-test';
 import './bb-has-timers-test';
+import './build-next-test';
 import './cancel-test';
 import './configurable-timeout-test';
 import './debounce-test';

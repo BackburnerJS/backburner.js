@@ -9,29 +9,41 @@ export interface IPlatform {
 const SET_TIMEOUT = setTimeout;
 const NOOP = () => {};
 
-export function buildPlatform(flush: () => void): IPlatform {
-  let next;
-  let clearNext = NOOP;
+export function buildNext(flush: () => void): () => void {
+  // Using "promises first" here to:
+  //
+  // 1) Ensure more consistent experience on browsers that
+  //    have differently queued microtasks (separate queues for
+  //    MutationObserver vs Promises).
+  // 2) Ensure better debugging experiences (it shows up in Chrome
+  //    call stack as "Promise.then (async)") which is more consistent
+  //    with user expectations
+  //
+  // When Promise is unavailable use MutationObserver (mostly so that we
+  // still get microtasks on IE11), and when neither MutationObserver and
+  // Promise are present use a plain old setTimeout.
+  if (typeof Promise === 'function') {
+    const autorunPromise = Promise.resolve();
 
-  if (typeof MutationObserver === 'function') {
+    return () => autorunPromise.then(flush);
+  } else if (typeof MutationObserver === 'function') {
     let iterations = 0;
     let observer = new MutationObserver(flush);
     let node = document.createTextNode('');
     observer.observe(node, { characterData: true });
 
-    next = () => {
+    return () => {
       iterations = ++iterations % 2;
       node.data = '' + iterations;
       return iterations;
     };
-
-  } else if (typeof Promise === 'function') {
-    const autorunPromise = Promise.resolve();
-    next = () => autorunPromise.then(flush);
-
   } else {
-    next = () => SET_TIMEOUT(flush, 0);
+    return () => SET_TIMEOUT(flush, 0);
   }
+}
+
+export function buildPlatform(flush: () => void): IPlatform {
+  let clearNext = NOOP;
 
   return {
     setTimeout(fn, ms) {
@@ -46,7 +58,7 @@ export function buildPlatform(flush: () => void): IPlatform {
       return Date.now();
     },
 
-    next,
+    next: buildNext(flush),
     clearNext,
   };
 }
