@@ -4,6 +4,7 @@ export {
 } from './backburner/platform';
 
 import {
+  buildNext,
   buildPlatform,
   IPlatform,
 } from './backburner/platform';
@@ -153,6 +154,8 @@ export interface IBackburnerOptions {
 
 export default class Backburner {
   public static Queue = Queue;
+  public static buildPlatform = buildPlatform;
+  public static buildNext = buildNext;
 
   public DEBUG = false;
 
