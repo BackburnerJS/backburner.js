@@ -5,6 +5,14 @@ import lolex from 'lolex';
 const SET_TIMEOUT = setTimeout;
 let fakeClock;
 
+function escapeCurrentMicrotaskQueue() {
+  return new Promise((resolve) => {
+    // this ensures that we have been to the end of the current
+    // events microtask queue
+    setTimeout(resolve, 0);
+  });
+}
+
 QUnit.module('tests/autorun', {
   afterEach() {
     if (fakeClock) {
@@ -161,4 +169,154 @@ QUnit.test('autorun functions even when using fake timers', function(assert) {
 
   assert.ok(bb.currentInstance, 'The DeferredActionQueues object exists');
   assert.equal(step++, 1);
+});
+
+QUnit.test('customizing flushing per queue via flush', function(assert) {
+  assert.step('start');
+
+  let deferredFlush;
+
+  let bb = new Backburner(
+    [
+      'zomg',
+      'render',
+      'afterRender'
+    ],
+    {
+      flush(queueName, flush) {
+        if (queueName === 'render') {
+          deferredFlush = flush;
+        } else {
+          flush();
+        }
+      }
+    }
+  );
+
+  bb.schedule('zomg', null, () => {
+    assert.step('running zomg');
+  });
+
+  bb.schedule('render', null, () => {
+    assert.step('running render');
+  });
+
+  bb.schedule('afterRender', null, () => {
+    assert.step('running afterRender');
+  });
+
+  return escapeCurrentMicrotaskQueue()
+    .then(() => {
+      deferredFlush();
+    })
+    .then(escapeCurrentMicrotaskQueue)
+    .then(() => {
+      assert.verifySteps([
+        'start',
+        'running zomg',
+        'running render',
+        'running afterRender',
+      ]);
+    });
+});
+
+QUnit.test('customized flushing - precedence is rechecked upon each flush', function(assert) {
+  assert.step('start');
+
+  let deferredFlush;
+
+  let bb = new Backburner(
+    [
+      'zomg',
+      'render',
+      'afterRender'
+    ],
+    {
+      flush(queueName, flush) {
+        if (deferredFlush === undefined && queueName === 'render') {
+          deferredFlush = flush;
+        } else {
+          flush();
+        }
+      }
+    }
+  );
+
+  bb.schedule('zomg', null, () => {
+    assert.step('running zomg');
+  });
+
+  bb.schedule('render', null, () => {
+    assert.step('running render');
+  });
+
+  bb.schedule('afterRender', null, () => {
+    assert.step('running afterRender');
+  });
+
+  return escapeCurrentMicrotaskQueue()
+    .then(() => {
+      bb.schedule('zomg', null, () => {
+        assert.step('running zomg 2');
+      });
+
+      deferredFlush();
+    })
+    .then(escapeCurrentMicrotaskQueue)
+    .then(() => {
+      assert.verifySteps([
+        'start',
+        'running zomg',
+        'running zomg 2',
+        'running render',
+        'running afterRender',
+      ]);
+    });
+});
+
+QUnit.test('customizing flushing per queue via flush - with forced run', function(assert) {
+  assert.step('start');
+
+  let deferredFlush;
+
+  let bb = new Backburner(
+    [
+      'zomg',
+      'render',
+      'afterRender'
+    ],
+    {
+      flush(queueName, flush) {
+        if (queueName === 'render') {
+          deferredFlush = flush;
+        } else {
+          flush();
+        }
+      }
+    }
+  );
+
+  bb.schedule('zomg', null, () => {
+    assert.step('running zomg');
+  });
+
+  bb.schedule('render', null, () => {
+    assert.step('running render');
+  });
+
+  bb.schedule('afterRender', null, () => {
+    assert.step('running afterRender');
+  });
+
+  return escapeCurrentMicrotaskQueue()
+    .then(() => {
+      bb.run(() => {});
+
+      assert.verifySteps([
+        'start',
+        'running zomg',
+        'running render',
+        'running afterRender',
+      ]);
+    });
 });
