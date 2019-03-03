@@ -99,9 +99,8 @@ QUnit.test('We can use a custom clearTimeout', function(assert) {
         next() {
           return setTimeout(flush, 0);
         },
-        clearNext(timer) {
+        clearNext() {
           customClearTimeoutWasUsed = true;
-          return clearTimeout(timer);
         },
         now() {
           return Date.now();

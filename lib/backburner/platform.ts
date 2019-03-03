@@ -2,7 +2,7 @@ export interface IPlatform {
   setTimeout(fn: Function, ms: number): any;
   clearTimeout(id: any): void;
   next(): any;
-  clearNext(timerId: any): void;
+  clearNext(): void;
   now(): number;
 }
 

@@ -7,9 +7,9 @@ export interface IDebugInfo {
 
 export default class DeferredActionQueues {
   public queues: { [name: string]: Queue } = {};
+  public queueNameIndex = 0;
 
   private queueNames: string[];
-  private queueNameIndex = 0;
 
   constructor(queueNames: string[] = [], options: any) {
     this.queueNames = queueNames;

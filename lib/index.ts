@@ -150,6 +150,7 @@ export interface IBackburnerOptions {
   onErrorMethod?: string;
   mustYield?: () => boolean;
   _buildPlatform?: (flush: () => void) => IPlatform;
+  flush?(queueName: string, flush: () => void): void;
 }
 
 export default class Backburner {
@@ -213,7 +214,7 @@ export default class Backburner {
 
   private _boundRunExpiredTimers: () => void;
 
-  private _autorun: number | null = null;
+  private _autorun = false;
   private _autorunStack: Error | undefined | null = null;
   private _boundAutorunEnd: () => void;
   private _defaultQueue: string;
@@ -236,9 +237,9 @@ export default class Backburner {
       autorunsCompletedCount++;
 
       // if the autorun was already flushed, do nothing
-      if (this._autorun === null) { return; }
+      if (this._autorun === false) { return; }
 
-      this._autorun = null;
+      this._autorun = false;
       this._autorunStack = null;
       this._end(true /* fromAutorun */);
     };
@@ -260,7 +261,7 @@ export default class Backburner {
     let previousInstance = this.currentInstance;
     let current;
 
-    if (this._autorun !== null) {
+    if (this._autorun !== false) {
       current = previousInstance;
       this._cancelAutorun();
     } else {
@@ -540,7 +541,7 @@ export default class Backburner {
   }
 
   public hasTimers() {
-    return this._timers.length > 0 || this._autorun !== null;
+    return this._timers.length > 0 || this._autorun;
   }
 
   public cancel(timer?) {
@@ -601,7 +602,8 @@ export default class Backburner {
         finallyAlreadyCalled = true;
 
         if (result === QUEUE_STATE.Pause) {
-          this._scheduleAutorun();
+          const plannedNextQueue = this.queueNames[currentInstance.queueNameIndex];
+          this._scheduleAutorun(plannedNextQueue);
         } else {
           this.currentInstance = null;
 
@@ -651,9 +653,9 @@ export default class Backburner {
   }
 
   private _cancelAutorun() {
-    if (this._autorun !== null) {
-      this._platform.clearNext(this._autorun);
-      this._autorun = null;
+    if (this._autorun) {
+      this._platform.clearNext();
+      this._autorun = false;
       this._autorunStack = null;
     }
   }
@@ -767,15 +769,23 @@ export default class Backburner {
     if (currentInstance === null) {
       this._autorunStack = this.DEBUG ? new Error() : undefined;
       currentInstance = this.begin();
-      this._scheduleAutorun();
+      this._scheduleAutorun(this.queueNames[0]);
     }
     return currentInstance;
   }
 
-  private _scheduleAutorun() {
+  private _scheduleAutorun(plannedNextQueue: string) {
     autorunsCreatedCount++;
 
     const next = this._platform.next;
-    this._autorun = next();
+    const flush = this.options.flush;
+
+    if (flush) {
+      flush(plannedNextQueue, next);
+    } else {
+      next();
+    }
+
+    this._autorun = true;
   }
 }
