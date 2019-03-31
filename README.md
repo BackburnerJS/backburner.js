@@ -45,25 +45,24 @@ A priority queue that will efficiently batch, order, reorder and process work; d
 The following code will only cause a single DOM manipulation:
 
 ```html
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Backburner demo</title>
   </head>
+
   <body>
+    <div id="name"></div>
 
-   <div id="name"></div>
+    <script type="module">
+      import Backburner from './dist/es6/backburner.js'
 
-    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script src="backburner.js"></script>
-
-    <script>
       var backburner = new Backburner(['render']),
-          person = {name: "Erik"};
+        person = {name: 'Erik'};
 
       function updateName() {
-        $('#name').text(person.name);
+        document.querySelector('#name').innerHTML = person.name;
       }
 
       function setName(name) {
@@ -72,44 +71,11 @@ The following code will only cause a single DOM manipulation:
       }
 
       backburner.run(function() {
-        setName("Kris");
-        setName("Tom");
-        setName("Yehuda");
+        setName('Kris');
+        setName('Tom');
+        setName('Yehuda');
       });
     </script>
   </body>
 </html>
-```
-
-## Simple Backbone Example
-
-```javascript
-app.TodoView = Backbone.View.extend({
-  // ...
-
-  initialize: function () {
-    this.listenTo(this.model, 'change', this.render);
-  },
-
-  render: function() {
-    // put the rerender on the backburner!
-    backburner.deferOnce('render', this, this.actuallyRender);
-  },
-
-  actuallyRender: function() {
-    // do our DOM manipulations here. will only be called once.
-  }
-
-  // ...
-});
-
-
-// ... somewhere in our app code ...
-backburner.run(function() {
-  model.set('firstName', 'Erik');
-  model.set('lastName',  'Bryn');
-});
-
-// our view has been rerendered only once, thanks to backburner!
-
 ```
