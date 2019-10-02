@@ -521,8 +521,13 @@ export default class Backburner {
         _timers[argIndex] = args;
       } else {
         let stack = this._timers[index + 5];
-        this._timers.splice(i, 0, executeAt, timerId, target, method, args, stack);
-        this._timers.splice(index, TIMERS_OFFSET);
+        if (i < index) {
+          this._timers.splice(index, TIMERS_OFFSET);
+          this._timers.splice(i, 0, executeAt, timerId, target, method, args, stack);
+        } else {
+          this._timers.splice(i, 0, executeAt, timerId, target, method, args, stack);
+          this._timers.splice(index, TIMERS_OFFSET);
+        }
       }
 
       if (index === 0) {
