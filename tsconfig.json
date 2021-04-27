@@ -8,6 +8,7 @@
     "inlineSources": true,
     "module": "es2015",
     "strictNullChecks": true,
+    "declaration": true,
     "paths": {
       "backburner": ["lib/index.ts"]
     }

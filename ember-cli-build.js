@@ -9,6 +9,7 @@ const path = require('path');
 const typescript = require('broccoli-typescript-compiler').default;
 const buble = require('rollup-plugin-buble');
 const fs = require('fs');
+const { relative } = require('path');
 
 const SOURCE_MAPPING_DATA_URL = '//# sourceMap' + 'pingURL=data:application/json;base64,';
 
@@ -92,6 +93,18 @@ module.exports = function (app) {
       annotation: 'tests/loader.js',
       destDir: 'tests',
       files: ['loader.js']
+    }),
+    new Funnel(compiled, {
+      destDir: '/',
+      include: ['lib/**/*.d.ts'],
+
+      getDestinationPath: function(relativePath) {
+        let path = relativePath.substring(4); // Slice off lib
+        if (path === 'index.d.ts') {
+          return 'backburner.d.ts';
+        }
+        return path;
+      }
     }),
     new Funnel(__dirname + '/tests', {
       destDir: 'tests',
