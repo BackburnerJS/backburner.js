@@ -73,10 +73,10 @@ QUnit.test('Default queue can be manually configured', function(assert) {
 QUnit.test('onBegin and onEnd are called and passed the correct parameters', function(assert) {
   assert.expect(2);
 
-  let befores: Array<any | null | undefined> = [];
-  let afters: Array<any | null | undefined> = [];
-  let expectedBefores: Array<any | null | undefined> = [];
-  let expectedAfters: Array<any | null | undefined> = [];
+  let befores: (any | null | undefined)[] = [];
+  let afters: (any | null | undefined)[] = [];
+  let expectedBefores: (any | null | undefined)[] = [];
+  let expectedAfters: (any | null | undefined)[] = [];
   let outer: any;
   let inner: any;
 
