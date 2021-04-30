@@ -9,7 +9,6 @@ const path = require('path');
 const typescript = require('broccoli-typescript-compiler').default;
 const buble = require('rollup-plugin-buble');
 const fs = require('fs');
-const { relative } = require('path');
 
 const SOURCE_MAPPING_DATA_URL = '//# sourceMap' + 'pingURL=data:application/json;base64,';
 
