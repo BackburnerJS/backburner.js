@@ -93,6 +93,18 @@ module.exports = function (app) {
       destDir: 'tests',
       files: ['loader.js']
     }),
+    new Funnel(compiled, {
+      destDir: '/',
+      include: ['lib/**/*.d.ts'],
+
+      getDestinationPath: function(relativePath) {
+        let path = relativePath.substring(4); // Slice off lib
+        if (path === 'index.d.ts') {
+          return 'backburner.d.ts';
+        }
+        return path;
+      }
+    }),
     new Funnel(__dirname + '/tests', {
       destDir: 'tests',
       files: ['index.html']

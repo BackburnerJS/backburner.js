@@ -138,7 +138,7 @@ export default class Queue {
     return false;
   }
 
-  public push(target, method, args, stack) {
+  public push(target, method, args, stack): { queue: Queue, target, method } {
     this._queue.push(target, method, args, stack);
 
     return {
@@ -148,7 +148,7 @@ export default class Queue {
     };
   }
 
-  public pushUnique(target, method, args, stack) {
+  public pushUnique(target, method, args, stack): { queue: Queue, target, method } {
     let localQueueMap = this.targetQueues.get(target);
 
     if (localQueueMap === undefined) {

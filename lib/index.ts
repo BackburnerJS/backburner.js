@@ -17,12 +17,16 @@ import {
 } from './backburner/utils';
 
 import searchTimer from './backburner/binary-search';
+
 import DeferredActionQueues from './backburner/deferred-action-queues';
+export type { DeferredActionQueues };
+
 import iteratorDrain, { Iterable } from './backburner/iterator-drain';
+
 
 import Queue, { QUEUE_STATE } from './backburner/queue';
 
-type Timer = string | number;
+export type Timer = string | number;
 
 const noop = function() {};
 

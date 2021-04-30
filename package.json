@@ -5,6 +5,7 @@
   "license": "MIT",
   "author": "Erik Bryn",
   "main": "dist/backburner.js",
+  "types": "dist/backburner.d.ts",
   "jsnext:main": "dist/backburner.js",
   "repository": {
     "type": "git",
