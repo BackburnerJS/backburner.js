@@ -18,6 +18,32 @@ QUnit.test('scheduleOnce', function(assert) {
   });
 });
 
+QUnit.test('cancelling does not affect future scheduleOnce calls', function(assert) {
+  assert.expect(5);
+
+  let bb = new Backburner(['queueName']);
+  const f1Calls: string[] = [];
+  const f2Calls: string[] = [];
+  const f3Calls: string[] = [];
+  const f1 = (arg: string) => f1Calls.push(arg);
+  const f2 = (arg: string) => f2Calls.push(arg);
+  const f3 = (arg: string) => f3Calls.push(arg);
+
+  bb.run(() => {
+    const toCancel = bb.scheduleOnce('queueName', null, f1, "f1 cancelled schedule");
+    bb.scheduleOnce('queueName', null, f2, "f2 first schedule");
+    bb.scheduleOnce('queueName', null, f3, "f3 first schedule");
+    bb.cancel(toCancel);
+    bb.scheduleOnce('queueName', null, f2, "f2 second schedule");
+  });
+
+  assert.equal(f1Calls.length, 0, "f1 was not called")
+  assert.equal(f2Calls.length, 1, "f2 was called once")
+  assert.equal(f3Calls.length, 1, "f3 was called once")
+  assert.deepEqual(f2Calls, ["f2 second schedule"], "f2 received the correct argument")
+  assert.deepEqual(f3Calls, ["f3 first schedule"], "f3 received the correct argument")
+});
+
 QUnit.test('setTimeout', function(assert) {
   assert.expect(5);
   let done = assert.async();
