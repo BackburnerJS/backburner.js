@@ -33,6 +33,7 @@
     "ember-cli-inject-live-reload": "2.0.2",
     "glob": "^7.1.6",
     "loader.js": "^4.7.0",
+    "lodash": "^4.17.21",
     "lolex": "^6.0.0",
     "qunit": "^2.14.1",
     "release-it": "^14.2.1",

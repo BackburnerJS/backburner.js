@@ -15,6 +15,8 @@ if (process.argv[2]) {
   console.log(fileGlob);
 }
 
+globalThis.Backburner = require("../dist/backburner").default;
+
 var suites = [];
 glob.sync(fileGlob).forEach(function(file) {
   var exported = require( path.resolve( file ) );
