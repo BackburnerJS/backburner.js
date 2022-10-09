@@ -2,14 +2,13 @@ import { IQueueItem } from './interfaces';
 import {
   findItem,
   getOnError,
-  getQueueItems
+  getQueueItems,
+  QUEUE_ITEM_LENGTH
 } from './utils';
 
 export const enum QUEUE_STATE {
   Pause = 1
 }
-
-const QUEUE_ITEM_LENGTH = 4;
 
 export default class Queue {
   private name: string;
@@ -28,12 +27,19 @@ export default class Queue {
 
   public stackFor(index) {
     if (index < this._queue.length) {
-      let entry = this._queue[index * 3 + QUEUE_ITEM_LENGTH];
+      let entry = this._queue[(index * QUEUE_ITEM_LENGTH) + 3];
       if (entry) {
         return entry.stack;
       } else {
         return null;
       }
+    }
+  }
+
+  public consoleTaskFor(index, inQueueBeingFlushed = false) {
+    let q = inQueueBeingFlushed ? this._queueBeingFlushed : this._queue;
+    if (index < q.length) {
+      return q[(index * QUEUE_ITEM_LENGTH) + 4];
     }
   }
 
@@ -43,6 +49,7 @@ export default class Queue {
     let method;
     let args;
     let errorRecordedForStack;
+    let consoleTask;
 
     this.targetQueues.clear();
     if (this._queueBeingFlushed.length === 0) {
@@ -84,7 +91,12 @@ export default class Queue {
           target                = queueItems[i];
           args                  = queueItems[i + 2];
           errorRecordedForStack = queueItems[i + 3]; // Debugging assistance
-          invoke(target, method, args, onError, errorRecordedForStack);
+          consoleTask           = queueItems[i + 4];
+          if(consoleTask){
+            consoleTask.run(invoke.bind(this, target, method, args, onError, errorRecordedForStack))
+          }else{
+            invoke(target, method, args, onError, errorRecordedForStack)
+          }
         }
 
         if (this.index !== this._queueBeingFlushed.length &&
@@ -138,8 +150,8 @@ export default class Queue {
     return false;
   }
 
-  public push(target, method, args, stack): { queue: Queue, target, method } {
-    this._queue.push(target, method, args, stack);
+  public push(target, method, args, stack, consoleTask): { queue: Queue, target, method } {
+    this._queue.push(target, method, args, stack, consoleTask);
 
     return {
       queue: this,
@@ -148,7 +160,7 @@ export default class Queue {
     };
   }
 
-  public pushUnique(target, method, args, stack): { queue: Queue, target, method } {
+  public pushUnique(target, method, args, stack, consoleTask): { queue: Queue, target, method } {
     let localQueueMap = this.targetQueues.get(target);
 
     if (localQueueMap === undefined) {
@@ -158,12 +170,13 @@ export default class Queue {
 
     let index = localQueueMap.get(method);
     if (index === undefined) {
-      let queueIndex = this._queue.push(target, method, args, stack) - QUEUE_ITEM_LENGTH;
+      let queueIndex = this._queue.push(target, method, args, stack, consoleTask) - QUEUE_ITEM_LENGTH;
       localQueueMap.set(method, queueIndex);
     } else {
       let queue = this._queue;
       queue[index + 2] = args;  // replace args
       queue[index + 3] = stack; // replace stack
+      queue[index + 3] = consoleTask; // replace consoleTask
     }
 
     return {

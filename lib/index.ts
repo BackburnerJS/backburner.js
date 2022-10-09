@@ -32,6 +32,14 @@ const noop = function() {};
 
 const DISABLE_SCHEDULE = Object.freeze([]);
 
+interface ConsoleWithCreateTask extends Console {
+  createTask(name: string): ConsoleTask;
+}
+
+interface ConsoleTask {
+  run<T>(f: () => T): T;
+}
+
 function parseArgs(...args: any[]);
 function parseArgs() {
   let length = arguments.length;
@@ -163,6 +171,7 @@ export default class Backburner {
   public static buildNext = buildNext;
 
   public DEBUG = false;
+  public ASYNC_STACKS = false;
 
   public currentInstance: DeferredActionQueues | null = null;
 
@@ -371,7 +380,8 @@ export default class Backburner {
     scheduleCount++;
     let [target, method, args] = parseArgs(..._args);
     let stack = this.DEBUG ? new Error() : undefined;
-    return this._ensureInstance().schedule(queueName, target, method, args, false, stack);
+    let consoleTask = this.createTask(queueName, method);
+    return this._ensureInstance().schedule(queueName, target, method, args, false, stack, consoleTask);
   }
 
   /*
@@ -385,7 +395,8 @@ export default class Backburner {
   public scheduleIterable(queueName: string, iterable: () => Iterable) {
     scheduleIterableCount++;
     let stack = this.DEBUG ? new Error() : undefined;
-    return this._ensureInstance().schedule(queueName, null, iteratorDrain, [iterable], false, stack);
+    let consoleTask = this.createTask(queueName, null);
+    return this._ensureInstance().schedule(queueName, null, iteratorDrain, [iterable], false, stack, consoleTask);
   }
 
   /**
@@ -406,7 +417,8 @@ export default class Backburner {
     scheduleOnceCount++;
     let [target, method, args] = parseArgs(..._args);
     let stack = this.DEBUG ? new Error() : undefined;
-    return this._ensureInstance().schedule(queueName, target, method, args, true, stack);
+    let consoleTask = this.createTask(queueName, method);
+    return this._ensureInstance().schedule(queueName, target, method, args, true, stack, consoleTask);
   }
 
   /**
@@ -525,7 +537,8 @@ export default class Backburner {
         _timers[argIndex] = args;
       } else {
         let stack = this._timers[index + 5];
-        this._timers.splice(i, 0, executeAt, timerId, target, method, args, stack);
+        let consoleTask = this._timers[index + 6];
+        this._timers.splice(i, 0, executeAt, timerId, target, method, args, stack, consoleTask);
         this._timers.splice(index, TIMERS_OFFSET);
       }
 
@@ -666,16 +679,17 @@ export default class Backburner {
 
   private _later(target, method, args, wait) {
     let stack = this.DEBUG ? new Error() : undefined;
+    let consoleTask = this.createTask("(timer)", method);
     let executeAt = this._platform.now() + wait;
     let id = UUID++;
 
     if (this._timers.length === 0) {
-      this._timers.push(executeAt, id, target, method, args, stack);
+      this._timers.push(executeAt, id, target, method, args, stack, consoleTask);
       this._installTimerTimeout();
     } else {
       // find position to insert
       let i = searchTimer(executeAt, this._timers);
-      this._timers.splice(i, 0, executeAt, id, target, method, args, stack);
+      this._timers.splice(i, 0, executeAt, id, target, method, args, stack, consoleTask);
 
       // always reinstall since it could be out of sync
       this._reinstallTimerTimeout();
@@ -741,7 +755,8 @@ export default class Backburner {
         let target = timers[i + 2];
         let method = timers[i + 3];
         let stack = timers[i + 5];
-        this.currentInstance!.schedule(defaultQueue, target, method, args, false, stack);
+        let consoleTask = timers[i + 6];
+        this.currentInstance!.schedule(defaultQueue, target, method, args, false, stack, consoleTask);
       }
     }
 
@@ -791,5 +806,13 @@ export default class Backburner {
     }
 
     this._autorun = true;
+  }
+
+  private createTask(queueName, method){
+    if (this.ASYNC_STACKS && console["createTask"]) {
+      return (<ConsoleWithCreateTask>console).createTask(
+        `runloop ${queueName} | ${method?.name || "<anonymous>"}`
+      );
+    }
   }
 }
