@@ -679,7 +679,7 @@ export default class Backburner {
 
   private _later(target, method, args, wait) {
     let stack = this.DEBUG ? new Error() : undefined;
-    let consoleTask = this.createTask("(timer)", method);
+    let consoleTask = this.createTask('(timer)', method);
     let executeAt = this._platform.now() + wait;
     let id = UUID++;
 
@@ -809,9 +809,9 @@ export default class Backburner {
   }
 
   private createTask(queueName, method){
-    if (this.ASYNC_STACKS && console["createTask"]) {
-      return (<ConsoleWithCreateTask>console).createTask(
-        `runloop ${queueName} | ${method?.name || "<anonymous>"}`
+    if (this.ASYNC_STACKS && console['createTask']) {
+      return (console as ConsoleWithCreateTask).createTask(
+        `runloop ${queueName} | ${method?.name || '<anonymous>'}`
       );
     }
   }

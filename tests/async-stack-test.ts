@@ -1,26 +1,26 @@
 import Backburner from 'backburner';
 
-const skipIfNotSupported = !!console["createTask"] ? QUnit.test : QUnit.skip;
+const skipIfNotSupported = !!console['createTask'] ? QUnit.test : QUnit.skip;
 
 QUnit.module('tests/async_stacks');
 
-QUnit.test("schedule - does not affect normal behaviour", function(assert) {
+QUnit.test('schedule - does not affect normal behaviour', function(assert) {
   let bb = new Backburner(['one']);
   let callCount = 0;
 
   bb.run(() => {
-    bb.schedule("one", () => callCount += 1)
-    bb.schedule("one", () => callCount += 1)
+    bb.schedule('one', () => callCount += 1)
+    bb.schedule('one', () => callCount += 1)
   });
-  assert.strictEqual(callCount, 2, "schedule works correctly with ASYNC_STACKS disabled");
+  assert.strictEqual(callCount, 2, 'schedule works correctly with ASYNC_STACKS disabled');
 
   bb.ASYNC_STACKS = true;
 
   bb.run(() => {
-    bb.schedule("one", () => callCount += 1)
-    bb.schedule("one", () => callCount += 1)
+    bb.schedule('one', () => callCount += 1)
+    bb.schedule('one', () => callCount += 1)
   });
-  assert.strictEqual(callCount, 4, "schedule works correctly with ASYNC_STACKS enabled");
+  assert.strictEqual(callCount, 4, 'schedule works correctly with ASYNC_STACKS enabled');
 });
 
 skipIfNotSupported('schedule - ASYNC_STACKS flag enables async stack tagging', function(assert) {
@@ -38,13 +38,13 @@ skipIfNotSupported('schedule - ASYNC_STACKS flag enables async stack tagging', f
   assert.true(!!task?.run, 'consoleTask is stored in queue');
 });
 
-QUnit.test("later - ASYNC_STACKS does not affect normal behaviour", function(assert) {
+QUnit.test('later - ASYNC_STACKS does not affect normal behaviour', function(assert) {
   let bb = new Backburner(['one']);
   let done = assert.async();
   bb.ASYNC_STACKS = true;
 
   bb.later(() => {
-    assert.true(true, "timer called")
+    assert.true(true, 'timer called')
     done()
   });
 });
