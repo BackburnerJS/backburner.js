@@ -121,7 +121,7 @@ export default class Queue {
     let index = findItem(target, method, queue);
 
     if (index > -1) {
-      queue.splice(index, QUEUE_ITEM_LENGTH);
+      queue[index + 1] = null;
       return true;
     }
 
