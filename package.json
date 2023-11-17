@@ -1,6 +1,6 @@
 {
   "name": "backburner.js",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "Backburner.js is a simple run loop-esque library for coalescing actions",
   "repository": {
     "type": "git",

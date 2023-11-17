@@ -1,3 +1,12 @@
+## v2.8.0 (2023-11-17)
+
+#### :bug: Bug Fix
+* [#402](https://github.com/BackburnerJS/backburner.js/pull/402) Ensure `scheduleOnce` works correctly following a cancelled job ([@davidtaylorhq](https://github.com/davidtaylorhq))
+
+#### Committers: 1
+- David Taylor ([@davidtaylorhq](https://github.com/davidtaylorhq))
+
+
 ## v2.7.0 (2021-04-30)
 
 #### :rocket: Enhancement
