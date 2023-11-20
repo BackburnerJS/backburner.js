@@ -550,6 +550,7 @@ export default class Backburner {
 
   public cancel(timer?) {
     cancelCount++;
+
     if (timer === null || timer === undefined) { return false; }
     let timerType = typeof timer;
 
@@ -719,11 +720,9 @@ export default class Backburner {
 
   private _runExpiredTimers() {
     this._timerTimeoutId = null;
-    if (this._timers.length > 0) {
-      this.begin();
-      this._scheduleExpiredTimers();
-      this.end();
-    }
+    this.begin();
+    this._scheduleExpiredTimers();
+    this.end();
   }
 
   private _scheduleExpiredTimers() {
