@@ -89,8 +89,8 @@ module.exports = function (app) {
       files: ['qunit.css', 'qunit.js']
     }),
     new Funnel(path.dirname(require.resolve('loader.js')), {
-      annotation: 'tests/loader.js',
-      destDir: 'tests',
+      annotation: 'loader.js',
+      destDir: '',
       files: ['loader.js']
     }),
     new Funnel(compiled, {
@@ -108,7 +108,35 @@ module.exports = function (app) {
     new Funnel(__dirname + '/tests', {
       destDir: 'tests',
       files: ['index.html']
-    })
+    }),
+    new Funnel(__dirname + "/bench", {
+      destDir: "bench",
+      files: ["index.html"],
+    }),
+    new Rollup(__dirname + "/bench", {
+      rollup: {
+        treeshake: false,
+        input: "browser-bench.js",
+        external: ["backburner"],
+        plugins: [
+          resolve(),
+          commonjs(),
+          loadWithInlineMap(),
+        ],
+        output: [
+          {
+            file: "bench/browser-bench.js",
+            format: "amd",
+            amd: { id: "browser-bench" },
+            sourcemap: true,
+          },
+        ],
+      },
+    }),
+    new Funnel(path.dirname(require.resolve("lodash")), {
+      destDir: "bench",
+      files: ["lodash.js"],
+    }),
   ], {
     annotation: 'dist'
   });

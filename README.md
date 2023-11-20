@@ -75,3 +75,17 @@ The following code will only cause a single DOM manipulation:
   </body>
 </html>
 ```
+
+## Benchmarks
+
+The `/bench` directory includes a number of performance benchmarks.
+
+To run in `node`:
+
+```bash
+yarn ember build
+node ./bench/index.js # (all benchmarks)
+node ./bench/index.js ./bench/benches/some-file.js # (specific benchmark)
+```
+
+Or to run in a browser, run `yarn ember server`, and visit `http://localhost:4200` in a browser. Be aware that having the developer tools open/closed can affect JS performance.
