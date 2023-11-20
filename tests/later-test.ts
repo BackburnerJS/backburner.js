@@ -56,6 +56,30 @@ QUnit.test('later', function(assert) {
   }, 20);
 });
 
+QUnit.test('debounce with later', function(assert) {
+  assert.expect(3);
+  let done = assert.async(2);
+  let bb = new Backburner(['batman']);
+
+  function debounceFunc(obj) {
+    assert.notOk(obj.isFoo, 'debounce called with foo');
+    assert.ok(obj.isBar, 'debounce called with bar');
+    done();
+  }
+
+  function laterFunc() {
+    assert.ok(true, 'later called');
+    done();
+  }
+
+  const foo = { isFoo: true };
+  const bar = { isBar: true };
+
+  bb.debounce(debounceFunc, foo, 500);
+  bb.later(laterFunc, 100);
+  bb.debounce(debounceFunc, bar, 10);
+});
+
 QUnit.test('later should rely on stubbed `Date.now`', function(assert) {
   assert.expect(1);
 
