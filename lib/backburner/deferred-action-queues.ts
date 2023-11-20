@@ -15,7 +15,7 @@ export default class DeferredActionQueues {
     this.queueNames = queueNames;
 
     queueNames.reduce(function(queues, queueName) {
-      queues[queueName] = new Queue(queueName, options[queueName], options);
+      queues[queueName] = new Queue(queueName, options);
       return queues;
     }, this.queues);
   }
