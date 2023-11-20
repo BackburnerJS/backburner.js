@@ -11,7 +11,8 @@ const enum QueueItemPosition {
   stack
 }
 
-export const TIMERS_OFFSET = 6;
+export const QUEUE_ITEM_LENGTH = 5;
+export const TIMERS_OFFSET = 7;
 
 export function isCoercableNumber(suspect) {
   let type = typeof suspect;
@@ -25,7 +26,7 @@ export function getOnError(options) {
 export function findItem(target, method, collection) {
   let index = -1;
 
-  for (let i = 0, l = collection.length; i < l; i += 4) {
+  for (let i = 0, l = collection.length; i < l; i += QUEUE_ITEM_LENGTH) {
     if (collection[i] === target && collection[i + 1] === method) {
       index = i;
       break;
@@ -38,7 +39,7 @@ export function findItem(target, method, collection) {
 export function findTimerItem(target, method, collection) {
   let index = -1;
 
-  for (let i = 2, l = collection.length; i < l; i += 6) {
+  for (let i = 2, l = collection.length; i < l; i += TIMERS_OFFSET) {
     if (collection[i] === target && collection[i + 1] === method) {
       index = i - 2;
       break;

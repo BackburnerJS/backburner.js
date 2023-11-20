@@ -8,6 +8,15 @@ function prodSetup() {
   };
 }
 
+function asyncStackSetup() {
+  var backburner = new this.Backburner(["sync", "actions", "routerTransitions", "render", "afterRender", "destroy", "rsvpAfter"]);
+  backburner.ASYNC_STACKS = true;
+
+  var target = {
+    someMethod: function() { }
+  };
+}
+
 function debugSetup() {
   var backburner = new this.Backburner(["sync", "actions", "routerTransitions", "render", "afterRender", "destroy", "rsvpAfter"]);
   backburner.DEBUG = true;
@@ -75,6 +84,13 @@ base.forEach(item => {
   let prodItem = Object.assign({}, item);
   prodItem.setup = prodSetup;
   scenarios.push(prodItem);
+});
+
+base.forEach(item => {
+  let debugItem = Object.assign({}, item);
+  debugItem.name = `ASYNC_STACKS - ${debugItem.name}`;
+  debugItem.setup = asyncStackSetup;
+  scenarios.push(debugItem);
 });
 
 base.forEach(item => {

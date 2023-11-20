@@ -1,3 +1,4 @@
+import './async-stack-test';
 import './autorun-test';
 import './bb-has-timers-test';
 import './build-next-test';

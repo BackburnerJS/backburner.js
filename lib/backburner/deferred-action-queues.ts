@@ -30,7 +30,7 @@ export default class DeferredActionQueues {
    * @param {Any} stack
    * @return queue
    */
-  public schedule(queueName: string, target: any, method: any, args: any, onceFlag: boolean, stack: any) {
+  public schedule(queueName: string, target: any, method: any, args: any, onceFlag: boolean, stack: any, consoleTask: any) {
     let queues = this.queues;
     let queue = queues[queueName];
 
@@ -45,9 +45,9 @@ export default class DeferredActionQueues {
     this.queueNameIndex = 0;
 
     if (onceFlag) {
-      return queue.pushUnique(target, method, args, stack);
+      return queue.pushUnique(target, method, args, stack, consoleTask);
     } else {
-      return queue.push(target, method, args, stack);
+      return queue.push(target, method, args, stack, consoleTask);
     }
   }
 
